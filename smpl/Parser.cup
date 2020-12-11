@@ -1,0 +1,211 @@
+import java_cup.runtime.*;
+import java.io.*;
+import java.util.*;
+
+/* Preliminaries to set up and use the scanner.  */
+parser code {:
+		Lexer lexer;
+
+		public ArithParser(Lexer l) {
+		    // As of CUP v0.11, need to pass Lexer to superclass
+		    super(l);
+		    lexer = l;
+		}
+
+		public void report_error(String message, Object info) {
+		    System.err.println(message);
+		}
+
+		public void syntax_error(Symbol cur_token) {
+		    System.err.print("Line " + lexer.getLine() +
+				     " near char " + lexer.getChar() + ": ");
+		    report_error("Syntax error", cur_token);
+		    System.err.println ("Last token read is " +
+					 lexer.getText());
+		}
+	    :};
+
+init with {:
+	  :};
+
+scan with {:
+		try {
+		    return lexer.next_token();
+		} catch (java.io.IOException ioe) {
+		    System.out.println("Line " + lexer.getLine() + ", pos " +
+				       lexer.getChar() +
+				       ": Unrecognised token");
+		    System.out.println(ioe.getMessage());
+		    throw ioe;
+		}
+	  :};
+
+/* Terminals (tokens returned by the scanner). */
+// keywords
+terminal FUN, IF, THEN, ELSE;
+
+// special symbols
+terminal LPAREN, RPAREN, SEMI, LBRACE, RBRACE, BIND, COMMA;
+
+// arithmetic operators
+terminal PLUS, MINUS, MUL, DIV, MOD, ASSIGN;
+
+// comparators
+terminal LESS, LESSEQ, EQUAL, GREATEREQ, GREATER, NEQUAL;
+
+// boolean operators
+terminal AND, OR, NOT;
+
+// terminals with values
+terminal Integer INT;
+terminal String VAR;
+
+/* Non terminals */
+non terminal ArithProgram program;
+non terminal StmtSequence stmtList;
+non terminal Statement stmt;
+non terminal StmtDefinition definition;
+
+non terminal StmtFunDefn funDefn;
+non terminal ArrayList<String> paramList;
+non terminal ArrayList<String> paramListE;
+
+non terminal ExpIf ifStmt;
+non terminal Exp else;
+non terminal StmtSequence conditionalBlock;
+
+non terminal Exp expression;
+non terminal Exp and;
+non terminal Exp not;
+
+non terminal Exp comparator;
+
+non terminal ExpFunCall funCall;
+non terminal ArrayList<Exp> argList;
+non terminal ArrayList<Exp> argListE;
+
+non terminal Exp arithExp;
+non terminal Exp term;
+non terminal Exp factor;
+non terminal empty;
+
+/* Grammar rules */
+
+program ::= stmtList:s {: RESULT = new ArithProgram(s); :};
+
+stmtList ::= stmtList:lst stmt:s {:
+		lst.add(s); 
+		RESULT = lst;
+		:} |
+	     stmt:s {:
+		RESULT = new StmtSequence(s);
+		:};
+
+stmt ::= definition:d {: RESULT = d; :} |
+	 funDefn:funDef {: RESULT = funDef; :} |
+	 expression:e SEMI {: RESULT = new Statement(e); :} |
+	 ifStmt:i {: RESULT = new Statement(i); :};
+
+
+funDefn ::= FUN VAR:v LPAREN paramListE:pListE RPAREN BIND expression:e SEMI {:
+				RESULT = new StmtFunDefn(v, pListE, e); :} |
+			FUN VAR:v LPAREN paramListE:pListE RPAREN BIND LBRACE stmtList:sList RBRACE {:
+				RESULT = new StmtFunDefn(v, pListE, sList); :};
+
+paramList ::=  paramList:pList COMMA VAR:v {:
+					pList.add(v);
+					RESULT = pList; :} |
+				VAR:v {: ArrayList<String> pList = new ArrayList<String>();
+					pList.add(v);
+					RESULT = pList;
+				:};
+
+paramListE ::= paramList:pList {: RESULT = pList; :} |
+				empty {: RESULT = new ArrayList<String>(); :};
+
+
+funCall ::= VAR:v LPAREN argListE:aListE RPAREN {:
+				RESULT = new ExpFunCall(v, aListE); :};
+
+argList ::= argList:aList COMMA expression:e {:
+				aList.add(e);
+				RESULT = aList; :} |
+			expression:e {: ArrayList<Exp> aList = new ArrayList<Exp>();
+					aList.add(e);
+					RESULT = aList;
+			:};
+
+argListE ::= argList:aList {: RESULT = aList; :} |
+			empty {: RESULT = new ArrayList<Exp>(); :};
+
+
+definition ::= VAR:v ASSIGN expression:e SEMI {:
+					RESULT = new StmtDefinition(v, e); :} |
+				VAR:v ASSIGN ifStmt:i {:
+					RESULT = new StmtDefinition(v, i); :};
+
+
+ifStmt	::=	IF expression:e THEN expression:conseq SEMI else:alt {:
+				RESULT = new ExpIf(e, conseq, alt); :} |
+			IF expression:e THEN LBRACE conditionalBlock:conseq expression:end SEMI RBRACE else:alt {:
+				conseq.add(new Statement(end));
+				RESULT = new ExpIf(e, conseq, alt); :};
+
+else  ::= ELSE expression:alt SEMI {: RESULT = alt; :} |
+			ELSE LBRACE conditionalBlock:alt expression:end SEMI RBRACE {:
+				alt.add(new Statement(end));
+				RESULT = alt; :} |
+			empty {: RESULT = new ExpLit(Integer.MAX_VALUE); :};
+
+conditionalBlock ::= conditionalBlock:c stmt:s {:
+						c.add(s);
+						RESULT = c; :} |
+					empty {: RESULT = new StmtSequence(); :};
+
+
+expression ::= expression:e OR and:a {: RESULT = new ExpOr(e, a); :} |
+				and:a {: RESULT = a; :};
+
+and ::= and:a AND not:n {: RESULT = new ExpAnd(a, n); :} |
+		not:n {: RESULT = n; :};
+
+not ::= NOT comparator:c {: RESULT = new ExpNot(c); :} |
+		comparator:c {: RESULT = c; :};
+
+comparator ::= comparator:c LESS arithExp:a {:
+					RESULT = new ExpLess(c, a); :} |
+				comparator:c LESSEQ arithExp:a {:
+					RESULT = new ExpLessEq(c, a); :} |
+				comparator:c EQUAL arithExp:a {:
+					RESULT = new ExpEqual(c, a); :} |
+				comparator:c GREATEREQ arithExp:a {:
+					RESULT = new ExpGreaterEq(c, a); :} |
+				comparator:c GREATER arithExp:a {:
+					RESULT = new ExpGreater(c, a); :} |
+				comparator:c NEQUAL arithExp:a {:
+					RESULT = new ExpNotEqual(c, a); :} |
+				arithExp:a {:
+					RESULT = a; :};
+
+arithExp ::= arithExp:a PLUS term:t {:
+			RESULT = new ExpAdd(a, t); :} |
+		arithExp:a MINUS term:t {:
+			RESULT = new ExpSub(a, t); :} |
+		term:t {:
+			RESULT = t; :};
+
+term ::= term:t MUL factor:f {:
+		RESULT = new ExpMul(t, f); :} |
+	 term:t DIV factor:f {:
+		RESULT = new ExpDiv(t, f); :} |
+	 term:t MOD factor:f {:
+		RESULT = new ExpMod(t, f); :} |
+	 factor:f {:
+	 	RESULT = f; :};
+
+factor ::= INT:ilit {: RESULT = new ExpLit(ilit); :} |
+	   funCall:fCall {: RESULT = fCall; :} |
+	   VAR:var {: RESULT = new ExpVar(var); :} |
+	   LPAREN expression:e RPAREN {: RESULT = e; :}	;
+
+empty ::= ;

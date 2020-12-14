@@ -137,16 +137,18 @@ hex = [0-9A-Fa-f]
 
 
 <YYINITIAL>    [-]{0-1}[0-9]+ {return new Symbol(sym.INT, new Integer(yytext()));}
-<YYINITIAL>    "#x"{hex}+ {
-			int i = Integer.parseInt(yytext().substring(2), 16);
+<YYINITIAL>    [-]{01}"#x"{hex}+ {
+			String I = yytext().replaceFirst("#x", "");
+			int i = Integer.parseInt(I, 16);
 			return new Symbol(sym.INT, new Integer(i));
 		}
-<YYINITIAL>    "#b"[01]+ {
-			int i = Integer.parseInt(yytext().substring(2), 2);
+<YYINITIAL>    [-]{01}"#b"[01]+ {
+			String I = yytext().replaceFirst("#b", "");
+			int i = Integer.parseInt(I, 2);
 			return new Symbol(sym.INT, new Integer(i));
 		}
 
-<YYINITIAL>    ([0-9]+\.[0-9]+) | (\.[0-9]+) | ([0-9]+\.) {
+<YYINITIAL>    [-]{01}[([0-9]+\.[0-9]+) | (\.[0-9]+) | ([0-9]+\.)] {
 			// DOUBLE
 	    	return new Symbol(sym.DOUBLE, new Double(yytext()));
 		}

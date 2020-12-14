@@ -239,14 +239,46 @@ public class ToScheme implements Visitor<Void, String> {
 	}
 	}
 
-    public String visitExpLit(ExpLit exp, Void arg)
-	throws VisitException{
-	return "" + exp.getVal();
-    }
 
     public String visitExpVar(ExpVar exp, Void arg)
 	throws VisitException {
 	return exp.getVar();
     }
+
+
+	public String visitSmplInt(SmplInt exp, Void arg)
+	throws VisitException{
+	return exp.tostring();
+	}
+	public String visitSmplDouble(SmplDouble exp, Void arg)
+	throws VisitException{
+	return exp.tostring();
+	}
+	public String visitSmplString(SmplString exp, Void arg)
+	throws VisitException{
+	return exp.tostring();
+	}
+	public String visitSmplChar(SmplChar exp, Void arg)
+	throws VisitException{
+	return exp.tostring();
+	}
+	public String visitSmplBool(SmplBool exp, Void arg)
+	throws VisitException{
+	return exp.tostring();
+	}
+	public String visitSmplPair(SmplPair exp, Void arg)
+	throws VisitException{
+	return exp.tostring();
+	}
+	public String visitSmplVector(SmplVector exp, Void arg)
+	throws VisitException{
+	return exp.tostring();
+	}
+
+
+	public String visitSmplNone(SmplNone exp, Void arg)
+	throws VisitException{
+	return exp.toString();
+	}
 
 }

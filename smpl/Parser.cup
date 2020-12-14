@@ -145,7 +145,7 @@ definition ::= VAR:v ASSIGN expression:e SEMI {:
 					RESULT = new StmtDefinition(v, i); :};
 
 
-ifStmt	::=	IF expression:e THEN expression:conseq SEMI else:alt {:
+ifStmt	::=	IF expression:e THEN expression:conseq else:alt {:
 				RESULT = new ExpIf(e, conseq, alt); :} |
 			IF expression:e THEN LBRACE conditionalBlock:conseq expression:end SEMI RBRACE else:alt {:
 				conseq.add(new Statement(end));
@@ -155,7 +155,7 @@ else  ::= ELSE expression:alt SEMI {: RESULT = alt; :} |
 			ELSE LBRACE conditionalBlock:alt expression:end SEMI RBRACE {:
 				alt.add(new Statement(end));
 				RESULT = alt; :} |
-			empty {: RESULT = new ExpLit(Integer.MAX_VALUE); :};
+			SEMI {: RESULT = new SmplNone; :};
 
 conditionalBlock ::= conditionalBlock:c stmt:s {:
 						c.add(s);

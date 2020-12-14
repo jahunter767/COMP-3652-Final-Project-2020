@@ -41,6 +41,15 @@ public interface Visitor<S, T> {
     public T visitExpGreater(ExpGreater exp, S arg) throws VisitException;
     public T visitExpNotEqual(ExpNotEqual exp, S arg) throws VisitException;
 
-    public T visitExpLit(ExpLit exp, S arg) throws VisitException;
     public T visitExpVar(ExpVar exp, S arg) throws VisitException;
+
+    public T visitSmplInt(SmplInt exp, S arg) throws VisitException;
+    public T visitSmplDouble(SmplDouble exp, S arg) throws VisitException;
+    public T visitSmplString(SmplString exp, S arg) throws VisitException;
+    public T visitSmplChar(SmplChar exp, S arg) throws VisitException;
+    public T visitSmplBool(SmplBool exp, S arg) throws VisitException;
+    public T visitSmplPair(SmplPair exp, S arg) throws VisitException;
+    public T visitSmplVector(SmplVector exp, S arg) throws VisitException;
+
+    public T visitSmplNone(SmplNone exp, S arg) throws VisitException;
 }

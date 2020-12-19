@@ -46,8 +46,8 @@ import java_cup.runtime.*;
 
 %debug
 
-%states YYSTRING
-%xstates CHAR_ESCAPE
+%state STRING
+%state CHAR_ESCAPE
 
 nl = [\n\r]
 
@@ -57,11 +57,13 @@ ws = {cc}|[\t ]
 
 alpha = [a-zA-Z_]
 
-alphanum = {alpha}|[0-9]
+alphanum = {alpha}|[0-9] 
 
-special = [\?!-\*/%\^&\+|~@]
+special = [\?!-\*/%\^&\+|~@] | {ws}
 
 allChar = {alphanum}|{special}
+
+reserved = [substr,size]
 
 hex = [0-9A-Fa-f]
 
@@ -110,6 +112,8 @@ hex = [0-9A-Fa-f]
 <YYINITIAL>	"]"	{return new Symbol(sym.RSQPAREN);}
 
 <YYINITIAL>	"proc"	{return new Symbol(sym.PROC);}
+<YYINITIAL>	"def"	{return new Symbol(sym.DEF);}
+
 
 <YYINITIAL> "if" {return new Symbol(sym.IF);}
 <YYINITIAL> "then" {return new Symbol(sym.THEN);}
@@ -143,13 +147,18 @@ hex = [0-9A-Fa-f]
 			return new Symbol(sym.CHAR, new Character(c[0]));
 		}
 
-<YYINITIAL>    {allChar}*{alpha}{allChar}* {
+
+
+<YYINITIAL>	"\""{allChar}*"\"" 	{return new Symbol(sym.STRING, yytext());}
+
+<YYINITIAL>    {alpha}{alphanum}* {
 	       // VAR
 	       return new Symbol(sym.VAR, yytext());
 		}
 
 
 <YYINITIAL>    [-]{0,1}[0-9]+ {return new Symbol(sym.INT, new Integer(yytext()));}
+
 <YYINITIAL>    [-]{0,1}"#x"{hex}+ {
 			String I = yytext().replaceFirst("#x", "");
 			int i = Integer.parseInt(I, 16);
@@ -168,20 +177,8 @@ hex = [0-9A-Fa-f]
 		}
 
 
-<YYINITIAL>	\"	{yybegin(YYSTRING);
-                 return new Symbol(sym.OPEN_QUOTE);}
-<YYSTRING> {
-	\\	{yybegin(CHAR_ESCAPE);}
-	<CHAR_ESCAPE>	\\	{yybegin(YYSTRING);
-                         return new Symbol(sym.BACKSLASH);}
-	<CHAR_ESCAPE>	n	{yybegin(YYSTRING);
-                         return new Symbol(sym.NEWLINE);}
-	<CHAR_ESCAPE>	t	{yybegin(YYSTRING);
-                         return new Symbol(sym.TAB);}
-	~[\"\\]*	{return new Symbol(sym.STRING, yytext());}
-	\"	{yybegin(YYINITIAL);
-        	return new Symbol(sym.CLOSE_QUOTE);}
-}
+
+
 <YYINITIAL>    \S		{ // error situation
 	       String msg = String.format("Unrecognised Token: %s", yytext());
 	       throw new TokenException(msg);

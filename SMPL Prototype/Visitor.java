@@ -17,9 +17,10 @@ public interface Visitor<S, T> {
     public T visitStatement(Statement exp, S arg) throws VisitException ;
     public T visitStmtSequence(StmtSequence exp, S arg) throws VisitException ;
 
-/*
+
     public T visitStmtDefinition(StmtDefinition sd, S arg) throws VisitException;
 
+/*
     public T visitStmtFunDefn(StmtFunDefn fd, S arg) throws VisitException;
     public T visitExpFunCall(ExpFunCall fc, S arg) throws VisitException;
 
@@ -43,9 +44,11 @@ public interface Visitor<S, T> {
 */
 
     public T visitExpLit(ExpLit exp, S arg) throws VisitException;
+    public T visitStringExp(StringExp exp, S arg) throws VisitException;
+
+    public T visitExpVar(ExpVar exp, S arg) throws VisitException;
 
 /*
-    public T visitExpVar(ExpVar exp, S arg) throws VisitException;
     public T visitExpPow(ExpPow exp, S arg) throws VisitException;
 
     // comparator expressions

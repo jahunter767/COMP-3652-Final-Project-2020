@@ -56,6 +56,15 @@ public class Evaluator implements Visitor<Environment<SMPLObject>, SMPLObject> {
 	return result;
     }
 
+    public SMPLObject visitStmtDefinition(StmtDefinition sd,
+				      Environment<SMPLObject> env)
+	throws VisitException {
+	SMPLObject result;
+	result = sd.getExp().visit(this, env);
+	env.put(sd.getVar(), result);
+	return result;
+    }
+
 
 
     public SMPLObject visitExpAdd(ExpAdd exp, Environment<SMPLObject> env)
@@ -71,7 +80,19 @@ public class Evaluator implements Visitor<Environment<SMPLObject>, SMPLObject> {
 
     public SMPLObject visitExpLit(ExpLit exp, Environment<SMPLObject> env)
 	throws VisitException {
-	return SMPL.makeInstance(exp.getVal());// returns the SMPL lit object / instance//factory methods (eg smplobject.make())
+	return SMPL.makeInstance(exp.getVal());// returns the SMPL object / instance//factory methods (eg smplobject.make())
+    }
+
+
+    public SMPLObject visitExpVar(ExpVar exp, Environment<SMPLObject> env)
+	throws VisitException {
+	return env.get(exp.getVar());
+    }
+
+
+    public SMPLObject visitStringExp(StringExp exp, Environment<SMPLObject> env)
+	throws VisitException {
+	return SMPL.makeInstance(exp.getString());// returns the SMPL object / instance//factory methods (eg smplobject.make())
     }
 
 

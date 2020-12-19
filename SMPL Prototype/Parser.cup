@@ -70,12 +70,13 @@ terminal VECT_OPEN,VECT_CLOSE,SIZE;
 terminal EQUAL_PRED, EQUIV_PRED;
 
 //other terminals
-terminal PROC,PAIR,CAR,CDR,PAIR_PRED,LIST,SUBSTR,LSTCONCAT;
+terminal DEF,PROC,PAIR,CAR,CDR,PAIR_PRED,LIST,SUBSTR,LSTCONCAT;
 terminal OPEN_QUOTE,CLOSE_QUOTE,DOUBLE,NEWLINE,TAB,BACKSLASH,CHAR;
 
 // terminals with values
 terminal Integer INT;
 terminal String VAR;
+terminal String STRING;
 
 /* Non terminals */
 non terminal ArithProgram program;
@@ -83,8 +84,10 @@ non terminal StmtSequence stmtList;
 non terminal Statement stmt;
 
 
-/*
+
 non terminal StmtDefinition definition;
+
+/*
 non terminal StmtDefinition ifdefn;
 */
 
@@ -130,6 +133,9 @@ non terminal Exp term;
 non terminal Exp factor;
 non terminal Exp atom;
 
+non terminal Exp expr;
+non terminal StringExp str;
+
 
 
 non terminal Exp empty;
@@ -148,9 +154,9 @@ stmtList ::= stmtList:lst stmt:s {:
 		RESULT = new StmtSequence(s);
 		:};
 
-stmt ::= arithmaticExpression:a {: RESULT = new Statement(a); :} SEMI; //definition:d {: RESULT = d; :} | |conditionalExpression:conditional {: RESULT = new Statement(conditional); :}|funDefn:func {: RESULT = func; :}; //
+stmt ::= definition:d {: RESULT = d; :} | str:s {: RESULT = new Statement(s); :} | arithmaticExpression:a {: RESULT = new Statement(a); :} SEMI; // |conditionalExpression:conditional {: RESULT = new Statement(conditional); :}|funDefn:func {: RESULT = func; :}; //
 
-
+str ::= STRING:s {: RESULT = new StringExp(s); :};
 
 
 //funDefn ::= FUN VAR:v LPAREN paramListE:p RPAREN DEFINE And:a SEMI {: RESULT = new StmtFunDefn(v,p,new StmtSequence(new Statement(a))); :} |FUN VAR:var LPAREN paramListE:parameters RPAREN DEFINE LBRACE stmtList:statements RBRACE {: RESULT = new StmtFunDefn(var, parameters, statements); :} ;  
@@ -167,6 +173,13 @@ paramList ::= paramList:pList COMMA VAR:var {:
 */
 
 //paramListE ::= paramList:paramList {: RESULT = paramList; :} | emptyS:e {: RESULT = e; :};
+
+
+
+
+definition ::= DEF VAR:v expr:exp {: RESULT = new StmtDefinition(v,exp); :};
+
+expr ::= arithmaticExpression:a {: RESULT = new Statement(a); :} | str:s {: RESULT = new Statement(s); :};
 
 
 /*
@@ -291,7 +304,7 @@ term ::= term:t MUL factor:f {: // x := f(2+1) + 1 * y
 factor ::= atom:a EXP factor:f {:RESULT = new ExpAdd(a,f); :} | atom:a {: RESULT = a; :};
 
 atom ::= INT:ilit {: RESULT = new ExpLit(ilit); :} |
-	   LPAREN arithmaticExpression:a RPAREN {: RESULT = a; :}; // |VAR:var {:RESULT = new ExpVar(var);:}; //funcall:fcall {:RESULT = fcall;:} |
+	   LPAREN arithmaticExpression:a RPAREN {: RESULT = a; :} | VAR:var {:RESULT = new ExpVar(var);:}; //funcall:fcall {:RESULT = fcall;:} |
 	   
 
 //emptyA ::= {: ArrayList<Exp> result = new ArrayList<>(); RESULT = result; :} ;

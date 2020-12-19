@@ -2,7 +2,7 @@ import java.lang.*;
 
 public class SMPL {
 
-    public SMPL(){
+    public SMPL(){ // This is an instance of the factory pattern
     }
 
 

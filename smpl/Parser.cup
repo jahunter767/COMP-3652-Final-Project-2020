@@ -41,14 +41,32 @@ scan with {:
 	  :};
 
 /* Terminals (tokens returned by the scanner). */
+
+/* REMEMBER THESE ARE REASSIGNABLE BY THE USER */
+// built-ins
+terminal PAIR, CAR, CDR, PAIR_PRED, LIST;
+terminal SIZE;
+terminal EQUIV_PRED, EQUAL_PRED;
+terminal SUBSTR;
+
 // keywords
-terminal FUN, IF, THEN, ELSE;
+terminal DEF, PROC, CALL, LET, IF, THEN, ELSE, CASE;
+
+// standard I/O
+terminal PRINT, PRINTLN, READ, READINT;
 
 // special symbols
-terminal LPAREN, RPAREN, SEMI, LBRACE, RBRACE, BIND, COMMA;
+terminal LBRACE, RBRACE, LPAREN, RPAREN, LSQPAREN, RSQPAREN, VECT_OPEN, VECT_CLOSE;
+terminal ASSIGN, BIND, COMMA, SEMI;
+
+// compound data operators
+terminal LSTCONCAT;
 
 // arithmetic operators
-terminal PLUS, MINUS, MUL, DIV, MOD, ASSIGN;
+terminal PLUS, MINUS, MUL, DIV, MOD, EXP;
+
+// bit-wise operators
+terminal BIT_AND, BIT_OR, BIT_NOT;
 
 // comparators
 terminal LESS, LESSEQ, EQUAL, GREATEREQ, GREATER, NEQUAL;
@@ -58,6 +76,11 @@ terminal AND, OR, NOT;
 
 // terminals with values
 terminal Integer INT;
+terminal Double DOUBLE;
+terminal Boolean TRUE;
+terminal Boolean FALSE;
+terminal Character CHAR;
+terminal String STRING;
 terminal String VAR;
 
 /* Non terminals */
@@ -94,12 +117,10 @@ non terminal empty;
 program ::= stmtList:s {: RESULT = new ArithProgram(s); :};
 
 stmtList ::= stmtList:lst stmt:s {:
-		lst.add(s); 
-		RESULT = lst;
-		:} |
-	     stmt:s {:
-		RESULT = new StmtSequence(s);
-		:};
+				lst.add(s);
+				RESULT = lst;
+				:} |
+	    stmt:s {: RESULT = new StmtSequence(s); :};
 
 stmt ::= definition:d {: RESULT = d; :} |
 	 funDefn:funDef {: RESULT = funDef; :} |
@@ -107,10 +128,8 @@ stmt ::= definition:d {: RESULT = d; :} |
 	 ifStmt:i {: RESULT = new Statement(i); :};
 
 
-funDefn ::= FUN VAR:v LPAREN paramListE:pListE RPAREN BIND expression:e SEMI {:
-				RESULT = new StmtFunDefn(v, pListE, e); :} |
-			FUN VAR:v LPAREN paramListE:pListE RPAREN BIND LBRACE stmtList:sList RBRACE {:
-				RESULT = new StmtFunDefn(v, pListE, sList); :};
+funDefn ::= PROC LPAREN paramListE:pListE RPAREN BIND LBRACE stmtList:sList RBRACE {:
+				RESULT = new StmtFunDefn(pListE, sList); :};
 
 paramList ::=  paramList:pList COMMA VAR:v {:
 					pList.add(v);

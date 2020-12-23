@@ -14,7 +14,7 @@ public class Environment<T> {
 
     Environment<T> parent;
     HashMap<String, T> dictionary;
-    HashMap<String, Closure> closureDictionary = new HashMap<>(); 
+    //HashMap<String, Closure> closureDictionary = new HashMap<>(); 
 
 
     /**
@@ -44,6 +44,7 @@ public class Environment<T> {
 	}
     }
 
+/*
     public Environment(Environment<T> parent, String[] ids, T[] values, String[] Fids, Closure[] closures) {
 	this.parent = parent;
 	dictionary = new HashMap<>();
@@ -56,6 +57,8 @@ public class Environment<T> {
 	}
 	
     }
+
+*/
 
     /**
      * Creates a new <code>Environment</code> instance that is
@@ -76,6 +79,8 @@ public class Environment<T> {
 	}
     }
 
+/*
+
     public Environment(Environment<T> parent, ArrayList<String> ids,
 		       ArrayList<T> values, ArrayList<String> Fids, ArrayList<Closure> closures) {
 	this.parent = parent;
@@ -90,14 +95,16 @@ public class Environment<T> {
 
     }
 
+*/
+
     /**
      * Create an instance of a global environment suitable for
      * evaluating an program.
      *
      * @return the <code>Environment</code> created.
      */
-    public static <T> Environment<T> makeGlobalEnv(Class<T> cls) {
-	Environment<T> result =  new Environment<T>();
+    public static <b> Environment<b> makeGlobalEnv (Class<b> cls) {
+	Environment<b> result =  new Environment<b>();
 	// add definitions for any primitive procedures or
 	// constants here
 	return result;
@@ -114,11 +121,13 @@ public class Environment<T> {
 	dictionary.put(id, value);
     }
 
-
+/*
     public double putClosure(String Fid, Closure closure) {
 	closureDictionary.put(Fid, closure);
 	return 1000D;
-    } 
+    }
+
+*/ 
 
     /**
      * Return the int associated with the given identifier.
@@ -139,6 +148,7 @@ public class Environment<T> {
 	    return result;
     }
 
+/*
     public Closure getClosure(String Fid) throws UnboundVarException {
 	Closure result = closureDictionary.get(Fid);
 	if (result == null)
@@ -149,6 +159,8 @@ public class Environment<T> {
 	else
 	    return result;
     }
+
+*/
 
     /**
      * Create a string representation of this environment.

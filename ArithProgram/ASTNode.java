@@ -15,6 +15,7 @@ public abstract class ASTNode<E extends ASTNode> {
      * Create a new node of the specified type with subtrees rooted at the
      * given argument nodes.
      */
+
     protected ASTNode(String name, E... subExps) {
 	this.name = name;
 	subTrees = new ArrayList<E>();
@@ -43,6 +44,7 @@ public abstract class ASTNode<E extends ASTNode> {
      * @param index The index of the requested subtree
      * @return the subtree at the given index
      */
+
     public E getSubTree(int index) {
 	return subTrees.get(index);
     }
@@ -53,9 +55,11 @@ public abstract class ASTNode<E extends ASTNode> {
      * keyword that makes it clear what type of expression / statement this
      * node represents.
      */
+
     public String getName() {
 	return name;
     }
+
 
     /** Method to support Visitor design pattern. A call to visit on
      * the ASTNode results in a specific method call in the provided
@@ -63,7 +67,7 @@ public abstract class ASTNode<E extends ASTNode> {
      * call to its associated method in the visitor.
      */
     public abstract <S, T> T visit(Visitor<S, T> v, S arg)
-	throws VisitException ;
+	throws VisitException;
 
     /** Return a string representation of this node and its subtree.
      * The returned string should bear some resemblance to the user's

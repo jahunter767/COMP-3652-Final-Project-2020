@@ -1,14 +1,14 @@
-public class ExpLit extends Exp {
+public class ExpLit<T> extends Exp {
 
-    int val;
+    private T V;
 
-    public ExpLit(Integer v) {
-	super(v.toString());
-	val = v.intValue();
+    public ExpLit(T value) {
+	super(value.toString());
+	V = value;
     }
 
-    public int getVal() {
-	return val;
+    public T getVal() {
+	return V;
     }
 
     public <S, T> T visit(Visitor<S, T> v, S arg) throws VisitException {
@@ -16,7 +16,7 @@ public class ExpLit extends Exp {
     }
 
     public String toString() {
-	return Integer.toString(val);
+	return V.toString();
     }
 }
 

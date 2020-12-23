@@ -56,7 +56,7 @@ public class Main {
 	try {
 	    PersistentWalker<?, ?> walker;	// to be set by switch statement
 	    if (walkerName.equals("")) {
-		walker = new PersistentWalker<Environment<Double>, Double>
+		walker = new PersistentWalker<Environment<Object>, Object>
 		    (new Evaluator(0D));
 	    } else {
 		Class<? extends Visitor<S, T>> wclass =
@@ -110,7 +110,7 @@ public class Main {
 	    while (true) {
 		try {
 		    System.out.print(PROMPT);
-			String line = scanner.readLine();
+		    String line = scanner.readLine();
 		    while (line != null && !line.equals(".")) {
 			// we add a newline character so the lexer can see it
 			input.append(line + "\n");

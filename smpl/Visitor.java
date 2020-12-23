@@ -13,34 +13,31 @@ public interface Visitor<S, T> {
     public T visitArithProgram(ArithProgram p, S arg) throws VisitException;
 
     // statements
-    public T visitStatement(Statement exp, S arg) throws VisitException;
-    public T visitStmtSequence(StmtSequence exp, S arg) throws VisitException;
+    public T visitStatement(Statement exp, S arg) throws VisitException ;
+    public T visitStmtSequence(StmtSequence exp, S arg) throws VisitException ;
     public T visitStmtDefinition(StmtDefinition sd, S arg) throws VisitException;
 
-    
     public T visitStmtFunDefn(StmtFunDefn fd, S arg) throws VisitException;
     public T visitExpFunCall(ExpFunCall fc, S arg) throws VisitException;
-    
-    // expressions
-    public T visitExpIf(ExpIf sd, S arg) throws VisitException;
 
-    public T visitExpAdd(ExpAdd exp, S arg) throws VisitException;
+    // expressions
+    public T visitExpAdd(ExpAdd exp, S arg) throws VisitException ;
     public T visitExpSub(ExpSub exp, S arg) throws VisitException;
     public T visitExpMul(ExpMul exp, S arg) throws VisitException;
     public T visitExpDiv(ExpDiv exp, S arg) throws VisitException;
     public T visitExpMod(ExpMod exp, S arg) throws VisitException;
-
-    public T visitExpAnd(ExpAnd exp, S arg) throws VisitException;
-    public T visitExpOr(ExpOr exp, S arg) throws VisitException;
-    public T visitExpNot(ExpNot exp, S arg) throws VisitException;
-
-    public T visitExpLess(ExpLess exp, S arg) throws VisitException;
-    public T visitExpLessEq(ExpLessEq exp, S arg) throws VisitException;
-    public T visitExpEqual(ExpEqual exp, S arg) throws VisitException;
-    public T visitExpGreaterEq(ExpGreaterEq exp, S arg) throws VisitException;
-    public T visitExpGreater(ExpGreater exp, S arg) throws VisitException;
-    public T visitExpNotEqual(ExpNotEqual exp, S arg) throws VisitException;
-
     public T visitExpLit(ExpLit exp, S arg) throws VisitException;
     public T visitExpVar(ExpVar exp, S arg) throws VisitException;
+	
+	//Relational or Compare expressions
+	public T visitCompareL(CompareL exp, S arg) throws VisitException;
+	public T visitCompareLE(CompareLE exp, S arg) throws VisitException;
+	public T visitCompareG(CompareG exp, S arg) throws VisitException;
+	public T visitCompareGE(CompareGE exp, S arg) throws VisitException;
+	//Boolean
+	public T visitStmtNot(StmtNot exp, S arg) throws VisitException;
+	public T visitStmtAnd(StmtAnd exp, S arg) throws VisitException;
+	public T visitStmtOr(StmtOr exp, S arg) throws VisitException;
+	//IF Statement
+	public T visitStmtIfDefn(StmtIfDefn exp, S arg) throws VisitException;
 }

@@ -1,32 +1,33 @@
-import java.util.ArrayList;
-
+import java.util.*;
 /**
  * IR Class to represent a function call
  */
 public class ExpFunCall extends Exp {
     
     // Implement this class
+	private String var;
+	private ArrayList<Object> exp;
 
-    String name;
-
-    protected ExpFunCall(String funName, ArrayList<Exp> args) {	// placeholder; can be removed eventually
-    super("call", args);
-    this.name = funName;
+    public ExpFunCall(String v, ArrayList<Object> xps) {	// placeholder; can be removed eventually
+	super("call");
+	var = v;
+	exp = xps;
+    }
+	
+	public String getVar(){
+	return var;
+	}
+	
+	public ArrayList<Object> getExp(){
+	return exp;
+	}
+	
+	public String toString() {
+	return String.format("%s := %s", getVar(), getExp().toString());
+    }
+	
+	public <S, T> T visit(Visitor<S, T> v, S arg) throws VisitException {
+	return v.visitExpFunCall(this, arg);
     }
 
-    public String getName(){
-    return this.name;
-    }
-
-    public ArrayList<Exp> getArgs(){
-    return super.getSubTrees();
-    }
-
-    public <S, T> T visit(Visitor<S,T> v, S arg) throws VisitException {
-    return v.visitExpFunCall(this, arg);
-    }
-    
-    public String toString(){
-    return super.getName() + ": " + getName();
-    }
 }

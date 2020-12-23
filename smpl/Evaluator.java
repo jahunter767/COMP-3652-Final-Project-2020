@@ -1,15 +1,15 @@
 import java.util.*;
 
-public class Evaluator implements Visitor<Environment<Double>, Double> {
+public class Evaluator implements Visitor<Environment<Object>, Object> {
     /* For this visitor, the argument passed to all visit
        methods will be the environment object that used to
        be passed to the eval method in the first style of
        implementation. */
 
     // allocate state here
-    protected Double result;	// result of evaluation
+    protected Object result;	// result of evaluation
     private Double defaultValue;
-    private Class<Double> myClass;
+    private Class<Object> myClass;
 
     protected Evaluator() {
 	this(Double.NaN);
@@ -18,33 +18,32 @@ public class Evaluator implements Visitor<Environment<Double>, Double> {
     public Evaluator(Double defaultVal) {
 	// perform initialisations here
 	this.defaultValue = defaultVal;
-	myClass = Double.class;
+	myClass = Object.class;
 	result = defaultValue;
     }
 
-    public Environment<Double> getDefaultState() {
+    public Environment<Object> getDefaultState() {
 	return Environment.makeGlobalEnv(myClass);
     }
 
-    public Double visitArithProgram(ArithProgram p, Environment<Double> env)
+    public Object visitArithProgram(ArithProgram p, Environment<Object> env)
 	throws VisitException {
 	result = p.getSeq().visit(this, env);
 	return result;
     }
 
-    public Double visitStatement(Statement s, Environment<Double> env)
+    public Object visitStatement(Statement s, Environment<Object> env)
     throws VisitException {
-	System.out.println("S:" + s.toString());
 	return s.getExp().visit(this, env);
     }
 
-    public Double visitStmtSequence(StmtSequence sseq, Environment<Double> env)
+    public Object visitStmtSequence(StmtSequence sseq, Environment<Object> env)
 	throws VisitException {
 	// remember that env is the environment
 	Statement s;
 	ArrayList seq = sseq.getSeq();
 	Iterator iter = seq.iterator();
-	Double result = defaultValue;
+	Object result = defaultValue;
 	while(iter.hasNext()) {
 	    s = (Statement) iter.next();
 	    result = s.visit(this, env);
@@ -53,270 +52,227 @@ public class Evaluator implements Visitor<Environment<Double>, Double> {
 	return result;
     }
 
-    public Double visitStmtDefinition(StmtDefinition sd,
-				      Environment<Double> env)
+    public Object visitStmtDefinition(StmtDefinition sd,
+				      Environment<Object> env)
 	throws VisitException {
 	Double result;
-	result = sd.getExp().visit(this, env);
+	result = (Double) sd.getExp().visit(this, env);
 	env.put(sd.getVar(), result);
 	return result;
     }
 
-    public Double visitStmtFunDefn(StmtFunDefn fd, Environment<Double> env)
+    public Object visitStmtFunDefn(StmtFunDefn fd, Environment<Object> env)
 	throws VisitException {
 	Closure c = new Closure(fd, env);
-	env.putClosure(fd.getName(), c);
-	return Double.NaN;
+	env.put(fd.getFname(), c); //Add function defintion binding to environment
+	return 0D; 
     }
 
-    public Double visitExpFunCall(ExpFunCall fc, Environment<Double> env)
+    public Object visitExpFunCall(ExpFunCall fc, Environment<Object> env)
 	throws VisitException {
-	Closure c = env.getClosure(fc.getName());
-	StmtFunDefn funDef = c.getFunction();
-
-	ArrayList<Exp> args = fc.getArgs();
-	ArrayList<Double> values = new ArrayList<Double>();
-	for (Exp arg : args){
-		values.add(arg.visit(this, env));
+	// to be implemented
+	StmtFunDefn function;
+    Environment<Object> closingEnv;
+	StmtSequence sseq;  //To be evaulated
+	ArrayList<Object> params,args;
+	//Extract function from closure object : Env Lookup
+	Closure c = (Closure) env.get(fc.getVar());
+	function = c.getFunction();
+	closingEnv = env;
+	//Make bindings for function call arguements
+	sseq = function.getStmt();
+	params = function.getExps();
+	args = fc.getExp();
+	ExpVar var;
+	ExpLit expLit;
+	for (int i = 0; i < params.size(); i++){
+	var = (ExpVar) params.get(i);
+	expLit = (ExpLit) args.get(i);
+	closingEnv.put(var.getVar(), expLit.visit(this, env));	
 	}
-
-	ArrayList<String> params = funDef.getParameters();
-	Environment<Double> subEnv = new Environment<Double>(c.getClosingEnv(), params, values);
-	Exp body = funDef.getBody();
-	return body.visit(this, subEnv);
-	}
-
-	public Double visitExpIf(ExpIf ifStmt, Environment<Double> env)
-	throws VisitException {
-	double decision = ifStmt.getPredicate().visit(this, env);
-	if (decision == 0.0){
-		Double result = ifStmt.getAlternative().visit(this, env);
-		if (result == Integer.MAX_VALUE){
-			return Double.NaN;
-		}
-		return result;
-	}else{
-		return ifStmt.getConsequent().visit(this, env);
-	}
+	//Evaulate function body with arg bindings
+	result = (Double) sseq.visit(this,closingEnv);
+	return result;
     }
 
-    public Double visitExpAdd(ExpAdd exp, Environment<Double> env)
+    public Object visitExpAdd(ExpAdd exp, Environment<Object> env)
 	throws VisitException {
 	Double val1, val2;
-	val1 = exp.getExpL().visit(this, env);
-	val2 = exp.getExpR().visit(this, env);
+	val1 = (Double) exp.getExpL().visit(this, env);
+	val2 = (Double) exp.getExpR().visit(this, env);
 	return val1 + val2;
     }
 
-    public Double visitExpSub(ExpSub exp, Environment<Double> env)
+    public Object visitExpSub(ExpSub exp, Environment<Object> env)
 	throws VisitException {
 	Double val1, val2;
-	val1 = exp.getExpL().visit(this, env);
-	val2 = exp.getExpR().visit(this, env);
+	val1 = (Double) exp.getExpL().visit(this, env);
+	val2 = (Double) exp.getExpR().visit(this, env);
 	return val1 - val2;
     }
 
-    public Double visitExpMul(ExpMul exp, Environment<Double> env)
+    public Object visitExpMul(ExpMul exp, Environment<Object> env)
 	throws VisitException {
 	Double val1, val2;
-	val1 = exp.getExpL().visit(this, env);
-	val2 = exp.getExpR().visit(this, env);
+	val1 = (Double) exp.getExpL().visit(this, env);
+	val2 = (Double) exp.getExpR().visit(this, env);
 	return val1 * val2;
     }
 
-    public Double visitExpDiv(ExpDiv exp, Environment<Double> env)
+    public Object visitExpDiv(ExpDiv exp, Environment<Object> env)
 	throws VisitException {
 	Double val1, val2;
-	val1 = exp.getExpL().visit(this, env);
-	val2 = exp.getExpR().visit(this, env);
+	val1 = (Double) exp.getExpL().visit(this, env);
+	val2 = (Double) exp.getExpR().visit(this, env);
 	return val1 / val2;
     }
 
-    public Double visitExpMod(ExpMod exp, Environment<Double> env)
+    public Object visitExpMod(ExpMod exp, Environment<Object> env)
 	throws VisitException {
 	Double val1, val2;
-	val1 = exp.getExpL().visit(this, env);
-	val2 = exp.getExpR().visit(this, env);
+	val1 = (Double) exp.getExpL().visit(this, env);
+	val2 = (Double) exp.getExpR().visit(this, env);
 	return val1 % val2;
     }
 
-	public Double visitExpAnd(ExpAnd exp, Environment<Double> env)
+    public Object visitExpLit(ExpLit exp, Environment<Object> env)
 	throws VisitException {
-	double val1, val2;
-	val1 = exp.getExpL().visit(this, env);
-	if (val1 == 0.0){
-		return new Double(0);
-	}else{
-		val2 = exp.getExpR().visit(this, env);
-		if (val2 == 0.0){
-			return new Double(0);
-		}else{
-			return new Double(1);
-		}
-	}
-	}
-
-	public Double visitExpOr(ExpOr exp, Environment<Double> env)
-	throws VisitException {
-	double val1, val2;
-	val1 = exp.getExpL().visit(this, env);
-	if (val1 == 0.0){
-		val2 = exp.getExpR().visit(this, env);
-		if (val2 == 0.0){
-			return new Double(0);
-		}else{
-			return new Double(1);
-		}
-	}else{
-		return new Double(1);
-	}
-	}
-
-	public Double visitExpNot(ExpNot exp, Environment<Double> env)
-	throws VisitException {
-	double val1;
-	val1 = exp.getPredicate().visit(this, env);
-	if (val1 == 0.0){
-		return new Double(1);
-	}else{
-		return new Double(0);
-	}
-	}
-
-	public Double visitExpLess(ExpLess exp, Environment<Double> env)
-	throws VisitException {
-	Exp left = exp.getLeftPred();
-	Exp right = exp.getRightPred();
-	if (left instanceof ExpBinComp){
-		ExpBinComp l = (ExpBinComp) left;
-		ExpLess r = new ExpLess(l.getRightPred(), right);
-		ExpAnd temp = new ExpAnd(left, r);
-		return temp.visit(this, env);
-	}else{
-		double val1, val2;
-		val1 = exp.getLeftPred().visit(this, env).doubleValue();
-		val2 = exp.getRightPred().visit(this, env).doubleValue();
-		if (val1 < val2){
-			return new Double(1);
-		}else{
-			return new Double(0);
-		}
-	}
-	}
-
-	public Double visitExpLessEq(ExpLessEq exp, Environment<Double> env)
-	throws VisitException {
-	Exp left = exp.getLeftPred();
-	Exp right = exp.getRightPred();
-	if (left instanceof ExpBinComp){
-		ExpBinComp l = (ExpBinComp) left;
-		ExpLessEq r = new ExpLessEq(l.getRightPred(), right);
-		ExpAnd temp = new ExpAnd(left, r);
-		return temp.visit(this, env);
-	}else{
-		double val1, val2;
-		val1 = exp.getLeftPred().visit(this, env).doubleValue();
-		val2 = exp.getRightPred().visit(this, env).doubleValue();
-		if (val1 <= val2){
-			return new Double(1);
-		}else{
-			return new Double(0);
-		}
-	}
-	}
-
-	public Double visitExpEqual(ExpEqual exp, Environment<Double> env)
-	throws VisitException {
-	Exp left = exp.getLeftPred();
-	Exp right = exp.getRightPred();
-	if (left instanceof ExpBinComp){
-		ExpBinComp l = (ExpBinComp) left;
-		ExpEqual r = new ExpEqual(l.getRightPred(), right);
-		ExpAnd temp = new ExpAnd(left, r);
-		return temp.visit(this, env);
-	}else{
-		double val1, val2;
-		val1 = exp.getLeftPred().visit(this, env).doubleValue();
-		val2 = exp.getRightPred().visit(this, env).doubleValue();
-		System.out.println("Values: " + val1 + " " + val2);
-		if (val1 == val2){
-			return new Double(1);
-		}else{
-			return new Double(0);
-		}
-	}
-	}
-
-	public Double visitExpGreaterEq(ExpGreaterEq exp, Environment<Double> env)
-	throws VisitException {
-	Exp left = exp.getLeftPred();
-	Exp right = exp.getRightPred();
-	if (left instanceof ExpBinComp){
-		ExpBinComp l = (ExpBinComp) left;
-		ExpGreaterEq r = new ExpGreaterEq(l.getRightPred(), right);
-		ExpAnd temp = new ExpAnd(left, r);
-		return temp.visit(this, env);
-	}else{
-		double val1, val2;
-		val1 = exp.getLeftPred().visit(this, env).doubleValue();
-		val2 = exp.getRightPred().visit(this, env).doubleValue();
-		if (val1 >= val2){
-			return new Double(1);
-		}else{
-			return new Double(0);
-		}
-	}
-	}
-
-	public Double visitExpGreater(ExpGreater exp, Environment<Double> env)
-	throws VisitException {
-	Exp left = exp.getLeftPred();
-	Exp right = exp.getRightPred();
-	if (left instanceof ExpBinComp){
-		ExpBinComp l = (ExpBinComp) left;
-		ExpGreater r = new ExpGreater(l.getRightPred(), right);
-		ExpAnd temp = new ExpAnd(left, r);
-		return temp.visit(this, env);
-	}else{
-		double val1, val2;
-		val1 = exp.getLeftPred().visit(this, env).doubleValue();
-		val2 = exp.getRightPred().visit(this, env).doubleValue();
-		if (val1 > val2){
-			return new Double(1);
-		}else{
-			return new Double(0);
-		}
-	}
-	}
-
-	public Double visitExpNotEqual(ExpNotEqual exp, Environment<Double> env)
-	throws VisitException {
-	Exp left = exp.getLeftPred();
-	Exp right = exp.getRightPred();
-	if (left instanceof ExpBinComp){
-		ExpBinComp l = (ExpBinComp) left;
-		ExpNotEqual r = new ExpNotEqual(l.getRightPred(), right);
-		ExpAnd temp = new ExpAnd(left, r);
-		return temp.visit(this, env);
-	}else{
-		double val1, val2;
-		val1 = exp.getLeftPred().visit(this, env).doubleValue();
-		val2 = exp.getRightPred().visit(this, env).doubleValue();
-		if (val1 != val2){
-			return new Double(1);
-		}else{
-			return new Double(0);
-		}
-	}
-	}
-
-    public Double visitExpLit(ExpLit exp, Environment<Double> env)
-	throws VisitException {
-	return new Double(exp.getVal());
+	return exp.getVal();
     }
 
-    public Double visitExpVar(ExpVar exp, Environment<Double> env)
+    public Object visitExpVar(ExpVar exp, Environment<Object> env)
 	throws VisitException {
-	return env.get(exp.getVar());
+	return (Double) env.get(exp.getVar());
     }
+	
+	public Object visitCompareL(CompareL exp,Environment<Object> env) 
+	throws VisitException {
+	Object val1;
+	Object val2;
+	val1 = (Object) exp.getExpL().visit(this, env);
+	val2 = (Object) exp.getExpR().visit(this, env);
+	Boolean r;
+	if (val2 instanceof Boolean){
+		Double val3 = (Double) CompareL.nextVal.visit(this,env);
+		//System.out.println(val1 + " " + val3 );
+		r = (Double) val1 < val3;
+		r = r & (Boolean) val2;
+	}else {
+		//System.out.println(val1 + " " + val2 );
+		r = (Double) val1 < (Double) val2;
+	}
+	CompareL.nextVal = exp.getExpL();
+	return r;
+	}
+
+	public Object visitCompareLE(CompareLE exp, Environment<Object> env) 
+	throws VisitException {
+	Object val1;
+	Object val2;
+	val1 = (Object) exp.getExpL().visit(this, env);
+	val2 = (Object) exp.getExpR().visit(this, env);
+	Boolean r;
+	if (val2 instanceof Boolean){
+		Double val3 = (Double) CompareLE.nextVal.visit(this,env);
+		//System.out.println(val1 + " " + val3 );
+		r = (Double) val1 <= val3;
+		r = r & (Boolean) val2;
+	}else {
+		//System.out.println(val1 + " " + val2 );
+		r = (Double) val1 <= (Double) val2;
+	}
+	CompareLE.nextVal = exp.getExpL();
+	return r;
+	}
+	
+	
+	public Object visitCompareG(CompareG exp, Environment<Object> env) 
+	throws VisitException {
+	Object val1;
+	Object val2;
+	val1 = (Object) exp.getExpL().visit(this, env);
+	val2 = (Object) exp.getExpR().visit(this, env);
+	Boolean r;
+	if (val2 instanceof Boolean){
+		Double val3 = (Double) CompareG.nextVal.visit(this,env);
+		//System.out.println(val1 + " " + val3 );
+		r = (Double) val1 > val3;
+		r = r & (Boolean) val2;
+	}else {
+		//System.out.println(val1 + " " + val2 );
+		r = (Double) val1 > (Double) val2; 
+	}
+	CompareG.nextVal = exp.getExpL();
+	return r;
+	}
+	
+	public Object visitCompareGE(CompareGE exp, Environment<Object> env) 
+	throws VisitException {
+	Object val1;
+	Object val2;
+	val1 = (Object) exp.getExpL().visit(this, env);
+	val2 = (Object) exp.getExpR().visit(this, env);
+	Boolean r;
+	if (val2 instanceof Boolean){
+		Double val3 = (Double) CompareGE.nextVal.visit(this,env);
+		//System.out.println(val1 + " " + val3 );
+		r = (Double) val1 >= val3;
+		r = r & (Boolean) val2;
+	}else {
+		//System.out.println(val1 + " " + val2 );
+		r = (Double) val1 >= (Double) val2; 
+	}
+	CompareGE.nextVal = exp.getExpL();
+	return r;
+	}
+	
+	public Object visitStmtAnd(StmtAnd exp, Environment<Object> env) 
+	throws VisitException {
+	Object val1;
+	Object val2;
+	Boolean flag = true;
+	val1 = (Object) exp.getExpL().visit(this, env);
+	val2 = (Object) exp.getExpR().visit(this, env);
+	flag = flag & (Boolean) val1 & (Boolean) val2;
+	return flag;
+	}
+	
+	public Object visitStmtOr(StmtOr exp, Environment<Object> env) 
+	throws VisitException {
+	Object val1;
+	Object val2;
+	Boolean flag = false;
+	val1 = (Object) exp.getExpL().visit(this, env);
+	val2 = (Object) exp.getExpR().visit(this, env);
+	flag = flag | (Boolean) val1 | (Boolean) val2;
+	return flag;
+	}
+	
+	public Object visitStmtNot(StmtNot exp, Environment<Object> env) 
+	throws VisitException {
+	Object val1;
+	val1 = (Object) exp.getExpL().visit(this, env);
+	if ((Boolean) val1 == true){
+		return false;
+	}else {
+		return true;
+	}
+	}
+	
+	public Object visitStmtIfDefn(StmtIfDefn exp, Environment<Object> env) 
+	throws VisitException {
+	Exp p = exp.getPredicate();
+	StmtSequence c = exp.getConsequent();
+	Statement a = exp.getAlternative();
+	Boolean flag = (Boolean) p.visit(this, env);
+	if (flag == true){
+		result = (Double) c.visit(this,env);
+	}else{
+		result = (Double) a.visit(this,env);
+	}
+	
+	return result;
+	}
+	
+	
 }

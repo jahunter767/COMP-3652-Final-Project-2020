@@ -13,7 +13,6 @@ public class Environment<T> {
 
     Environment<T> parent;
     HashMap<String, T> dictionary;
-    HashMap<String, Closure<T>> functionDict;
 
     /**
      * Create a new (empty) top level Environment.
@@ -22,7 +21,6 @@ public class Environment<T> {
     public Environment() {
 	parent = null;
 	dictionary = new HashMap<>();
-	functionDict = new HashMap<>();
     }
 
     /**
@@ -36,11 +34,11 @@ public class Environment<T> {
      * have the same length.
      */
     public Environment(Environment<T> parent, String[] ids, T[] values) {
-    this();
 	this.parent = parent;
+	dictionary = new HashMap<>();
 	for (int i = 0; i < ids.length; i++) {
 	    dictionary.put(ids[i], values[i]);
-    }
+	}
     }
 
     /**
@@ -55,11 +53,11 @@ public class Environment<T> {
      */
     public Environment(Environment<T> parent, ArrayList<String> ids,
 		       ArrayList<T> values) {
-    this();
-    this.parent = parent;
+	this.parent = parent;
+	dictionary = new HashMap<>();
 	for (int i = 0; i < ids.size(); i++) {
 	    dictionary.put(ids.get(i), values.get(i));
-    }
+	}
     }
 
     /**
@@ -87,17 +85,6 @@ public class Environment<T> {
     }
 
     /**
-     * Store a closure for the given function to in the current
-     * environment.
-     *
-     * @param fun the name of the function
-     * @param c the closure of the function
-     */
-    public void putClosure(String fun, Closure<T> c) {
-    functionDict.put(fun, c);
-    }
-
-    /**
      * Return the int associated with the given identifier.
      *
      * @param id the identifier.
@@ -114,30 +101,6 @@ public class Environment<T> {
 		return parent.get(id);
 	else
 	    return result;
-    }
-
-    /**
-     * Return the Clisure associated with the given function.
-     *
-     * @param fun the function name.
-     * @return the Closure associated with the function in
-     * this environment.
-     * @exception Exception if <code>fun</code> is unbound
-     */
-    public Closure<T> getClosure(String fun) throws UnboundVarException {
-    //System.out.println("Dict: " + functionDict.toString());
-    //System.out.println("FunName: " + functionDict.get(fun).getFunction().getName());
-    //System.out.println("ClosingEnv: " + functionDict.get(fun).getClosingEnv());
-    //System.out.println("Parent: " + parent);
-
-    Closure<T> result = functionDict.get(fun);
-    if (result == null)
-        if (parent == null)
-        throw new UnboundVarException(fun);
-        else
-        return parent.getClosure(fun);
-    else
-        return result;
     }
 
     /**

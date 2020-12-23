@@ -46,6 +46,10 @@ public abstract class ASTNode<E extends ASTNode> {
     public E getSubTree(int index) {
 	return subTrees.get(index);
     }
+	
+	public void setSubTree(int index, E ex ){
+		subTrees.set(index,ex) ;
+	}
 
     /**
      * Return the name for this type of node.  Typically, this will be the

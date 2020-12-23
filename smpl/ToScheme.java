@@ -57,38 +57,33 @@ public class ToScheme implements Visitor<Void, String> {
 	    valExp + ")";
     }
 
-    public String visitStmtFunDefn(StmtFunDefn fd, Void env)
+    public String visitStmtFunDefn(StmtFunDefn fd, Void arg)
 	throws VisitException {
-	ArrayList<String> params = fd.getParameters();
-	String result = "(define " + fd.getName() + " (params " + params.remove(0);
-	for (String p : params){
-		result = result + " " + p;
+	// Convert parameters to String
+	StringBuffer sb = new StringBuffer();
+	for (Object v: fd.getExps()){
+	sb.append(v.toString());
+	sb.append(" ");
 	}
-	result = result + ") (body " + fd.getBody().toString() + ")";
-	return result;
+	String str = sb.toString();
+	return "(define "+"( "+fd.getFname()+" "+str+")"+fd.getStmt().visit(this,arg)+" )";
     }
 
-    public String visitExpFunCall(ExpFunCall fc, Void env)
+    public String visitExpFunCall(ExpFunCall fc, Void arg)
 	throws VisitException {
-	ArrayList<Exp> args = fc.getArgs();
-	String result = "(call " + fc.getName() + " (args " + args.remove(0).toString();
-	for (Exp a : args){
-		result = result + " " + a.toString();
+	// to be implemented
+	// Convert parameters to String
+	StringBuffer sb = new StringBuffer();
+	for (Object v: fc.getExp()){
+	sb.append(v.toString());
+	sb.append(" ");
 	}
-	result = result + ") )";
-	return result;
-	}
+	String str = sb.toString();
+	return "(define "+"( "+fc.getVar()+" "+str+")"+" )";
+    }
 
     // expressions
-	public String visitExpIf(ExpIf ifStmt, Void env)
-	throws VisitException {
-	String result = "(if " + ifStmt.getPredicate() + 
-					" (consequence " + ifStmt.getConsequent() +
-					") (alternative " + ifStmt.getAlternative() + ")";
-	return result;
-    }
-
-	public String visitExpAdd(ExpAdd exp, Void arg)
+    public String visitExpAdd(ExpAdd exp, Void arg)
 	throws VisitException {
 	String left = exp.getExpL().visit(this, arg);
 	String right = exp.getExpR().visit(this, arg);
@@ -122,123 +117,6 @@ public class ToScheme implements Visitor<Void, String> {
 	return "(mod " + left + " " + right + ")";
     }
 
-	public String visitExpAnd(ExpAnd exp, Void arg)
-	throws VisitException{
-	String left = exp.getExpL().visit(this, arg);
-	String right = exp.getExpR().visit(this, arg);
-	return "(and " + left + " " + right + ")";
-	}
-
-	public String visitExpOr(ExpOr exp, Void arg)
-	throws VisitException{
-	String left = exp.getExpL().visit(this, arg);
-	String right = exp.getExpR().visit(this, arg);
-	return "(or " + left + " " + right + ")";
-    }
-
-	public String visitExpNot(ExpNot exp, Void arg)
-	throws VisitException{
-	String pred = exp.getPredicate().visit(this, arg);
-	return "(not " + pred + ")";
-    }
-
-	public String visitExpLess(ExpLess exp, Void arg)
-	throws VisitException {
-	Exp left = exp.getLeftPred();
-	Exp right = exp.getRightPred();
-	if (left instanceof ExpBinComp){
-		ExpBinComp l = (ExpBinComp) left;
-		ExpLess r = new ExpLess(l.getRightPred(), right);
-		ExpAnd temp = new ExpAnd(left, r);
-		return temp.visit(this, arg);
-	}else{
-		String left1 = exp.getLeftPred().visit(this, arg);
-		String right1 = exp.getRightPred().visit(this, arg);
-		return "(< " + left1 + " " + right1 + ")";
-	}
-	}
-
-	public String visitExpLessEq(ExpLessEq exp, Void arg)
-	throws VisitException {
-	Exp left = exp.getLeftPred();
-	Exp right = exp.getRightPred();
-	if (left instanceof ExpBinComp){
-		ExpBinComp l = (ExpBinComp) left;
-		ExpLessEq r = new ExpLessEq(l.getRightPred(), right);
-		ExpAnd temp = new ExpAnd(left, r);
-		return temp.visit(this, arg);
-	}else{
-		String left1 = exp.getLeftPred().visit(this, arg);
-		String right1 = exp.getRightPred().visit(this, arg);
-		return "(<= " + left1 + " " + right1 + ")";
-	}
-	}
-
-	public String visitExpEqual(ExpEqual exp, Void arg)
-	throws VisitException {
-	Exp left = exp.getLeftPred();
-	Exp right = exp.getRightPred();
-	if (left instanceof ExpBinComp){
-		ExpBinComp l = (ExpBinComp) left;
-		ExpEqual r = new ExpEqual(l.getRightPred(), right);
-		ExpAnd temp = new ExpAnd(left, r);
-		return temp.visit(this, arg);
-	}else{
-		String left1 = exp.getLeftPred().visit(this, arg);
-		String right1 = exp.getRightPred().visit(this, arg);
-		return "(== " + left1 + " " + right1 + ")";
-	}
-	}
-
-	public String visitExpGreaterEq(ExpGreaterEq exp, Void arg)
-	throws VisitException {
-	Exp left = exp.getLeftPred();
-	Exp right = exp.getRightPred();
-	if (left instanceof ExpBinComp){
-		ExpBinComp l = (ExpBinComp) left;
-		ExpGreaterEq r = new ExpGreaterEq(l.getRightPred(), right);
-		ExpAnd temp = new ExpAnd(left, r);
-		return temp.visit(this, arg);
-	}else{
-		String left1 = exp.getLeftPred().visit(this, arg);
-		String right1 = exp.getRightPred().visit(this, arg);
-		return "(>= " + left1 + " " + right1 + ")";
-	}
-	}
-
-
-	public String visitExpGreater(ExpGreater exp, Void arg)
-	throws VisitException {
-	Exp left = exp.getLeftPred();
-	Exp right = exp.getRightPred();
-	if (left instanceof ExpBinComp){
-		ExpBinComp l = (ExpBinComp) left;
-		ExpGreater r = new ExpGreater(l.getRightPred(), right);
-		ExpAnd temp = new ExpAnd(left, r);
-		return temp.visit(this, arg);
-	}else{
-		String left1 = exp.getLeftPred().visit(this, arg);
-		String right1 = exp.getRightPred().visit(this, arg);
-		return "(> " + left1 + " " + right1 + ")";
-	}
-	}
-
-	public String visitExpNotEqual(ExpNotEqual exp, Void arg)
-	throws VisitException {
-	Exp left = exp.getLeftPred();
-	Exp right = exp.getRightPred();
-	if (left instanceof ExpBinComp){
-		ExpBinComp l = (ExpBinComp) left;
-		ExpNotEqual r = new ExpNotEqual(l.getRightPred(), right);
-		ExpAnd temp = new ExpAnd(left, r);
-		return temp.visit(this, arg);
-	}else{
-		String left1 = exp.getLeftPred().visit(this, arg);
-		String right1 = exp.getRightPred().visit(this, arg);
-		return "(!= " + left1 + " " + right1 + ")";
-	}
-	}
-
     public String visitExpLit(ExpLit exp, Void arg)
 	throws VisitException{
 	return "" + exp.getVal();
@@ -248,5 +126,40 @@ public class ToScheme implements Visitor<Void, String> {
 	throws VisitException {
 	return exp.getVar();
     }
-
+	public String visitCompareGE(CompareGE exp, Void arg) 
+	throws VisitException {
+		return "Greater than OR equal to";
+	}
+	public String visitCompareG(CompareG exp, Void arg) 
+	throws VisitException {
+		return "Greater than";
+	}
+	public String visitCompareLE(CompareLE exp, Void arg) 
+	throws VisitException {
+		return "Less than";
+	}
+	public String visitCompareL(CompareL exp, Void arg) 
+	throws VisitException {
+		return "Less than Or equal to";
+	}
+	
+	public String visitStmtNot(StmtNot exp, Void arg) 
+	throws VisitException {
+		return "NOT";
+	}
+	
+	public String visitStmtAnd(StmtAnd exp, Void arg) 
+	throws VisitException {
+		return "AND";
+	}
+	
+	public String visitStmtOr(StmtOr exp, Void arg) 
+	throws VisitException {
+		return "Or";
+	}
+	
+	public String visitStmtIfDefn(StmtIfDefn exp, Void arg) 
+	throws VisitException {
+		return "IF-STATEMENT";
+	}
 }

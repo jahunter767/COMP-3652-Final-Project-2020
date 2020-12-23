@@ -44,7 +44,6 @@ import java_cup.runtime.*;
     }
 %}
 
-%debug
 
 %state STRING
 %state CHAR_ESCAPE
@@ -59,7 +58,7 @@ alpha = [a-zA-Z_]
 
 alphanum = {alpha}|[0-9] 
 
-special = [\?!-\*/%\^&\+|~@] | {ws}
+special = [\?!-\*/%\^&:\+|~@] | {ws}
 
 allChar = {alphanum}|{special}
 

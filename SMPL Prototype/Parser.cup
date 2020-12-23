@@ -135,6 +135,7 @@ non terminal Exp atom;
 
 non terminal Exp expr;
 non terminal StringExp str;
+non terminal Substr Substr;
 
 
 
@@ -154,9 +155,11 @@ stmtList ::= stmtList:lst stmt:s {:
 		RESULT = new StmtSequence(s);
 		:};
 
-stmt ::= definition:d {: RESULT = d; :} | str:s {: RESULT = new Statement(s); :} | arithmaticExpression:a {: RESULT = new Statement(a); :} SEMI; // |conditionalExpression:conditional {: RESULT = new Statement(conditional); :}|funDefn:func {: RESULT = func; :}; //
+stmt ::= Substr:subs {:RESULT = new Statement(subs); :} | definition:d {: RESULT = d; :} | str:s {: RESULT = new Statement(s); :} | arithmaticExpression:a {: RESULT = new Statement(a); :} SEMI; // |conditionalExpression:conditional {: RESULT = new Statement(conditional); :}|funDefn:func {: RESULT = func; :}; //
 
 str ::= STRING:s {: RESULT = new StringExp(s); :};
+
+Substr::= SUBSTR LPAREN expr:e COMMA arithmaticExpression:start COMMA arithmaticExpression:end RPAREN {: RESULT = new Substr(e,start,end); :};
 
 
 //funDefn ::= FUN VAR:v LPAREN paramListE:p RPAREN DEFINE And:a SEMI {: RESULT = new StmtFunDefn(v,p,new StmtSequence(new Statement(a))); :} |FUN VAR:var LPAREN paramListE:parameters RPAREN DEFINE LBRACE stmtList:statements RBRACE {: RESULT = new StmtFunDefn(var, parameters, statements); :} ;  
@@ -179,7 +182,7 @@ paramList ::= paramList:pList COMMA VAR:var {:
 
 definition ::= DEF VAR:v expr:exp {: RESULT = new StmtDefinition(v,exp); :};
 
-expr ::= arithmaticExpression:a {: RESULT = new Statement(a); :} | str:s {: RESULT = new Statement(s); :};
+expr ::= arithmaticExpression:a {: RESULT = new Statement(a); :} | str:s {: RESULT = new Statement(s); :} | Substr:str {: RESULT = new Statement(str); :};
 
 
 /*

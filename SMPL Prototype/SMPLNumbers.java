@@ -41,7 +41,7 @@ public class SMPLNumbers extends SMPLObject<Double> {
 		if(this.wasInt && obj.wasInt()){
 			
 			Integer res = new Integer(result.intValue());
-			return SMPL.makeInstance(res);
+			return SMPL.makeInstance(res); //
 		}else{
 			return SMPL.makeInstance(result);
 

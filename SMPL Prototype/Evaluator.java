@@ -76,6 +76,15 @@ public class Evaluator implements Visitor<Environment<SMPLObject>, SMPLObject> {
     }
 
 
+    public SMPLObject visitSubstr(Substr exp, Environment<SMPLObject> env)
+	throws VisitException {
+	SMPLObject arg1, arg2, arg3;
+	arg1 = exp.getArg1().visit(this, env);
+	arg2 = exp.getArg2().visit(this, env);
+	arg3 = exp.getArg3().visit(this, env);
+	return arg1.Substr(arg2,arg3);
+    }
+
 
 
     public SMPLObject visitExpLit(ExpLit exp, Environment<SMPLObject> env)

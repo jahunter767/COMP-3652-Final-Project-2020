@@ -20,10 +20,12 @@ public interface Visitor<S, T> {
 
     public T visitStmtDefinition(StmtDefinition sd, S arg) throws VisitException;
 
-/*
+
     public T visitStmtFunDefn(StmtFunDefn fd, S arg) throws VisitException;
+
     public T visitExpFunCall(ExpFunCall fc, S arg) throws VisitException;
 
+/*
     //conditionals
     public T visitExpConditional(ExpConditional cs, S arg) throws VisitException;
     public T visitStmtConditionalStmt(StmtConditionalStmt cs, S arg) throws VisitException;

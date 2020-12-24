@@ -67,6 +67,46 @@ public class Evaluator implements Visitor<Environment<SMPLObject>, SMPLObject> {
 
 
 
+    public SMPLObject visitStmtFunDefn(StmtFunDefn fd, Environment<SMPLObject> env)
+	throws VisitException {
+	Closure closure = new Closure(fd,env);// wrap function in a closure
+	SMPLObject f = SMPL.makeInstance(closure); //wrap that closure in SMPLFunc 
+	// to be implemented
+	return f; // return that SMPLFunc
+    }
+
+
+
+
+    public SMPLObject visitExpFunCall(ExpFunCall fc, Environment<SMPLObject> env)
+	throws VisitException, MismatchedParamsException {
+	SMPLFunction Func = null;
+;
+	if(fc.getProcedure() != null){Func = (SMPLFunction)fc.getProcedure().visit(this,env);}
+	else if(fc.getName() != null){Func = (SMPLFunction)env.get(fc.getName());}
+	else {throw new VisitException("Error: Unknown function.");}
+
+	ArrayList<SMPLObject> args = new ArrayList<>();
+	ArrayList<Exp> exp = fc.getArgs(); // expressions that we got as arguments
+	StmtFunDefn myFunc = Func.getVal().getFunction();// getVal is the closure within SMPLFunction. The funcdef is within closure
+	ArrayList<String> parameters = myFunc.getParams(); // getParam is within the function defintion 
+
+	if (parameters.size() != exp.size()){
+		throw new MismatchedParamsException(parameters.size(),exp.size());
+	}
+	
+	for(int i = 0; i < parameters.size(); i++){
+		args.add(exp.get(i).visit(this,env));// bounding the arguments to variables 
+		
+	}
+	
+	Environment newEnv = new Environment(Func.getVal().getClosingEnv(),parameters,args);
+	
+	return myFunc.getBody().visit(this,newEnv);
+    }
+
+
+
     public SMPLObject visitExpAdd(ExpAdd exp, Environment<SMPLObject> env)
 	throws VisitException {
 	SMPLObject val1, val2;

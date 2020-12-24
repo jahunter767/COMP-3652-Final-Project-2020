@@ -77,6 +77,7 @@ terminal OPEN_QUOTE,CLOSE_QUOTE,DOUBLE,NEWLINE,TAB,BACKSLASH,CHAR;
 terminal Integer INT;
 terminal String VAR;
 terminal String STRING;
+//terminal SMPLFunction FUNC; //** might be a violation
 
 /* Non terminals */
 non terminal ArithProgram program;
@@ -92,14 +93,16 @@ non terminal StmtDefinition ifdefn;
 */
 
 /* ** Fix these declarations ** */
-/*
+
 non terminal StmtFunDefn funDefn;
 non terminal ArrayList<String> paramList;
 non terminal ArrayList<String> paramListE;
+
 non terminal ArrayList<Exp> args;
 non terminal ArrayList<Exp> argsE;
 non terminal ExpFunCall funcall;
-*/
+
+
 /* **** */
 
 
@@ -133,9 +136,10 @@ non terminal Exp term;
 non terminal Exp factor;
 non terminal Exp atom;
 
-non terminal Exp expr;
-non terminal StringExp str;
-non terminal Substr Substr;
+non terminal Exp expr; // for all expressions
+non terminal Exp Defnexpr; // for all definition expressions 
+non terminal StringExp str; // for strings
+non terminal Substr Substr; // for substrings
 
 
 
@@ -155,16 +159,16 @@ stmtList ::= stmtList:lst stmt:s {:
 		RESULT = new StmtSequence(s);
 		:};
 
-stmt ::= Substr:subs {:RESULT = new Statement(subs); :} | definition:d {: RESULT = d; :} | str:s {: RESULT = new Statement(s); :} | arithmaticExpression:a {: RESULT = new Statement(a); :} SEMI; // |conditionalExpression:conditional {: RESULT = new Statement(conditional); :}|funDefn:func {: RESULT = func; :}; //
+stmt ::= Substr:subs {:RESULT = new Statement(subs); :} | funDefn:func {: RESULT = func; :} | definition:d {: RESULT = d; :} | str:s {: RESULT = new Statement(s); :} | arithmaticExpression:a {: RESULT = new Statement(a); :} SEMI; // |conditionalExpression:conditional {: RESULT = new Statement(conditional); :}; //
 
 str ::= STRING:s {: RESULT = new StringExp(s); :};
 
 Substr::= SUBSTR LPAREN expr:e COMMA arithmaticExpression:start COMMA arithmaticExpression:end RPAREN {: RESULT = new Substr(e,start,end); :};
 
 
-//funDefn ::= FUN VAR:v LPAREN paramListE:p RPAREN DEFINE And:a SEMI {: RESULT = new StmtFunDefn(v,p,new StmtSequence(new Statement(a))); :} |FUN VAR:var LPAREN paramListE:parameters RPAREN DEFINE LBRACE stmtList:statements RBRACE {: RESULT = new StmtFunDefn(var, parameters, statements); :} ;  
+funDefn ::= PROC LPAREN paramListE:parameters RPAREN LBRACE stmtList:statements RBRACE {: RESULT = new StmtFunDefn(parameters, statements); :} ; // PROC LPAREN paramListE:p RPAREN DEFINE And:a SEMI {: RESULT = new StmtFunDefn(v,p,new StmtSequence(new Statement(a))); :} |  
 
-/*
+
 paramList ::= paramList:pList COMMA VAR:var {: 
 	pList.add(var);
 	RESULT = pList; :} |
@@ -173,17 +177,17 @@ paramList ::= paramList:pList COMMA VAR:var {:
 	result.add(var);
 	RESULT = result;
 	:}; 
-*/
-
-//paramListE ::= paramList:paramList {: RESULT = paramList; :} | emptyS:e {: RESULT = e; :};
 
 
+paramListE ::= paramList:paramList {: RESULT = paramList; :} | emptyS:e {: RESULT = e; :};
 
 
-definition ::= DEF VAR:v expr:exp {: RESULT = new StmtDefinition(v,exp); :};
 
-expr ::= arithmaticExpression:a {: RESULT = new Statement(a); :} | str:s {: RESULT = new Statement(s); :} | Substr:str {: RESULT = new Statement(str); :};
 
+definition ::= DEF VAR:v Defnexpr:exp {: RESULT = new StmtDefinition(v,exp); :};
+
+Defnexpr ::= arithmaticExpression:a SEMI {: RESULT = new Statement(a); :} | str:s {: RESULT = new Statement(s); :} | Substr:str {: RESULT = new Statement(str); :} | funDefn:func {: RESULT = func; :};
+expr ::= arithmaticExpression:a {: RESULT = new Statement(a); :} | str:s {: RESULT = new Statement(s); :} | Substr:str {: RESULT = new Statement(str); :} | funDefn:func {: RESULT = func; :};
 
 /*
 definition ::= VAR:v ASSIGN comparisonExpression:e SEMI {:
@@ -203,21 +207,22 @@ ifdefn ::= VAR:v ASSIGN comparisonExpression:e {:
 
 
 
-/*
-args ::= args:aList COMMA comparisonExpression:e {: // a < b < c < d =>a,b and b,c and c,d
-	aList.add(e);
+
+args ::= args:aList COMMA expr:a {: // a < b < c < d =>a,b and b,c and c,d
+	aList.add(a);
 	RESULT = aList; :} |
-	comparisonExpression:e {:
+	expr:a{:
 	ArrayList<Exp> result = new ArrayList<>();
-	result.add(e);
+	result.add(a);
 	RESULT = result;
 	 :};
 
 argsE ::= args:aList {: RESULT = aList; :} | emptyA:e {: RESULT = e; :};
 
-funcall ::= VAR:name LPAREN argsE:arguments RPAREN {: RESULT = new ExpFunCall(name, arguments); :};
-*/
 
+funcall::= LPAREN funDefn:procedure RPAREN LPAREN argsE:arguments RPAREN{: RESULT = new ExpFunCall(procedure, arguments); :} | VAR:procedure LPAREN argsE:arguments RPAREN {: RESULT = new ExpFunCall(procedure, arguments); :}; //
+
+//funcall ::= VAR:name LPAREN argsE:arguments RPAREN {: RESULT = new ExpFunCall(name, arguments); :};
 
 
 //conditionalExpression:conditional {:RESULT = conditional;:} |
@@ -307,10 +312,10 @@ term ::= term:t MUL factor:f {: // x := f(2+1) + 1 * y
 factor ::= atom:a EXP factor:f {:RESULT = new ExpAdd(a,f); :} | atom:a {: RESULT = a; :};
 
 atom ::= INT:ilit {: RESULT = new ExpLit(ilit); :} |
-	   LPAREN arithmaticExpression:a RPAREN {: RESULT = a; :} | VAR:var {:RESULT = new ExpVar(var);:}; //funcall:fcall {:RESULT = fcall;:} |
+	   LPAREN arithmaticExpression:a RPAREN {: RESULT = a; :} | funcall:fcall {:RESULT = fcall;:} | VAR:var {:RESULT = new ExpVar(var);:}; //
 	   
 
-//emptyA ::= {: ArrayList<Exp> result = new ArrayList<>(); RESULT = result; :} ;
+emptyA ::= {: ArrayList<Exp> result = new ArrayList<>(); RESULT = result; :} ;
 emptyS ::= {: ArrayList<String> result = new ArrayList<>(); RESULT = result; :} ;
 empty ::= ;
 emptyElse ::= ;

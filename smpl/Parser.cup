@@ -216,8 +216,9 @@ factor ::= let:l {: RESULT = l; :} |
 		read:r {: RESULT = r; :} |
 		LPAREN expression:e RPAREN {: RESULT = e; :} |
 		VAR:var {: RESULT = new ExpVar(var); :} |
-		list:lst {: RESULT = lst; :} |
 		vector:vect {: RESULT = vect; :} |
+		list:lst {: RESULT = lst; :} |
+		NIL {: RESULT = new ExpLit("nil"); :} |
 		INT:ilit {: RESULT = new ExpLit<Integer>("number", ilit); :} |
 		DOUBLE:dlit {: RESULT = new ExpLit<Double>("number", dlit); :} |
 		BOOL:blit {: RESULT = new ExpLit<Boolean>("boolean", blit); :} |
@@ -275,7 +276,7 @@ ifStmt ::= IF expression:e THEN body:conseq else:alt {:
 				RESULT = new ExpIf(e, conseq, alt); :};
 
 else  ::= ELSE body:alt {: RESULT = alt; :} |
-			empty {: RESULT = new SmplNone(); :};
+			empty {: RESULT = new ExpLit("none"); :};
 
 
 funCall ::= CALL LPAREN expression:f COMMA expression:lst RPAREN {:
@@ -300,7 +301,7 @@ read ::= READ LPAREN RPAREN {: RESULT = new ExpRead(); :} |
 
 
 list ::= LSQPAREN pairElementLst:lst RSQPAREN {:
-			RESULT = new ExpLit<ArrayList<Exp>>("pair", lst); :};
+			RESULT = new ExpLit<ArrayList<Exp>>("list", lst); :};
 
 pairElementLst ::= pairElementLst:lst COMMA expression:e {:
 			lst.add(e);

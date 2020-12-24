@@ -131,23 +131,8 @@ hex = [0-9A-Fa-f]
 <YYINITIAL> "else" {return new Symbol(sym.ELSE);}
 <YYINITIAL>	"case"	{return new Symbol(sym.CASE);}
 
-/* REMEMBER THESE ARE REASSIGNABLE BY THE USER */
-<YYINITIAL>	"pair"	{return new Symbol(sym.PAIR);}
-<YYINITIAL>	"car"	{return new Symbol(sym.CAR);}
-<YYINITIAL>	"cdr"	{return new Symbol(sym.CDR);}
-<YYINITIAL>	"pair?"	{return new Symbol(sym.PAIR_PRED);}
-<YYINITIAL>	"list"	{return new Symbol(sym.LIST);}
-
 <YYINITIAL>	"[:"	{return new Symbol(sym.VECT_OPEN);}
 <YYINITIAL>	":]"	{return new Symbol(sym.VECT_CLOSE);}
-<YYINITIAL>	"size"	{return new Symbol(sym.SIZE);} // REMEMBER THIS IS REASSIGNABLE BY THE USER
-
-/* REMEMBER THESE ARE REASSIGNABLE BY THE USER */
-<YYINITIAL>	"eqv?"	{return new Symbol(sym.EQUIV_PRED);}
-<YYINITIAL>	"equal?"	{return new Symbol(sym.EQUAL_PRED);}
-
-/* REMEMBER THESE ARE REASSIGNABLE BY THE USER */
-<YYINITIAL>	"substr"	{return new Symbol(sym.SUBSTR);}
 
 <YYINITIAL>	"print"	{return new Symbol(sym.PRINT);}
 <YYINITIAL>	"println"	{return new Symbol(sym.PRINTLN);}

@@ -107,6 +107,15 @@ public class Environment<T> {
 	Environment<b> result =  new Environment<b>();
 	// add definitions for any primitive procedures or
 	// constants here
+
+	ArrayList<String> parameters = new ArrayList<String>();
+	parameters.add("string");parameters.add("start");parameters.add("end");
+	StmtSequence body = new StmtSequence(new Statement(new Substr(new ExpVar("string"),new ExpVar("start"),new ExpVar("end"))));
+	StmtFunDefn fd = new StmtFunDefn(parameters, body);
+	Closure closure = new Closure(fd,result);
+	SMPLObject substr = SMPL.makeInstance(closure);
+	
+	result.put("substr",(b) substr);
 	return result;
     }
 

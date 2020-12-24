@@ -131,7 +131,7 @@ hex = [0-9A-Fa-f]
 <YYINITIAL>	"eqv?"	{return new Symbol(sym.EQUIV_PRED);}
 <YYINITIAL>	"equal?"	{return new Symbol(sym.EQUAL_PRED);}
 
-<YYINITIAL>	"substr"	{return new Symbol(sym.SUBSTR);}
+<YYINITIAL>	"substrTESTING"	{return new Symbol(sym.SUBSTR);}
 
 
 <YYINITIAL>	"#t" {return new Symbol(sym.TRUE);}

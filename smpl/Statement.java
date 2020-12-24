@@ -22,7 +22,7 @@ public class Statement extends Exp {
     }
 
     public Exp getExp() {
-	return super.getSubTree(0);
+	return getSubTree(0);
     }
 
     public <S, T> T visit(Visitor<S, T> v, S arg) throws VisitException {

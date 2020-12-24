@@ -5,7 +5,7 @@ public class StmtDefinition extends Statement {
     //Exp exp;
 
     public StmtDefinition(String id, Exp e) {
-	super(":=", e);
+	super("def", e);
 	var = id;
 	// exp = e;
     }

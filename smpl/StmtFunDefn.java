@@ -1,38 +1,44 @@
-import java.util.ArrayList;
 
 /**
- * IR Class to represent a function definition
+ * IR Class to represent a function definition new vers
  */
+import java.util.ArrayList;
 public class StmtFunDefn extends Statement {
+    //String name;
+    ArrayList<String> parameters;
+    StmtSequence body;
     // Implement this class
 
-    String name;
-    ArrayList<String> params;
 
-    protected StmtFunDefn(String functionName, ArrayList<String> parameters, Exp body) {	// placeholder; can be removed eventually
-    super("funDef", body);
-    this.name = functionName;
-    this.params = parameters;
+    protected StmtFunDefn() {	// placeholder; can be removed eventually
+	super("funDef");
     }
 
-    public String getName(){
-    return this.name;
+
+    protected StmtFunDefn(ArrayList<String> funcParams, StmtSequence funcBody) {	// placeholder; can be removed eventually
+	super("funDef",funcBody);
+	this.parameters = funcParams;
+	this.body = funcBody;
+	
     }
 
-    public ArrayList<String> getParameters(){
-    return this.params;
+/*
+    public String getName() {	
+	return this.name;
+    }
+*/
+    public ArrayList<String> getParams() {	
+	return this.parameters;
     }
 
-    public Exp getBody(){
-    return super.getSubTree(0);
+    public StmtSequence getBody() {	
+	return this.body;
     }
 
-    public <S, T> T visit(Visitor<S,T> v, S arg) throws VisitException {
-    return v.visitStmtFunDefn(this, arg);
+    public <S,T> T visit(Visitor<S,T> v, S arg) throws VisitException {	
+	return v.visitStmtFunDefn(this,arg);
     }
-    
-    public String toString(){
-    return super.getName() + ": " + getName();
-    }
-    
+
+
+
 }

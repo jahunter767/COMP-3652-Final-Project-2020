@@ -1,6 +1,7 @@
 import java.util.*;
 
 /**
+ * new vers
  * An instance of class <code>Environment</code> maintains a
  * collection of bindings from valid identifiers to integers.
  * It supports storing and retrieving bindings, just as would
@@ -13,7 +14,8 @@ public class Environment<T> {
 
     Environment<T> parent;
     HashMap<String, T> dictionary;
-    HashMap<String, Closure<T>> functionDict;
+    //HashMap<String, Closure> closureDictionary = new HashMap<>(); 
+
 
     /**
      * Create a new (empty) top level Environment.
@@ -22,7 +24,6 @@ public class Environment<T> {
     public Environment() {
 	parent = null;
 	dictionary = new HashMap<>();
-	functionDict = new HashMap<>();
     }
 
     /**
@@ -36,12 +37,28 @@ public class Environment<T> {
      * have the same length.
      */
     public Environment(Environment<T> parent, String[] ids, T[] values) {
-    this();
 	this.parent = parent;
+	dictionary = new HashMap<>();
 	for (int i = 0; i < ids.length; i++) {
 	    dictionary.put(ids[i], values[i]);
+	}
     }
+
+/*
+    public Environment(Environment<T> parent, String[] ids, T[] values, String[] Fids, Closure[] closures) {
+	this.parent = parent;
+	dictionary = new HashMap<>();
+	for (int i = 0; i < ids.length; i++) {
+	    dictionary.put(ids[i], values[i]);
+	}
+
+	for (int i = 0; i < Fids.length; i++) {
+	    closureDictionary.put(Fids[i], closures[i]);
+	}
+	
     }
+
+*/
 
     /**
      * Creates a new <code>Environment</code> instance that is
@@ -55,12 +72,30 @@ public class Environment<T> {
      */
     public Environment(Environment<T> parent, ArrayList<String> ids,
 		       ArrayList<T> values) {
-    this();
-    this.parent = parent;
+	this.parent = parent;
+	dictionary = new HashMap<>();
 	for (int i = 0; i < ids.size(); i++) {
 	    dictionary.put(ids.get(i), values.get(i));
+	}
     }
+
+/*
+
+    public Environment(Environment<T> parent, ArrayList<String> ids,
+		       ArrayList<T> values, ArrayList<String> Fids, ArrayList<Closure> closures) {
+	this.parent = parent;
+	dictionary = new HashMap<>();
+	for (int i = 0; i < ids.size(); i++) {
+	    dictionary.put(ids.get(i), values.get(i));
+	}
+
+	for (int i = 0; i < Fids.size(); i++) {
+	    closureDictionary.put(Fids.get(i), closures.get(i));
+	}
+
     }
+
+*/
 
     /**
      * Create an instance of a global environment suitable for
@@ -68,8 +103,8 @@ public class Environment<T> {
      *
      * @return the <code>Environment</code> created.
      */
-    public static <T> Environment<T> makeGlobalEnv(Class<T> cls) {
-	Environment<T> result =  new Environment<T>();
+    public static <b> Environment<b> makeGlobalEnv (Class<b> cls) {
+	Environment<b> result =  new Environment<b>();
 	// add definitions for any primitive procedures or
 	// constants here
 	return result;
@@ -86,16 +121,13 @@ public class Environment<T> {
 	dictionary.put(id, value);
     }
 
-    /**
-     * Store a closure for the given function to in the current
-     * environment.
-     *
-     * @param fun the name of the function
-     * @param c the closure of the function
-     */
-    public void putClosure(String fun, Closure<T> c) {
-    functionDict.put(fun, c);
+/*
+    public double putClosure(String Fid, Closure closure) {
+	closureDictionary.put(Fid, closure);
+	return 1000D;
     }
+
+*/ 
 
     /**
      * Return the int associated with the given identifier.
@@ -116,29 +148,19 @@ public class Environment<T> {
 	    return result;
     }
 
-    /**
-     * Return the Clisure associated with the given function.
-     *
-     * @param fun the function name.
-     * @return the Closure associated with the function in
-     * this environment.
-     * @exception Exception if <code>fun</code> is unbound
-     */
-    public Closure<T> getClosure(String fun) throws UnboundVarException {
-    //System.out.println("Dict: " + functionDict.toString());
-    //System.out.println("FunName: " + functionDict.get(fun).getFunction().getName());
-    //System.out.println("ClosingEnv: " + functionDict.get(fun).getClosingEnv());
-    //System.out.println("Parent: " + parent);
-
-    Closure<T> result = functionDict.get(fun);
-    if (result == null)
-        if (parent == null)
-        throw new UnboundVarException(fun);
-        else
-        return parent.getClosure(fun);
-    else
-        return result;
+/*
+    public Closure getClosure(String Fid) throws UnboundVarException {
+	Closure result = closureDictionary.get(Fid);
+	if (result == null)
+	    if (parent == null)
+		throw new UnboundVarException(Fid);
+	    else
+		return parent.getClosure(Fid);
+	else
+	    return result;
     }
+
+*/
 
     /**
      * Create a string representation of this environment.

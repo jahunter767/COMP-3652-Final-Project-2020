@@ -56,12 +56,13 @@ public class Main {
 	try {
 	    PersistentWalker<?, ?> walker;	// to be set by switch statement
 	    if (walkerName.equals("")) {
-		walker = new PersistentWalker<Environment<Double>, Double>
-		    (new Evaluator(0D));
+		walker = new PersistentWalker<Environment<SMPLObject>, SMPLObject>
+		    (new Evaluator(SMPL.makeInstance(new Integer(0))));// CHANGE TO DEFAULT RETURN TYPE - USING NUMBERS FOR NOW. CAN BE CHANGED TO NONE TYPE
 	    } else {
 		Class<? extends Visitor<S, T>> wclass =
 		    (Class<? extends Visitor<S, T>>) Class.forName(walkerName);
 		walker = new PersistentWalker<S, T>(wclass.newInstance());
+		
 	    }
 
 	    for (String fname : filenames) {
@@ -110,7 +111,7 @@ public class Main {
 	    while (true) {
 		try {
 		    System.out.print(PROMPT);
-			String line = scanner.readLine();
+		    String line = scanner.readLine();
 		    while (line != null && !line.equals(".")) {
 			// we add a newline character so the lexer can see it
 			input.append(line + "\n");
@@ -146,7 +147,7 @@ public class Main {
 	try {
 	    parser = new ArithParser(new Lexer(reader));
 	    // now parse the input to produce an AST for the program
-	    ast = (ArithProgram) parser.parse().value;
+	    ast = (ArithProgram) parser.parse().value; 	//LOOK AT RETURN TYPE
 	} catch (TokenException te) {
 	    System.out.println("Lexing Error: "+ te.getMessage());
 	} catch (Exception e) {
@@ -158,8 +159,8 @@ public class Main {
 	if (ast != null)
 	    try {
 		// now walk the AST to evaluate the program.
-		result = walker.walk(ast);
-		System.out.println("\nResult: " + result);
+		result = walker.walk(ast); 
+		System.out.println("\nResult: " + result);// HERE CHANGE TO EXTRACT THE ANSWER  
 	    } catch (VisitException e) {
 		System.out.println(e.getMessage());
 	    }

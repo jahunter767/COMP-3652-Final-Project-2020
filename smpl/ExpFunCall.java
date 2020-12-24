@@ -1,32 +1,61 @@
-import java.util.ArrayList;
-
 /**
- * IR Class to represent a function call
+ * IR Class to represent a function call new vers
  */
+import java.util.ArrayList;
 public class ExpFunCall extends Exp {
-    
+    //SMPLFunction procedure;
+    Exp procedure;
+    String name;
+    ArrayList<Exp> arguments;
     // Implement this class
 
-    String name;
-
-    protected ExpFunCall(String funName, ArrayList<Exp> args) {	// placeholder; can be removed eventually
-    super("call", args);
-    this.name = funName;
+    protected ExpFunCall() {	// placeholder; can be removed eventually
+	super("Funcall");
     }
 
-    public String getName(){
-    return this.name;
+    protected ExpFunCall(SMPLFunction proc, ArrayList<Exp> funcArgs) {	// placeholder; can be removed eventually
+	super("Funcall",funcArgs);
+	this.procedure = null;
+	this.arguments = funcArgs;
     }
 
-    public ArrayList<Exp> getArgs(){
-    return super.getSubTrees();
+    protected ExpFunCall(Exp proc, ArrayList<Exp> funcArgs) {	// placeholder; can be removed eventually
+	super("Funcall",funcArgs);
+	this.procedure = proc;
+	this.name = null;
+	this.arguments = funcArgs;
     }
 
-    public <S, T> T visit(Visitor<S,T> v, S arg) throws VisitException {
-    return v.visitExpFunCall(this, arg);
+
+    protected ExpFunCall(String proc, ArrayList<Exp> funcArgs) {	// placeholder; can be removed eventually
+	super("Funcall",funcArgs);
+	this.procedure = null;
+	this.name = proc ;
+	this.arguments = funcArgs;
     }
-    
-    public String toString(){
-    return super.getName() + ": " + getName();
+
+    public Exp getProcedure() {
+	return this.procedure;
     }
+
+    public String getName() {
+	return this.name;
+    }
+
+    public ArrayList<Exp> getArgs() {
+	return this.arguments;
+    }
+
+    public String toString() {
+	return "";
+    }
+
+
+    public <S,T> T visit(Visitor<S,T> v, S arg) throws VisitException {
+	return v.visitExpFunCall(this, arg);
+    }
+
+
+
+
 }

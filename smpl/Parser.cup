@@ -75,27 +75,41 @@ terminal LESS, LESSEQ, EQUAL, GREATEREQ, GREATER, NEQUAL;
 terminal AND, OR, NOT;
 
 // terminals with values
+terminal String VAR;
 terminal Integer INT;
 terminal Double DOUBLE;
-terminal Boolean TRUE;
-terminal Boolean FALSE;
+terminal Boolean BOOL;
 terminal Character CHAR;
 terminal String STRING;
-terminal String VAR;
+terminal ExpLit<ArrayList> NIL;
 
 /* Non terminals */
 non terminal ArithProgram program;
 non terminal StmtSequence stmtList;
 non terminal Statement stmt;
+
+non terminal StmtPrint print;
+
 non terminal StmtDefinition definition;
+non terminal StmtDefinition assignment;
+
+non terminal Exp body;
+non terminal StmtSequence compoundExpr;
+
+non terminal ExpLet let;
+non terminal ArrayList<ExpBind> bindList;
+non terminal ExpBind binding;
 
 non terminal StmtFunDefn funDefn;
 non terminal ArrayList<String> paramList;
 non terminal ArrayList<String> paramListE;
 
+non terminal ExpCase case;
+non terminal ArrayList<ExpClause> clauseLst;
+non terminal ExpClause clause;
+
 non terminal ExpIf ifStmt;
-non terminal Exp else;
-non terminal StmtSequence conditionalBlock;
+non terminal StmtSequence else;
 
 non terminal Exp expression;
 non terminal Exp and;
@@ -103,13 +117,19 @@ non terminal Exp not;
 
 non terminal Exp comparator;
 
-non terminal ExpFunCall funCall;
-non terminal ArrayList<Exp> argList;
-non terminal ArrayList<Exp> argListE;
-
 non terminal Exp arithExp;
 non terminal Exp term;
 non terminal Exp factor;
+
+non terminal ExpFunCall funCall;
+non terminal ExpRead read;
+
+non terminal ExpLit<ArrayList<Exp>> list;
+non terminal ExpLit<ArrayList<Exp>> pair;
+non terminal ExpLit<ArrayList<Exp>> vector;
+non terminal ArrayList<Exp> objLst;
+non terminal Exp object;
+
 non terminal empty;
 
 /* Grammar rules */
@@ -122,64 +142,96 @@ stmtList ::= stmtList:lst stmt:s {:
 				:} |
 	    stmt:s {: RESULT = new StmtSequence(s); :};
 
-stmt ::= definition:d {: RESULT = d; :} |
-	 funDefn:funDef {: RESULT = funDef; :} |
-	 expression:e SEMI {: RESULT = new Statement(e); :} |
-	 ifStmt:i {: RESULT = new Statement(i); :};
+stmt ::= print:p SEMI {: RESULT = new ExpPrint(); :} |
+		let:l {: RESULT = l; :} |
+		funDefn:f {:RESULT = f; :} |
+		case:c {: RESULT = new Statement(c); :} |
+		ifStmt:i {: RESULT = new Statement(i); :} |
+		definition:d {:RESULT = d; :} |
+		assignment:a {:RESULT = a; :} |
+		expression:e SEMI {:RESULT = new Statement(e); :};
 
 
-funDefn ::= PROC LPAREN paramListE:pListE RPAREN BIND LBRACE stmtList:sList RBRACE {:
-				RESULT = new StmtFunDefn(pListE, sList); :};
+print ::= PRINT LPAREN expression:e RPAREN {: RESULT = new StmtPrint(e); :} |
+		PRINT LPAREN let:l RPAREN {: RESULT = new StmtPrint(l); :} |
+		PRINT LPAREN case:c RPAREN {: RESULT = new StmtPrint(c); :} |
+		PRINT LPAREN ifStmt:i RPAREN {: RESULT = new StmtPrint(i); :} |
+		PRINTLN LPAREN expression:e RPAREN {: RESULT = new StmtPrintln(e); :} |
+		PRINTLN LPAREN let:l RPAREN {: RESULT = new StmtPrintln(l); :} |
+		PRINTLN LPAREN case:c RPAREN {: RESULT = new StmtPrintln(c); :} |
+		PRINTLN LPAREN ifStmt:i RPAREN {: RESULT = new StmtPrintln(i); :};
+
+
+definition ::= DEF VAR:v let:l {: RESULT = new StmtDefinition(v, l); :} |
+				DEF VAR:v funDefn:f {: RESULT = new StmtDefinition(v, f); :} |
+				DEF VAR:v case:c {: RESULT = new StmtDefinition(v, c); :} |
+				DEF VAR:v ifStmt:i {: RESULT = new StmtDefinition(v, i); :} |
+				DEF VAR:v expression:e SEMI {: RESULT = new StmtDefinition(v, e); :};
+
+assignment ::= VAR:v ASSIGN let:l {: RESULT = new StmtAssignment(v, l); :} |
+				VAR:v ASSIGN funDefn:f {: RESULT = new StmtAssignment(v, f); :} |
+				VAR:v ASSIGN case:c {: RESULT = new StmtAssignment(v, c); :} |
+				VAR:v ASSIGN ifStmt:i {: RESULT = new StmtAssignment(v, i); :} |
+				VAR:v ASSIGN expression:e SEMI {: RESULT = new StmtAssignment(v, e); :};
+
+
+body ::= compoundExpr:sList {: RESULT = sList; :} |
+		expression:e SEMI {: RESULT = e; :};
+
+compoundExpr ::= LBRACE stmtList:sList RBRACE {: RESULT = sList; :};
+
+
+let ::= LET LPAREN bindList:bindLst RPAREN compoundExpr:sList {:
+	 		RESULT = new ExpLet(bindLst, sList); :};
+
+bindList ::= bindList:bindLst COMMA binding:b {:
+                bindLst.add(b);
+                RESULT = bindLst; :} |
+            binding:b {:
+                ArrayList<ExpBind> result = new ArrayList<ExpBind>();
+                result.add(b);
+                RESULT = result; :};
+
+binding ::= VAR:v BIND expression:e {: RESULT = new ExpBind(v, e); :};
+
+
+funDefn ::= PROC LPAREN paramListE:pListE RPAREN compoundExpr:sList {:
+				RESULT = new StmtFunDefn(pListE, sList); :} |
+			PROC LPAREN paramList:pList DOT VAR:paramOvf RPAREN compoundExpr:sList {:
+				RESULT = new StmtFunDefn(pList, paramOvf, sList); :} |
+			PROC VAR:v compoundExpr:sList {:
+				RESULT = new StmtFunDefn(v, sList); :};
 
 paramList ::=  paramList:pList COMMA VAR:v {:
 					pList.add(v);
 					RESULT = pList; :} |
-				VAR:v {: ArrayList<String> pList = new ArrayList<String>();
+				VAR:v {:
+					ArrayList<String> pList = new ArrayList<String>();
 					pList.add(v);
-					RESULT = pList;
-				:};
+					RESULT = pList; :};
 
 paramListE ::= paramList:pList {: RESULT = pList; :} |
 				empty {: RESULT = new ArrayList<String>(); :};
 
 
-funCall ::= VAR:v LPAREN argListE:aListE RPAREN {:
-				RESULT = new ExpFunCall(v, aListE); :};
+case ::= CASE LBRACE clauseLst:cList RBRACE {: RESULT = new ExpCase(cList); :};
 
-argList ::= argList:aList COMMA expression:e {:
-				aList.add(e);
-				RESULT = aList; :} |
-			expression:e {: ArrayList<Exp> aList = new ArrayList<Exp>();
-					aList.add(e);
-					RESULT = aList;
-			:};
+clauseLst ::= clauseLst:cList COMMA clause:c {:
+				cList.add(c);
+				RESULT = cList; :} |
+			clause:c {:
+				ArrayList<ExpClause> cList = new ArrayList<ExpClause>();
+				cList.add(c);
+				RESULT = cList; :};
 
-argListE ::= argList:aList {: RESULT = aList; :} |
-			empty {: RESULT = new ArrayList<Exp>(); :};
+clause ::= expression:pred COLON compoundExpr:conseq {: RESULT = new ExpClause(pred, conseq); :};
 
 
-definition ::= VAR:v ASSIGN expression:e SEMI {:
-					RESULT = new StmtDefinition(v, e); :} |
-				VAR:v ASSIGN ifStmt:i {:
-					RESULT = new StmtDefinition(v, i); :};
-
-
-ifStmt	::=	IF expression:e THEN expression:conseq else:alt {:
-				RESULT = new ExpIf(e, conseq, alt); :} |
-			IF expression:e THEN LBRACE conditionalBlock:conseq expression:end SEMI RBRACE else:alt {:
-				conseq.add(new Statement(end));
+ifStmt ::= IF expression:e THEN compoundExpr:conseq else:alt {:
 				RESULT = new ExpIf(e, conseq, alt); :};
 
-else  ::= ELSE expression:alt SEMI {: RESULT = alt; :} |
-			ELSE LBRACE conditionalBlock:alt expression:end SEMI RBRACE {:
-				alt.add(new Statement(end));
-				RESULT = alt; :} |
-			SEMI {: RESULT = new SmplNone; :};
-
-conditionalBlock ::= conditionalBlock:c stmt:s {:
-						c.add(s);
-						RESULT = c; :} |
-					empty {: RESULT = new StmtSequence(); :};
+else  ::= ELSE compoundExpr:alt {: RESULT = alt; :} |
+			empty {: RESULT = new SmplNone(); :};
 
 
 expression ::= expression:e OR and:a {: RESULT = new ExpOr(e, a); :} |
@@ -190,6 +242,7 @@ and ::= and:a AND not:n {: RESULT = new ExpAnd(a, n); :} |
 
 not ::= NOT comparator:c {: RESULT = new ExpNot(c); :} |
 		comparator:c {: RESULT = c; :};
+
 
 comparator ::= comparator:c LESS arithExp:a {:
 					RESULT = new ExpLess(c, a); :} |
@@ -205,6 +258,7 @@ comparator ::= comparator:c LESS arithExp:a {:
 					RESULT = new ExpNotEqual(c, a); :} |
 				arithExp:a {:
 					RESULT = a; :};
+
 
 arithExp ::= arithExp:a PLUS term:t {:
 			RESULT = new ExpAdd(a, t); :} |
@@ -222,9 +276,43 @@ term ::= term:t MUL factor:f {:
 	 factor:f {:
 	 	RESULT = f; :};
 
-factor ::= INT:ilit {: RESULT = new ExpLit(ilit); :} |
-	   funCall:fCall {: RESULT = fCall; :} |
+factor ::= funCall:fCall {: RESULT = fCall; :} |
+	   read:r {: RESULT = r; :}	|
+	   LPAREN expression:e RPAREN {: RESULT = e; :}	|
 	   VAR:var {: RESULT = new ExpVar(var); :} |
-	   LPAREN expression:e RPAREN {: RESULT = e; :}	;
+	   INT:ilit {: RESULT = new ExpLit<Integer>("number", ilit); :} |
+	   DOUBLE:dlit {: RESULT = new ExpLit<Double>("number", dlit); :} |
+	   BOOL:blit {: RESULT = new ExpLit<Boolean>("boolean", blit); :} |
+	   CHAR:charLit {: RESULT = new ExpLit<Character>("character", charLit); :} |
+	   STRING:strLit {: RESULT = new ExpLit<String>("string", strLit); :} |
+	   list:lst {: RESULT = lst; :} |
+	   vector:vect {: RESULT = vect; :};
+
+
+funCall ::= CALL LPAREN expression:f COMMA expression:lst RPAREN {:
+				RESULT = new ExpFunCall(f, lst); :};
+
+read ::= READ LPAREN RPAREN {: RESULT = new ExpRead(); :} |
+		READINT LPAREN RPAREN {: RESULT = new ExpReadInt(); :};
+
+
+list ::= LSQPAREN objLst:lst RSQPAREN {: RESULT = new ExpLit<ArrayList<Exp>>("pair", lst); :};
+
+vector ::= VECT_OPEN objLst:lst VECT_CLOSE {: RESULT = new ExpLit<ArrayList<Exp>>("vector", lst); :};
+
+objLst ::= objLst:oList COMMA object:o {:
+			oList.add(o);
+			RESULT = oList; :} |
+		object:o {:
+			ArrayList<Exp> oList = new ArrayList<Exp>();
+			oList.add(o);
+			RESULT = oList; :};
+
+object ::= let:l {: RESULT = l; :} |
+			funDefn:f {: RESULT = f; :} |
+			case:c {: RESULT = c; :} |
+			ifStmt:i {: RESULT = i; :} |
+			expression:e {: RESULT = e; :};
+
 
 empty ::= ;

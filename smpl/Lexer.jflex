@@ -59,6 +59,8 @@ cc = ([\b\f]|{nl})
 
 ws = {cc}|[\t ]
 
+space = [ \r\t]
+
 alpha = [a-zA-Z_]
 
 alphanum = {alpha}|[0-9]
@@ -80,47 +82,49 @@ hex = [0-9A-Fa-f]
 			 // skip whitespace
 			}
 
-<YYINITIAL>	"and"	{return new Symbol(sym.AND);}
-<YYINITIAL>	"or"	{return new Symbol(sym.OR);}
-<YYINITIAL>	"not"	{return new Symbol(sym.NOT);}
+<YYINITIAL>	{space}"and"{space}	{return new Symbol(sym.AND);}
+<YYINITIAL>	{space}"or"{space}	{return new Symbol(sym.OR);}
+<YYINITIAL>	{space}"not"{space}	{return new Symbol(sym.NOT);}
 
-<YYINITIAL>	" < "	{return new Symbol(sym.LESS);}
-<YYINITIAL>	" <= "	{return new Symbol(sym.LESSEQ);}
-<YYINITIAL>	" == "	{return new Symbol(sym.EQUAL);}
-<YYINITIAL>	" >= "	{return new Symbol(sym.GREATEREQ);}
-<YYINITIAL>	" > "	{return new Symbol(sym.GREATER);}
-<YYINITIAL>	" != "	{return new Symbol(sym.NEQUAL);}
+<YYINITIAL>	{space}"<"{space}	{return new Symbol(sym.LESS);}
+<YYINITIAL>	{space}"<="{space}	{return new Symbol(sym.LESSEQ);}
+<YYINITIAL>	{space}"=="{space}	{return new Symbol(sym.EQUAL);}
+<YYINITIAL>	{space}">="{space}	{return new Symbol(sym.GREATEREQ);}
+<YYINITIAL>	{space}">"{space}	{return new Symbol(sym.GREATER);}
+<YYINITIAL>	{space}"!="{space}	{return new Symbol(sym.NEQUAL);}
 
-<YYINITIAL>	" + "	{return new Symbol(sym.PLUS);}
-<YYINITIAL>	" - "	{return new Symbol(sym.MINUS);}
-<YYINITIAL>	" * "	{return new Symbol(sym.MUL);}
-<YYINITIAL>	" / "	{return new Symbol(sym.DIV);}
-<YYINITIAL>	" % "	{return new Symbol(sym.MOD);}
-<YYINITIAL>	" ^ "	{return new Symbol(sym.EXP);}
+<YYINITIAL>	{space}"+"{space}	{return new Symbol(sym.PLUS);}
+<YYINITIAL>	{space}"-"{space}	{return new Symbol(sym.MINUS);}
+<YYINITIAL>	{space}"*"{space}	{return new Symbol(sym.MUL);}
+<YYINITIAL>	{space}"/"{space}	{return new Symbol(sym.DIV);}
+<YYINITIAL>	{space}"%"{space}	{return new Symbol(sym.MOD);}
+<YYINITIAL>	{space}"^"{space}	{return new Symbol(sym.EXP);}
 
-<YYINITIAL>	" & "	{return new Symbol(sym.BIT_AND);}
-<YYINITIAL>	" | "	{return new Symbol(sym.BIT_OR);}
-<YYINITIAL>	" ~ "	{return new Symbol(sym.BIT_NOT);}
+<YYINITIAL>	{space}"&"{space}	{return new Symbol(sym.BIT_AND);}
+<YYINITIAL>	{space}"|"{space}	{return new Symbol(sym.BIT_OR);}
+<YYINITIAL>	{space}"~"{space}	{return new Symbol(sym.BIT_NOT);}
 
-<YYINITIAL>	" @ "	{return new Symbol(sym.LSTCONCAT);}
+<YYINITIAL>	{space}"@"{space}	{return new Symbol(sym.LSTCONCAT);}
 
-<YYINITIAL>	":="	{return new Symbol(sym.ASSIGN);}
+<YYINITIAL>	{space}":="{space}	{return new Symbol(sym.ASSIGN);}
 <YYINITIAL>	";"	{return new Symbol(sym.SEMI);}
 <YYINITIAL>	"{"	{return new Symbol(sym.LBRACE);}
 <YYINITIAL>	"}"	{return new Symbol(sym.RBRACE);}
 <YYINITIAL>	"("	{return new Symbol(sym.LPAREN);}
 <YYINITIAL>	")"	{return new Symbol(sym.RPAREN);}
-<YYINITIAL>	","	{return new Symbol(sym.COMMA);}
 <YYINITIAL>	"["	{return new Symbol(sym.LSQPAREN);}
 <YYINITIAL>	"]"	{return new Symbol(sym.RSQPAREN);}
+<YYINITIAL>	","	{return new Symbol(sym.COMMA);}
+<YYINITIAL>	":"	{return new Symbol(sym.COLON);}
 
 <YYINITIAL>	"def"	{return new Symbol(sym.DEF);}
 
 <YYINITIAL>	"proc"	{return new Symbol(sym.PROC);}
+<YYINITIAL>	{space}"."{space}	{return new Symbol(sym.DOT);}
 <YYINITIAL>	"call"	{return new Symbol(sym.CALL);}
 
 <YYINITIAL>	"let"	{return new Symbol(sym.LET);}
-<YYINITIAL>	" = "	{return new Symbol(sym.BIND);}
+<YYINITIAL>	{space}"="{space}	{return new Symbol(sym.BIND);}
 
 <YYINITIAL> "if" {return new Symbol(sym.IF);}
 <YYINITIAL> "then" {return new Symbol(sym.THEN);}
@@ -195,8 +199,8 @@ hex = [0-9A-Fa-f]
 	    	return new Symbol(sym.DOUBLE, new Double(yytext()));
 		}
 
-<YYINITIAL>	"#t"	{return new Symbol(sym.TRUE);}
-<YYINITIAL>	"#f"	{return new Symbol(sym.FALSE);}
+<YYINITIAL>	"#t"	{return new Symbol(sym.BOOL, new Boolean(True));}
+<YYINITIAL>	"#f"	{return new Symbol(sym.BOOL, new Boolean(False));}
 
 <YYINITIAL>	"#c"{alpha}	{return new Symbol(sym.CHAR,
 						new Character(yytext().charAt(2)));}
@@ -224,6 +228,8 @@ hex = [0-9A-Fa-f]
 
 	{stringChars}+	{strBuff.append(yytext());}
 }
+
+<YYINITIAL>	"#e"	{return new Symbol(sym.NIL);}
 
 <YYINITIAL>    \S		{ // error situation
 	       String msg = String.format("Unrecognised Token: %s", yytext());

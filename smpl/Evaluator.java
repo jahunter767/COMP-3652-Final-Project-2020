@@ -4,14 +4,12 @@ public class Evaluator implements Visitor<Environment<SMPLObject>, SMPLObject> {
     /* For this visitor, the argument passed to all visit
        methods will be the environment object that used to
        be passed to the eval method in the first style of
-       implementation. -- new vers -- */
+       implementation.*/
 
     // allocate state here
     protected SMPLObject result;	// result of evaluation
     private SMPLObject defaultValue;
     private Class<SMPLObject> myClass;
-    //private SMPLObject True;
-    //private SMPLObject False;
 
     protected Evaluator(){
 	this(SMPL.makeInstance(new Integer(-99)));
@@ -22,8 +20,6 @@ public class Evaluator implements Visitor<Environment<SMPLObject>, SMPLObject> {
 	this.defaultValue = defaultVal;
 	myClass = SMPLObject.class;
 	result = defaultValue;
-	//True = 0D;
-	//False = -10D;
     }
 
     public Environment<SMPLObject> getDefaultState() {
@@ -66,7 +62,6 @@ public class Evaluator implements Visitor<Environment<SMPLObject>, SMPLObject> {
     }
 
 
-
     public SMPLObject visitStmtFunDefn(StmtFunDefn fd, Environment<SMPLObject> env)
 	throws VisitException {
 	Closure closure = new Closure(fd,env);// wrap function in a closure
@@ -76,20 +71,22 @@ public class Evaluator implements Visitor<Environment<SMPLObject>, SMPLObject> {
     }
 
 
-
-
     public SMPLObject visitExpFunCall(ExpFunCall fc, Environment<SMPLObject> env)
 	throws VisitException, MismatchedParamsException {
+	SMPLFunction Func = env.get(fc.getName());
+	Closure c = Func.getClosure();
+
+	/*
 	SMPLFunction Func = null;
-;
 	if(fc.getProcedure() != null){Func = (SMPLFunction)fc.getProcedure().visit(this,env);}
 	else if(fc.getName() != null){Func = (SMPLFunction)env.get(fc.getName());}
 	else {throw new VisitException("Error: Unknown function.");}
-
-	ArrayList<SMPLObject> args = new ArrayList<>();
+	*/
+	
+	ArrayList<SMPLObject> args = new ArrayList<SMPLObject>();
 	ArrayList<Exp> exp = fc.getArgs(); // expressions that we got as arguments
-	StmtFunDefn myFunc = Func.getVal().getFunction();// getVal is the closure within SMPLFunction. The funcdef is within closure
-	ArrayList<String> parameters = myFunc.getParams(); // getParam is within the function defintion 
+	StmtFunDefn myFunc = Func.getClosure().getFunction();
+	ArrayList<String> parameters = myFunc.getParams(); // getParam is within the function defintion
 
 	if (parameters.size() != exp.size()){
 		throw new MismatchedParamsException(parameters.size(),exp.size());

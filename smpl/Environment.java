@@ -14,8 +14,6 @@ public class Environment<T> {
 
     Environment<T> parent;
     HashMap<String, T> dictionary;
-    //HashMap<String, Closure> closureDictionary = new HashMap<>(); 
-
 
     /**
      * Create a new (empty) top level Environment.
@@ -44,22 +42,6 @@ public class Environment<T> {
 	}
     }
 
-/*
-    public Environment(Environment<T> parent, String[] ids, T[] values, String[] Fids, Closure[] closures) {
-	this.parent = parent;
-	dictionary = new HashMap<>();
-	for (int i = 0; i < ids.length; i++) {
-	    dictionary.put(ids[i], values[i]);
-	}
-
-	for (int i = 0; i < Fids.length; i++) {
-	    closureDictionary.put(Fids[i], closures[i]);
-	}
-	
-    }
-
-*/
-
     /**
      * Creates a new <code>Environment</code> instance that is
      * initialised with the given collection of bindings
@@ -79,23 +61,6 @@ public class Environment<T> {
 	}
     }
 
-/*
-
-    public Environment(Environment<T> parent, ArrayList<String> ids,
-		       ArrayList<T> values, ArrayList<String> Fids, ArrayList<Closure> closures) {
-	this.parent = parent;
-	dictionary = new HashMap<>();
-	for (int i = 0; i < ids.size(); i++) {
-	    dictionary.put(ids.get(i), values.get(i));
-	}
-
-	for (int i = 0; i < Fids.size(); i++) {
-	    closureDictionary.put(Fids.get(i), closures.get(i));
-	}
-
-    }
-
-*/
 
     /**
      * Create an instance of a global environment suitable for
@@ -130,13 +95,6 @@ public class Environment<T> {
 	dictionary.put(id, value);
     }
 
-/*
-    public double putClosure(String Fid, Closure closure) {
-	closureDictionary.put(Fid, closure);
-	return 1000D;
-    }
-
-*/ 
 
     /**
      * Return the int associated with the given identifier.
@@ -157,19 +115,6 @@ public class Environment<T> {
 	    return result;
     }
 
-/*
-    public Closure getClosure(String Fid) throws UnboundVarException {
-	Closure result = closureDictionary.get(Fid);
-	if (result == null)
-	    if (parent == null)
-		throw new UnboundVarException(Fid);
-	    else
-		return parent.getClosure(Fid);
-	else
-	    return result;
-    }
-
-*/
 
     /**
      * Create a string representation of this environment.

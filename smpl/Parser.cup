@@ -119,7 +119,7 @@ non terminal Exp comparator;
 
 non terminal Exp arithExp;
 non terminal Exp term;
-non terminal Exp factor;
+non terminal Exp power;
 
 non terminal ExpFunCall funCall;
 non terminal ArrayList<Exp> argList;
@@ -199,16 +199,19 @@ arithExp ::= arithExp:a PLUS term:t {:
 		term:t {:
 			RESULT = t; :};
 
-term ::= term:t MUL factor:f {:
-		RESULT = new ExpMul(t, f); :} |
-	 term:t DIV factor:f {:
-		RESULT = new ExpDiv(t, f); :} |
-	 term:t MOD factor:f {:
-		RESULT = new ExpMod(t, f); :} |
-	 factor:f {:
-	 	RESULT = f; :};
+term ::= term:t MUL power:p {:
+		RESULT = new ExpMul(t, p); :} |
+	 term:t DIV power:p {:
+		RESULT = new ExpDiv(t, p); :} |
+	 term:t MOD power:p {:
+		RESULT = new ExpMod(t, p); :} |
+	 power:p {:
+	 	RESULT = p; :};
 
-factor ::= let:l {: RESULT = l; :} |
+power ::= lit:l EXP power:p {: RESULT = new ExpPow(l, p); :} |
+			lit:l {: RESULT = l; :};
+
+lit ::= let:l {: RESULT = l; :} |
 		funDefn:f {: RESULT = f; :} |
 		case:c {: RESULT = c; :} |
 		ifStmt:i {: RESULT = i; :} |
@@ -218,7 +221,7 @@ factor ::= let:l {: RESULT = l; :} |
 		VAR:var {: RESULT = new ExpVar(var); :} |
 		vector:vect {: RESULT = vect; :} |
 		list:lst {: RESULT = lst; :} |
-		NIL {: RESULT = new ExpLit("nil"); :} |
+		NIL {: RESULT = new ExpLit<String>("nil"); :} |
 		INT:ilit {: RESULT = new ExpLit<Integer>("number", ilit); :} |
 		DOUBLE:dlit {: RESULT = new ExpLit<Double>("number", dlit); :} |
 		BOOL:blit {: RESULT = new ExpLit<Boolean>("boolean", blit); :} |
@@ -276,7 +279,7 @@ ifStmt ::= IF expression:e THEN body:conseq else:alt {:
 				RESULT = new ExpIf(e, conseq, alt); :};
 
 else  ::= ELSE body:alt {: RESULT = alt; :} |
-			empty {: RESULT = new ExpLit("none"); :};
+			empty {: RESULT = new ExpLit<String>("none"); :};
 
 
 funCall ::= CALL LPAREN expression:f COMMA expression:lst RPAREN {:

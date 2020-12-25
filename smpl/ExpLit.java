@@ -9,6 +9,12 @@ public class ExpLit<D> extends Exp {
 	this.val = v;
     }
 
+    public ExpLit(String t) {
+    super("literal");
+    this.type = t;
+	this.val = null;
+    }
+
     public String getType() {
 	return type;
     }
@@ -22,7 +28,7 @@ public class ExpLit<D> extends Exp {
     }
 
     public String toString() {
-	return Integer.toString(val);
+	return type;
     }
 }
 

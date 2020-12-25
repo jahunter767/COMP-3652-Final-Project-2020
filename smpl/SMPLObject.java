@@ -94,15 +94,21 @@ public abstract class SMPLObject<T>{
     }
 
 
+    public SMPLObject car(SMPLObject object) throws TypeException {
+	throw new TypeException();
+    }
+
+    public SMPLObject cdr(SMPLObject object) throws TypeException {
+	throw new TypeException();
+    }
+
     public SMPLObject concat(SMPLObject object) throws TypeException {
 	throw new TypeException();
     }
 
-
     public SMPLObject eqv(SMPLObject object) throws TypeException{
 	throw new TypeException();
     }
-
 
     public SMPLObject Substr(SMPLObject arg1, SMPLObject arg2) throws TypeException, SubstringException{
 	throw new TypeException();

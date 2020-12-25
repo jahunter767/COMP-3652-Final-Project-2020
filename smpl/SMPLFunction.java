@@ -2,20 +2,16 @@ import java.util.ArrayList;
 
 
 public class SMPLFunction extends SMPLObject<Closure> {
+    public SMPLFunction(Closure val) {
+	super(val);
+    }
 
-    
-    public SMPLFunction(String type, Closure val) {
-	super(type, val);
+    public Closure getClosure(){
+        return getVal();
     }
 
     public String toString(){
-	return "Type: " + getType() + "\nValue: " + getVal().toString();
+	return "Type: SMPLFunction\nValue: " + getVal().toString();
     }
-
-
-    public String printVal(){
-	return getVal().toString();
-    }
-
 
 }

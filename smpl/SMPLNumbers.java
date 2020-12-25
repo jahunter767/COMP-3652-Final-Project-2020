@@ -1,6 +1,4 @@
-import java.util.ArrayList;
 import java.lang.Math;
-
 
 public class SMPLNumbers extends SMPLObject<Double> {    
     public SMPLNumbers(Double val) {
@@ -13,6 +11,10 @@ public class SMPLNumbers extends SMPLObject<Double> {
 
     public boolean isInt(){
 	return getVal().intValue() == getVal().doubleValue();
+    }
+
+	public int getIntVal(){
+	return getVal().intValue();
     }
 
 
@@ -185,12 +187,12 @@ public class SMPLNumbers extends SMPLObject<Double> {
 	}
 
     public SMPLObject eqv(SMPLObject object) throws TypeException {
-		return new SMPLBoolean(this == object);
+	return new SMPLBoolean(this == object);
     }
 
 
     public String toString(){
-	return "Type: " + getType() + "\nValue: " + String.valueOf(getVal());
+	return "Type: SMPLNumbers\nValue: " + String.valueOf(getVal());
     }
 
 }

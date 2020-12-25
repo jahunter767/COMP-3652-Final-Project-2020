@@ -1,4 +1,4 @@
-public class SMPLCharacter extends SMPLObject<Double> {    
+public class SMPLCharacter extends SMPLObject<Character> {    
     public SMPLCharacter(Character val) {
 	super(val);
     }
@@ -15,12 +15,12 @@ public class SMPLCharacter extends SMPLObject<Double> {
     }
 
     public SMPLObject eqv(SMPLObject object) throws TypeException {
-		return new SMPLBoolean(this == object);
+	return new SMPLBoolean(this == object);
     }
 
 
     public String toString(){
-	return "Type: " + getType() + "\nValue: " + String.valueOf(getVal());
+	return "Type: SMPLCharacter\nValue: " + String.valueOf(getVal());
     }
 
 }

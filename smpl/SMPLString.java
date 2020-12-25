@@ -1,13 +1,16 @@
-import java.util.ArrayList;
-
 public class SMPLString extends SMPLObject<String> {
     public SMPLString(String val) {
 	super(val);
     }
 
 
-    public SMPLObject equalTo(SMPLObject object) throws TypeException {
-    if(object instanceof SMPLString){
+	public int getLen(){
+		return getVal().length();
+	}
+
+
+	public SMPLObject equalTo(SMPLObject object) throws TypeException {
+    if (object instanceof SMPLString){
 		SMPLString obj = (SMPLString) object;
 		String val2 = obj.getVal();
 		return new SMPLBoolean(getVal().equals(val2));
@@ -17,51 +20,34 @@ public class SMPLString extends SMPLObject<String> {
     }
 
     public SMPLObject eqv(SMPLObject object) throws TypeException {
-		return new SMPLBoolean(this == object);
+	return new SMPLBoolean(this == object);
     }
 
-    public SMPLObject Substr(SMPLObject arg1,SMPLObject arg2) throws TypeException, SubstringException {
-	if(isType("Numbers", arg1.getType()) && arg1.isEqualType(arg2.getType())){
+    public SMPLObject substr(SMPLObject arg1,SMPLObject arg2) throws TypeException, SubstringException {
+	if ((arg1 instanceof SMPLNumbers) && (arg2 instanceof SMPLNumbers)){
 		SMPLNumbers s = (SMPLNumbers)arg1;
 		SMPLNumbers e = (SMPLNumbers)arg2;
 		String result = "";
-		int start = s.getVal().intValue();
-		int end = e.getVal().intValue();
+		int start = s.getIntVal();
+		int end = e.getIntVal();
+		int len = getLen();
 		
-		if(end < start){
-
-			return SMPL.makeInstance(result); //
-
-		}else if(start >= 0 && start < getVal().length()){
-
+		if(end <= start){
+			return new SMPLString(result);
+		}else if ((start >= 0) && (start < len) && (end <= len)){
 			result = getVal().substring(start,end);
-			return SMPL.makeInstance(result);
-
+			return new SMPLString(result);
 		}else{
 			throw new SubstringException();
 		}
-
-    	} else {
-		
+    }else{
 		throw new TypeException();
 	}
-
     }
 
 
-
-
-
-    public String toString(){
-	return "Type: " + getType() + "\nValue: " + getVal();
+	public String toString(){
+	return "Type: SMPLString\nValue: " + getVal();
     }
-
-
-    public String printVal(){
-	return String.valueOf(getVal());
-    }
-
-
-
 
 }

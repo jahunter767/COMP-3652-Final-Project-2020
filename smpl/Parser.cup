@@ -283,7 +283,7 @@ else  ::= ELSE body:alt {: RESULT = alt; :} |
 
 
 funCall ::= CALL LPAREN expression:f COMMA expression:lst RPAREN {:
-				RESULT = new ExpFunCall(f, lst); :} |
+				RESULT = new ExpCall(f, lst); :} |
 			VAR:v LPAREN argListE:aListE RPAREN {:
 				RESULT = new ExpFunCall(v, aListE); :};
 

@@ -11,9 +11,11 @@ public class SMPL {
 
 	try{
 		if(type == "number") return new SMPLNumbers(lit.getVal());
+		if(type == "boolean") return new SMPLBoolean(lit.getVal());
 		if(type == "character") return new SMPLCharacter(lit.getVal());
 		if(type == "string") return new SMPLString(lit.getVal());
-		if(type == "function") return new SMPLFunction(lit.getVal());
+		if(type == "nill") return new SMPLNill();
+		if(type == "none") return new SMPLNone();
 	}catch(ClassNotFoundException ex) { 
 		System.out.println(ex.toString());
 		return null;// or make the none type
@@ -21,7 +23,7 @@ public class SMPL {
 	return null;
     }
 
-	public static SMPLObject makeInstance(ExpLit lit, ArrayList<SMPLObject> seq{
+	public static SMPLObject makeInstance(ExpLit lit, ArrayList<SMPLObject> seq){
 	String type = lit.getType();
 
 	try{

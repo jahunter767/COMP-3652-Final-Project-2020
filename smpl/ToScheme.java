@@ -23,6 +23,17 @@ public class ToScheme implements Visitor<Void, String> {
 	return result;
     }
 
+
+    public SMPLObject visitSubstr(Substr exp, Void arg)
+	throws VisitException {
+	String arg1, arg2, arg3;
+	arg1 = exp.getArg1().toString() + " ";
+	arg2 = exp.getArg2().toString() + " ";
+	arg3 = exp.getArg3().toString();
+	return "(substr" + arg1 + + arg2 + arg3 ")";
+    }
+
+
     // statements
     public String visitStatement(Statement stmt, Void arg)
 	throws VisitException {
@@ -57,18 +68,23 @@ public class ToScheme implements Visitor<Void, String> {
 	    valExp + ")";
     }
 
-    public String visitStmtFunDefn(StmtFunDefn fd, Void env)
+    // expressions
+	public String visitStmtFunDefn(StmtFunDefn fd, Void arg)
 	throws VisitException {
 	ArrayList<String> params = fd.getParameters();
-	String result = "(define " + fd.getName() + " (params " + params.remove(0);
+	String result = "(proc (params " + params.remove(0);
 	for (String p : params){
 		result = result + " " + p;
+	}
+	String ovf = fd.getParamOvf();
+	if (ovf != null){
+		result = result + " (rest " + ovf + ")";
 	}
 	result = result + ") (body " + fd.getBody().toString() + ")";
 	return result;
     }
 
-    public String visitExpFunCall(ExpFunCall fc, Void env)
+    public String visitExpFunCall(ExpFunCall fc, Void arg)
 	throws VisitException {
 	ArrayList<Exp> args = fc.getArgs();
 	String result = "(call " + fc.getName() + " (args " + args.remove(0).toString();
@@ -79,8 +95,16 @@ public class ToScheme implements Visitor<Void, String> {
 	return result;
 	}
 
-    // expressions
-	public String visitExpIf(ExpIf ifStmt, Void env)
+	public String visitExpCall(ExpCall fc, Void arg)
+	throws VisitException {
+	Exp args = fc.getArgs();
+	Exp body = fc.getFunction();
+	String result = "(call " + body.visit(this, arg) + "(args " + args.visit(this, arg) + ") )";
+	return result;
+	}
+
+
+	public String visitExpIf(ExpIf ifStmt, Void arg)
 	throws VisitException {
 	String result = "(if " + ifStmt.getPredicate() + 
 					" (consequence " + ifStmt.getConsequent() +
@@ -88,59 +112,38 @@ public class ToScheme implements Visitor<Void, String> {
 	return result;
     }
 
-	public String visitExpAdd(ExpAdd exp, Void arg)
+	public String visitExpCase(ExpCase c, Void arg)
 	throws VisitException {
-	String left = exp.getExpL().visit(this, arg);
-	String right = exp.getExpR().visit(this, arg);
-	return "(+ " + left + " " + right + ")";
-    }
-    public String visitExpSub(ExpSub exp, Void arg)
-	throws VisitException {
-	String left = exp.getExpL().visit(this, arg);
-	String right = exp.getExpR().visit(this, arg);
-	return "(- " + left + " " + right + ")";
+	ArrayList<ExpClauses> clauses = c.getClauses();
+	String result = "(case " + clauses.remove(0).toString();
+	for (Exp c : clauses){
+		result = result + " " + c.toString();
+	}
+	result = result + " )"
+	return result;
     }
 
-    public String visitExpMul(ExpMul exp, Void arg)
-	throws VisitException {
-	String left = exp.getExpL().visit(this, arg);
-	String right = exp.getExpR().visit(this, arg);
-	return "(* " + left + " " + right + ")";
-    }
 
-    public String visitExpDiv(ExpDiv exp, Void arg)
-	throws VisitException {
-	String left = exp.getExpL().visit(this, arg);
-	String right = exp.getExpR().visit(this, arg);
-	return "(/ " + left + " " + right + ")";
-    }
-
-    public String visitExpMod(ExpMod exp, Void arg)
+	public String visitExpBitwiseAnd(ExpBitwiseAnd exp, Void arg)
 	throws VisitException{
 	String left = exp.getExpL().visit(this, arg);
 	String right = exp.getExpR().visit(this, arg);
-	return "(mod " + left + " " + right + ")";
-    }
-
-	public String visitExpAnd(ExpAnd exp, Void arg)
-	throws VisitException{
-	String left = exp.getExpL().visit(this, arg);
-	String right = exp.getExpR().visit(this, arg);
-	return "(and " + left + " " + right + ")";
+	return "(& " + left + " " + right + ")";
 	}
 
-	public String visitExpOr(ExpOr exp, Void arg)
+	public String visitExpBitwiseOr(ExpBitwiseOr exp, Void arg)
 	throws VisitException{
 	String left = exp.getExpL().visit(this, arg);
 	String right = exp.getExpR().visit(this, arg);
-	return "(or " + left + " " + right + ")";
+	return "(| " + left + " " + right + ")";
     }
 
-	public String visitExpNot(ExpNot exp, Void arg)
+	public String visitExpBitwiseNot(ExpBitwiseNot exp, Void arg)
 	throws VisitException{
 	String pred = exp.getPredicate().visit(this, arg);
-	return "(not " + pred + ")";
-    }
+	return "(~ " + pred + ")";
+	}
+
 
 	public String visitExpLess(ExpLess exp, Void arg)
 	throws VisitException {
@@ -206,7 +209,6 @@ public class ToScheme implements Visitor<Void, String> {
 	}
 	}
 
-
 	public String visitExpGreater(ExpGreater exp, Void arg)
 	throws VisitException {
 	Exp left = exp.getLeftPred();
@@ -238,6 +240,69 @@ public class ToScheme implements Visitor<Void, String> {
 		return "(!= " + left1 + " " + right1 + ")";
 	}
 	}
+
+
+	public String visitExpAnd(ExpAnd exp, Void arg)
+	throws VisitException{
+	String left = exp.getExpL().visit(this, arg);
+	String right = exp.getExpR().visit(this, arg);
+	return "(and " + left + " " + right + ")";
+	}
+
+	public String visitExpOr(ExpOr exp, Void arg)
+	throws VisitException{
+	String left = exp.getExpL().visit(this, arg);
+	String right = exp.getExpR().visit(this, arg);
+	return "(or " + left + " " + right + ")";
+    }
+
+	public String visitExpNot(ExpNot exp, Void arg)
+	throws VisitException{
+	String pred = exp.getPredicate().visit(this, arg);
+	return "(not " + pred + ")";
+    }
+
+
+	public String visitExpAdd(ExpAdd exp, Void arg)
+	throws VisitException {
+	String left = exp.getExpL().visit(this, arg);
+	String right = exp.getExpR().visit(this, arg);
+	return "(+ " + left + " " + right + ")";
+    }
+    public String visitExpSub(ExpSub exp, Void arg)
+	throws VisitException {
+	String left = exp.getExpL().visit(this, arg);
+	String right = exp.getExpR().visit(this, arg);
+	return "(- " + left + " " + right + ")";
+    }
+
+    public String visitExpMul(ExpMul exp, Void arg)
+	throws VisitException {
+	String left = exp.getExpL().visit(this, arg);
+	String right = exp.getExpR().visit(this, arg);
+	return "(* " + left + " " + right + ")";
+    }
+
+    public String visitExpDiv(ExpDiv exp, Void arg)
+	throws VisitException {
+	String left = exp.getExpL().visit(this, arg);
+	String right = exp.getExpR().visit(this, arg);
+	return "(/ " + left + " " + right + ")";
+    }
+
+    public String visitExpMod(ExpMod exp, Void arg)
+	throws VisitException{
+	String left = exp.getExpL().visit(this, arg);
+	String right = exp.getExpR().visit(this, arg);
+	return "(% " + left + " " + right + ")";
+    }
+
+	public String visitExpPow(ExpPow exp, Void arg)
+	throws VisitException{
+	String left = exp.getExpL().visit(this, arg);
+	String right = exp.getExpR().visit(this, arg);
+	return "(^ " + left + " " + right + ")";
+    }
 
 
     public String visitExpVar(ExpVar exp, Void arg)

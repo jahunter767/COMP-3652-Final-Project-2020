@@ -1,14 +1,12 @@
 import java.util.ArrayList;
 
-/**
- * IR Class to represent an if statement
- */
 public class ExpCase extends Exp {
-
-    Exp  predicate;
-
     protected ExpCase(ArrayList<ExpClause> clauses) {
     super("case", clauses);
+    }
+
+    public ArrayList<ExpClauses> getClauses(){
+    return super().getSubTrees();
     }
 
     public <S, T> T visit(Visitor<S,T> v, S arg) throws VisitException {

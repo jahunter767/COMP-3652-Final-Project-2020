@@ -12,6 +12,9 @@ public interface Visitor<S, T> {
     // program
     public T visitArithProgram(ArithProgram p, S arg) throws VisitException;
 
+    // built-ins
+    public T visitSubstr(Substr exp, S arg) throws VisitException;
+
 
     // statements
     public T visitStatement(Statement exp, S arg) throws VisitException ;
@@ -21,7 +24,11 @@ public interface Visitor<S, T> {
 
     // expressions
     public T visitExpFunCall(ExpFunCall fc, S arg) throws VisitException;
-    public T visitExpIf(ExpFunCall fc, S arg) throws VisitException;
+    public T visitExpCall(ExpCall fc, S arg) throws VisitException;
+
+    public T visitExpIf(ExpIf ifStmt, S arg) throws VisitException;
+    public T visitExpCase(ExpCase c, S arg) throws VisitException;
+    public T visitExpClause(ExpClause c, S arg) throws VisitException;
 
     // bitwise expressions
     public T visitExpBitwiseNot(ExpBitwiseNot exp, S arg) throws VisitException;

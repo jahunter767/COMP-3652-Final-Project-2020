@@ -6,21 +6,34 @@ import java.util.ArrayList;
 public class StmtFunDefn extends Statement {
     // Implement this class
 
-    String name;
     ArrayList<String> params;
+    String paramOvf;
 
-    protected StmtFunDefn(String functionName, ArrayList<String> parameters, Exp body) {	// placeholder; can be removed eventually
+    protected StmtFunDefn(String param, Exp body) {
     super("funDef", body);
-    this.name = functionName;
-    this.params = parameters;
+    this.params = new ArrayList<String>();
+    this.paramOvf = param;
     }
 
-    public String getName(){
-    return this.name;
+    protected StmtFunDefn(ArrayList<String> parameters, Exp body) {
+    super("funDef", body);
+    this.params = parameters;
+    this.paramOvf = null;
     }
+
+    protected StmtFunDefn(ArrayList<String> parameters, String paramOvf, Exp body) {
+    super("funDef", body);
+    this.params = parameters;
+    this.paramOvf = paramOvf;
+    }
+
 
     public ArrayList<String> getParameters(){
     return this.params;
+    }
+
+    public String getParamOvf(){
+    return this.paramOvf;
     }
 
     public Exp getBody(){

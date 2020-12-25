@@ -118,7 +118,7 @@ public class SMPLNumbers extends SMPLObject<Double> {
 	if(object instanceof SMPLNumbers){
 		SMPLNumbers obj = (SMPLNumbers) object;
 		Double val2 = obj.getVal();
-		Double result = Math.pow(getVal(), val2
+		Double result = Math.pow(getVal(), val2);
 		return new SMPLNumbers(result);
     }else {
 		throw new TypeException();

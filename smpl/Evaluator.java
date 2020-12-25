@@ -1,49 +1,53 @@
 import java.util.*;
 
-public class Evaluator implements Visitor<Environment<ExpLit>, ExpLit> {
+public class Evaluator implements Visitor<Environment<SMPLObject>, SMPLObject> {
     /* For this visitor, the argument passed to all visit
        methods will be the environment object that used to
        be passed to the eval method in the first style of
-       implementation. */
+       implementation. -- new vers -- */
 
     // allocate state here
-    protected ExpLit result;	// result of evaluation
-    private ExpLit defaultValue;
-    private Class<ExpLit> myClass;
+    protected SMPLObject result;	// result of evaluation
+    private SMPLObject defaultValue;
+    private Class<SMPLObject> myClass;
+    //private SMPLObject True;
+    //private SMPLObject False;
 
-    protected Evaluator() {
-	this(new SmplNone()));
+    protected Evaluator(){
+	this(SMPL.makeInstance(new Integer(-99)));
     }
 
-    public Evaluator(ExpLit defaultVal) {
+    public Evaluator(SMPLObject defaultVal) {
 	// perform initialisations here
 	this.defaultValue = defaultVal;
-	myClass = ExpLit.class;
+	myClass = SMPLObject.class;
 	result = defaultValue;
+	//True = 0D;
+	//False = -10D;
     }
 
-    public Environment<ExpLit> getDefaultState() {
+    public Environment<SMPLObject> getDefaultState() {
 	return Environment.makeGlobalEnv(myClass);
     }
 
-    public ExpLit visitArithProgram(ArithProgram p, Environment<ExpLit> env)
+    public SMPLObject visitArithProgram(ArithProgram p, Environment<SMPLObject> env)
 	throws VisitException {
 	result = p.getSeq().visit(this, env);
 	return result;
     }
 
-    public ExpLit visitStatement(Statement s, Environment<ExpLit> env)
+    public SMPLObject visitStatement(Statement s, Environment<SMPLObject> env)
     throws VisitException {
 	return s.getExp().visit(this, env);
     }
 
-    public ExpLit visitStmtSequence(StmtSequence sseq, Environment<ExpLit> env)
+    public SMPLObject visitStmtSequence(StmtSequence sseq, Environment<SMPLObject> env)
 	throws VisitException {
 	// remember that env is the environment
 	Statement s;
 	ArrayList seq = sseq.getSeq();
 	Iterator iter = seq.iterator();
-	ExpLit result = defaultValue;
+	SMPLObject result = defaultValue;
 	while(iter.hasNext()) {
 	    s = (Statement) iter.next();
 	    result = s.visit(this, env);
@@ -52,233 +56,96 @@ public class Evaluator implements Visitor<Environment<ExpLit>, ExpLit> {
 	return result;
     }
 
-    public ExpLit visitStmtDefinition(StmtDefinition sd, Environment<ExpLit> env)
+    public SMPLObject visitStmtDefinition(StmtDefinition sd,
+				      Environment<SMPLObject> env)
 	throws VisitException {
-	ExpLit result;
+	SMPLObject result;
 	result = sd.getExp().visit(this, env);
 	env.put(sd.getVar(), result);
 	return result;
     }
 
-    public ExpLit visitStmtFunDefn(StmtFunDefn fd, Environment<ExpLit> env)
+
+
+    public SMPLObject visitStmtFunDefn(StmtFunDefn fd, Environment<SMPLObject> env)
 	throws VisitException {
-	Closure c = new Closure(fd, env);
-	env.putClosure(fd.getName(), c);
-	return new SmplNone();
+	Closure closure = new Closure(fd,env);// wrap function in a closure
+	SMPLObject f = SMPL.makeInstance(closure); //wrap that closure in SMPLFunc 
+	// to be implemented
+	return f; // return that SMPLFunc
     }
 
-    public ExpLit visitExpFunCall(ExpFunCall fc, Environment<ExpLit> env)
-	throws VisitException {
-	Closure c = env.getClosure(fc.getName());
-	StmtFunDefn funDef = c.getFunction();
 
-	ArrayList<Exp> args = fc.getArgs();
-	ArrayList<ExpLit> values = new ArrayList<ExpLit>();
-	for (Exp arg : args){
-		values.add(arg.visit(this, env));
-	}
 
-	ArrayList<String> params = funDef.getParameters();
-	Environment<ExpLit> subEnv = new Environment<ExpLit>(c.getClosingEnv(), params, values);
-	Exp body = funDef.getBody();
-	return body.visit(this, subEnv);
-	}
 
-	public ExpLit visitExpIf(ExpIf ifStmt, Environment<ExpLit> env)
-	throws VisitException {
-	SmplBool decision = ifStmt.getPredicate().visit(this, env);
-	if (decision.getVal()){
-		return ifStmt.getAlternative().visit(this, env);
-	}else{
-		return ifStmt.getConsequent().visit(this, env);
+    public SMPLObject visitExpFunCall(ExpFunCall fc, Environment<SMPLObject> env)
+	throws VisitException, MismatchedParamsException {
+	SMPLFunction Func = null;
+;
+	if(fc.getProcedure() != null){Func = (SMPLFunction)fc.getProcedure().visit(this,env);}
+	else if(fc.getName() != null){Func = (SMPLFunction)env.get(fc.getName());}
+	else {throw new VisitException("Error: Unknown function.");}
+
+	ArrayList<SMPLObject> args = new ArrayList<>();
+	ArrayList<Exp> exp = fc.getArgs(); // expressions that we got as arguments
+	StmtFunDefn myFunc = Func.getVal().getFunction();// getVal is the closure within SMPLFunction. The funcdef is within closure
+	ArrayList<String> parameters = myFunc.getParams(); // getParam is within the function defintion 
+
+	if (parameters.size() != exp.size()){
+		throw new MismatchedParamsException(parameters.size(),exp.size());
 	}
+	
+	for(int i = 0; i < parameters.size(); i++){
+		args.add(exp.get(i).visit(this,env));// bounding the arguments to variables 
+		
+	}
+	
+	Environment newEnv = new Environment(Func.getVal().getClosingEnv(),parameters,args);
+	
+	return myFunc.getBody().visit(this,newEnv);
     }
 
-    public ExpLit visitExpAdd(ExpAdd exp, Environment<ExpLit> env)
+
+
+    public SMPLObject visitExpAdd(ExpAdd exp, Environment<SMPLObject> env)
 	throws VisitException {
-	ExpLit val1, val2;
+	SMPLObject val1, val2;
 	val1 = exp.getExpL().visit(this, env);
 	val2 = exp.getExpR().visit(this, env);
-	if ((val1 instanceof SmplDouble) || (val2 instanceof SmplDouble)){
-		return new SmplDouble(val1.getVal() + val2.getVal());
-	}
-	return new SmplInt(val1.getVal() + val2.getVal());
+	return val1.add(val2);
     }
 
-    public ExpLit visitExpSub(ExpSub exp, Environment<ExpLit> env)
+
+    public SMPLObject visitSubstr(Substr exp, Environment<SMPLObject> env)
 	throws VisitException {
-	ExpLit val1, val2;
-	val1 = exp.getExpL().visit(this, env);
-	val2 = exp.getExpR().visit(this, env);
-	if ((val1 instanceof SmplDouble) || (val2 instanceof SmplDouble)){
-		return new SmplDouble(val1.getVal() - val2.getVal());
-	}
-	return new SmplInt(val1.getVal() - val2.getVal());
+	SMPLObject arg1, arg2, arg3;
+	arg1 = exp.getArg1().visit(this, env);
+	arg2 = exp.getArg2().visit(this, env);
+	arg3 = exp.getArg3().visit(this, env);
+	return arg1.Substr(arg2,arg3);
     }
 
-    public ExpLit visitExpMul(ExpMul exp, Environment<ExpLit> env)
+
+
+    public SMPLObject visitExpLit(ExpLit exp, Environment<SMPLObject> env)
 	throws VisitException {
-	ExpLit val1, val2;
-	val1 = exp.getExpL().visit(this, env);
-	val2 = exp.getExpR().visit(this, env);
-	if ((val1 instanceof SmplDouble) || (val2 instanceof SmplDouble)){
-		return new SmplDouble(val1.getVal() * val2.getVal());
-	}
-	return new SmplInt(val1.getVal() * val2.getVal());
+	return SMPL.makeInstance(exp.getVal());// returns the SMPL object / instance//factory methods (eg smplobject.make())
     }
 
-    public ExpLit visitExpDiv(ExpDiv exp, Environment<ExpLit> env)
-	throws VisitException {
-	ExpLit val1, val2;
-	val1 = exp.getExpL().visit(this, env);
-	val2 = exp.getExpR().visit(this, env);
-	if ((val1 instanceof SmplDouble) || (val2 instanceof SmplDouble)){
-		return new SmplDouble(val1.getVal() / val2.getVal());
-	}
-	return new SmplInt(val1.getVal() / val2.getVal());
-    }
 
-    public ExpLit visitExpMod(ExpMod exp, Environment<ExpLit> env)
-	throws VisitException {
-	ExpLit val1, val2;
-	val1 = exp.getExpL().visit(this, env);
-	val2 = exp.getExpR().visit(this, env);
-	if ((val1 instanceof SmplDouble) || (val2 instanceof SmplDouble)){
-		return new SmplDouble(val1.getVal() % val2.getVal());
-	}
-	return new SmplInt(val1.getVal() % val2.getVal());
-    }
-
-	public ExpLit visitExpAnd(ExpAnd exp, Environment<ExpLit> env)
-	throws VisitException {
-	return exp.getExpL().visit(this, env).getVal() &&
-		exp.getExpR().visit(this, env).getVal();
-	}
-
-	public ExpLit visitExpOr(ExpOr exp, Environment<ExpLit> env)
-	throws VisitException {
-	return exp.getExpL().visit(this, env).getVal() ||
-		exp.getExpR().visit(this, env).getVal();
-	}
-
-	public ExpLit visitExpNot(ExpNot exp, Environment<ExpLit> env)
-	throws VisitException {
-	SmplBool val;
-	val = exp.getPredicate().visit(this, env);
-	return new SmplBool(!val.getVal());
-	}
-
-	public ExpLit visitExpLess(ExpLess exp, Environment<ExpLit> env)
-	throws VisitException {
-	Exp left = exp.getLeftPred();
-	Exp right = exp.getRightPred();
-	if (left instanceof ExpBinComp){
-		ExpLit r = left.getRightPred();
-		return new SmplBool(left.visit(this, env).getVal() &&
-			(r.getVal() < right.getVal()));
-	}
-	return new SmplBool(left.getVal() < right.getVal());
-	}
-
-	public ExpLit visitExpLessEq(ExpLessEq exp, Environment<ExpLit> env)
-	throws VisitException {
-	Exp left = exp.getLeftPred();
-	Exp right = exp.getRightPred();
-	if (left instanceof ExpBinComp){
-		ExpLit r = left.getRightPred();
-		return new SmplBool(left.visit(this, env).getVal() &&
-			(r.getVal() <= right.getVal()));
-	}
-	return new SmplBool(left.getVal() <= right.getVal());
-	}
-
-	public ExpLit visitExpEqual(ExpEqual exp, Environment<ExpLit> env)
-	throws VisitException {
-	Exp left = exp.getLeftPred();
-	Exp right = exp.getRightPred();
-	if (left instanceof ExpBinComp){
-		ExpLit r = left.getRightPred();
-		return new SmplBool(left.visit(this, env).getVal() &&
-			(r.getVal() == right.getVal()));
-	}
-	return new SmplBool(left.getVal() == right.getVal());
-	}
-
-	public ExpLit visitExpGreaterEq(ExpGreaterEq exp, Environment<ExpLit> env)
-	throws VisitException {
-	Exp left = exp.getLeftPred();
-	Exp right = exp.getRightPred();
-	if (left instanceof ExpBinComp){
-		ExpLit r = left.getRightPred();
-		return new SmplBool(left.visit(this, env).getVal() &&
-			(r.getVal() >= right.getVal()));
-	}
-	return new SmplBool(left.getVal() >= right.getVal());
-	}
-
-	public ExpLit visitExpGreater(ExpGreater exp, Environment<ExpLit> env)
-	throws VisitException {
-	Exp left = exp.getLeftPred();
-	Exp right = exp.getRightPred();
-	if (left instanceof ExpBinComp){
-		ExpLit r = left.getRightPred();
-		return new SmplBool(left.visit(this, env).getVal() &&
-			(r.getVal() > right.getVal()));
-	}
-	return new SmplBool(left.getVal() > right.getVal());
-	}
-
-	public ExpLit visitExpNotEqual(ExpNotEqual exp, Environment<ExpLit> env)
-	throws VisitException {
-	Exp left = exp.getLeftPred();
-	Exp right = exp.getRightPred();
-	if (left instanceof ExpBinComp){
-		ExpLit r = left.getRightPred();
-		return new SmplBool(left.visit(this, env).getVal() &&
-			(r.getVal() != right.getVal()));
-	}
-	return new SmplBool(left.getVal() != right.getVal());
-	}
-
-
-	public ExpLit visitExpVar(ExpVar exp, Environment<ExpLit> env)
+    public SMPLObject visitExpVar(ExpVar exp, Environment<SMPLObject> env)
 	throws VisitException {
 	return env.get(exp.getVar());
-	}
+    }
 
 
-	public ExpLit visitSmplInt(SmplInt exp, Environment<ExpLit> arg)
-	throws VisitException{
-	return exp;
-	}
-	
-	public ExpLit visitSmplDouble(SmplDouble exp, Environment<ExpLit> arg)
-	throws VisitException{
-	return exp;
-	}
-	
-	public ExpLit visitSmplString(SmplString exp, Environment<ExpLit> arg)
-	throws VisitException{
-	return exp;
-	}
-	
-	public ExpLit visitSmplChar(SmplChar exp, Environment<ExpLit> arg)
-	throws VisitException{
-	return exp;
-	}
-	
-	public ExpLit visitSmplBool(SmplBool exp, Environment<ExpLit> arg)
-	throws VisitException{
-	return exp;
-	}
-	
-	public ExpLit visitSmplPair(SmplPair exp, Environment<ExpLit> arg)
-	throws VisitException{
-	return exp;
-	}
-	
-	public ExpLit visitSmplVector(SmplVector exp, Environment<ExpLit> arg)
-	throws VisitException{
-	return exp;
-	}
+    public SMPLObject visitStringExp(StringExp exp, Environment<SMPLObject> env)
+	throws VisitException {
+	return SMPL.makeInstance(exp.getString());// returns the SMPL object / instance//factory methods (eg smplobject.make())
+    }
+
+
+
+
+
 }

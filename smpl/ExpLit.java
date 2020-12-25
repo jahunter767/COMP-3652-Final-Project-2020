@@ -1,11 +1,28 @@
-public abstract class ExpLit extends Exp {
+public class ExpLit<D> extends Exp {
 
-    protected ExpLit(String lit) {
-	super(lit);
+    String type;
+    D val;
+
+    public ExpLit(String t, D v) {
+    super("literal");
+    this.type = t;
+	this.val = v;
     }
 
-    public abstract <L> getVal();
-    public abstract boolean isEquivTo(ExpLit L);
-    public abstract boolean isEqualTo(ExpLit L);
+    public String getType() {
+	return type;
+    }
 
+    public D getVal() {
+	return val;
+    }
+
+    public <S, T> T visit(Visitor<S, T> v, S arg) throws VisitException {
+	return v.visitExpLit(this, arg);
+    }
+
+    public String toString() {
+	return Integer.toString(val);
+    }
 }
+

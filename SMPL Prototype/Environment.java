@@ -108,14 +108,33 @@ public class Environment<T> {
 	// add definitions for any primitive procedures or
 	// constants here
 
+	// ----- BUILTIN METHOD FOR SUBSTR -----
 	ArrayList<String> parameters = new ArrayList<String>();
 	parameters.add("string");parameters.add("start");parameters.add("end");
 	StmtSequence body = new StmtSequence(new Statement(new Substr(new ExpVar("string"),new ExpVar("start"),new ExpVar("end"))));
 	StmtFunDefn fd = new StmtFunDefn(parameters, body);
 	Closure closure = new Closure(fd,result);
 	SMPLObject substr = SMPL.makeInstance(closure);
-	
 	result.put("substr",(b) substr);
+
+	// ----- BULTIN METHOD FOR EQV? -----
+	ArrayList<String> Eqvparameters = new ArrayList<String>();
+	Eqvparameters.add("eqvobj1");Eqvparameters.add("eqvobj2");
+	body = new StmtSequence(new Statement(new Eqv(new ExpVar("eqvobj1"),new ExpVar("eqvobj2"))));
+	fd = new StmtFunDefn(Eqvparameters, body);
+	closure = new Closure(fd,result);
+	SMPLObject eqv = SMPL.makeInstance(closure);
+	result.put("eqv?", (b) eqv);
+
+	// ----- BULTIN METHOD FOR EQUAL? -----
+	ArrayList<String> equalParameters = new ArrayList<String>();
+	equalParameters.add("equalobj1");equalParameters.add("equalobj2");
+	body = new StmtSequence(new Statement(new Equal(new ExpVar("equalobj1"),new ExpVar("equalobj2"))));
+	fd = new StmtFunDefn(equalParameters, body);
+	closure = new Closure(fd,result);
+	SMPLObject equal = SMPL.makeInstance(closure);
+	result.put("equal?", (b) equal);
+	
 	return result;
     }
 

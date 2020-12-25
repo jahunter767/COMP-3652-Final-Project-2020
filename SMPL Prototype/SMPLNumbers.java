@@ -55,5 +55,26 @@ public class SMPLNumbers extends SMPLObject<Double> {
     }
 
 
+    public SMPLObject Equal(SMPLObject obj) throws TypeException{
+	Boolean result = false;
+	if(isEqualType(obj.getType())){
+		SMPLNumbers arg2 = (SMPLNumbers)obj;
+
+		if(getVal().compareTo(arg2.getVal()) == 0){
+			result = true;
+			return SMPL.makeInstance(result); //
+
+		}else{
+			return SMPL.makeInstance(result);
+		}
+
+    	} else {
+		
+		return SMPL.makeInstance(result);
+	}
+
+    }
+
+
 
 }

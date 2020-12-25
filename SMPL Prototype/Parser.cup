@@ -141,6 +141,8 @@ non terminal Exp Defnexpr; // for all definition expressions
 non terminal StringExp str; // for strings
 non terminal Substr Substr; // for substrings
 
+non terminal Eqv Eqv; // for eqv
+non terminal Equal Equal; // for equals
 
 
 non terminal Exp empty;
@@ -159,11 +161,16 @@ stmtList ::= stmtList:lst stmt:s {:
 		RESULT = new StmtSequence(s);
 		:};
 
-stmt ::= Substr:subs {:RESULT = new Statement(subs); :} | funDefn:func {: RESULT = func; :} | definition:d {: RESULT = d; :} | str:s {: RESULT = new Statement(s); :} | arithmaticExpression:a {: RESULT = new Statement(a); :} SEMI; // |conditionalExpression:conditional {: RESULT = new Statement(conditional); :}; //
+stmt ::= Eqv:eqv {:RESULT = new Statement(eqv); :} |Equal:equal {:RESULT = new Statement(equal); :} |Substr:subs {:RESULT = new Statement(subs); :} | funDefn:func {: RESULT = func; :} | definition:d {: RESULT = d; :} | str:s {: RESULT = new Statement(s); :} | arithmaticExpression:a {: RESULT = new Statement(a); :} SEMI; // |conditionalExpression:conditional {: RESULT = new Statement(conditional); :}; //
 
 str ::= STRING:s {: RESULT = new StringExp(s); :};
 
+// builtin functions - These are temp.. eventually will be removed
+
 Substr::= SUBSTR LPAREN expr:e COMMA arithmaticExpression:start COMMA arithmaticExpression:end RPAREN {: RESULT = new Substr(e,start,end); :};
+Eqv::= EQUIV_PRED LPAREN expr:exp1 COMMA expr:exp2  RPAREN {: RESULT = new Eqv(exp1,exp2); :};
+Equal ::= EQUAL_PRED LPAREN expr:exp1 COMMA expr:exp2  RPAREN {: RESULT = new Equal(exp1,exp2); :};
+
 
 
 funDefn ::= PROC LPAREN paramListE:parameters RPAREN LBRACE stmtList:statements RBRACE {: RESULT = new StmtFunDefn(parameters, statements); :} ; // PROC LPAREN paramListE:p RPAREN DEFINE And:a SEMI {: RESULT = new StmtFunDefn(v,p,new StmtSequence(new Statement(a))); :} |  

@@ -39,6 +39,27 @@ public class SMPLString extends SMPLObject<String> {
     }
 
 
+    public SMPLObject Equal(SMPLObject obj) throws TypeException{
+	Boolean result = false;
+	if(isEqualType(obj.getType())){
+		SMPLString arg2 = (SMPLString)obj;
+
+		if(getVal().equals(arg2.getVal())){
+			result = true;
+			return SMPL.makeInstance(result); //
+
+		}else{
+			return SMPL.makeInstance(result);
+		}
+
+    	} else {
+		
+		return SMPL.makeInstance(result);
+	}
+
+    }
+
+
 
 
 

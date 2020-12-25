@@ -81,7 +81,6 @@ public class Evaluator implements Visitor<Environment<SMPLObject>, SMPLObject> {
     public SMPLObject visitExpFunCall(ExpFunCall fc, Environment<SMPLObject> env)
 	throws VisitException, MismatchedParamsException {
 	SMPLFunction Func = null;
-;
 	if(fc.getProcedure() != null){Func = (SMPLFunction)fc.getProcedure().visit(this,env);}
 	else if(fc.getName() != null){Func = (SMPLFunction)env.get(fc.getName());}
 	else {throw new VisitException("Error: Unknown function.");}
@@ -123,6 +122,23 @@ public class Evaluator implements Visitor<Environment<SMPLObject>, SMPLObject> {
 	arg2 = exp.getArg2().visit(this, env);
 	arg3 = exp.getArg3().visit(this, env);
 	return arg1.Substr(arg2,arg3);
+    }
+
+
+    public SMPLObject visitEqv(Eqv exp, Environment<SMPLObject> env)
+	throws VisitException {
+	SMPLObject arg1, arg2;
+	arg1 = exp.getArg1().visit(this, env);
+	arg2 = exp.getArg2().visit(this, env);
+	return arg1.Eqv(arg2);
+    }
+
+    public SMPLObject visitEqual(Equal exp, Environment<SMPLObject> env)
+	throws VisitException {
+	SMPLObject arg1, arg2;
+	arg1 = exp.getArg1().visit(this, env);
+	arg2 = exp.getArg2().visit(this, env);
+	return arg1.Equal(arg2);
     }
 
 

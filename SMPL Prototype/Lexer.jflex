@@ -56,15 +56,18 @@ ws = {cc}|[\t ]
 
 alpha = [a-zA-Z_]
 
-alphanum = {alpha}|[0-9] 
+alphanum = {alpha}|[0-9]
 
 special = [\?!-\*/%\^&:\+|~@] | {ws}
+
+question = [\?] // temp to make var with ? works
 
 allChar = {alphanum}|{special}
 
 reserved = [substr,size]
 
 hex = [0-9A-Fa-f]
+
 
 %%
 
@@ -128,10 +131,10 @@ hex = [0-9A-Fa-f]
 <YYINITIAL>	":]"	{return new Symbol(sym.VECT_CLOSE);}
 <YYINITIAL>	"size"	{return new Symbol(sym.SIZE);}
 
-<YYINITIAL>	"eqv?"	{return new Symbol(sym.EQUIV_PRED);}
-<YYINITIAL>	"equal?"	{return new Symbol(sym.EQUAL_PRED);}
+//<YYINITIAL>	"eqv?"	{return new Symbol(sym.EQUIV_PRED);} // taken out as it's implemented in environment
+//<YYINITIAL>	"equal?"	{return new Symbol(sym.EQUAL_PRED);} // taken out as it's implemented in environment
 
-<YYINITIAL>	"substrTESTING"	{return new Symbol(sym.SUBSTR);}
+//<YYINITIAL>	"substrTESTING"	{return new Symbol(sym.SUBSTR);} // taken out as it's implemented in environment
 
 
 <YYINITIAL>	"#t" {return new Symbol(sym.TRUE);}
@@ -150,7 +153,7 @@ hex = [0-9A-Fa-f]
 
 <YYINITIAL>	"\""{allChar}*"\"" 	{return new Symbol(sym.STRING, yytext());}
 
-<YYINITIAL>    {alpha}{alphanum}* {
+<YYINITIAL>    {alpha}{alphanum}*{question}* {
 	       // VAR
 	       return new Symbol(sym.VAR, yytext());
 		}

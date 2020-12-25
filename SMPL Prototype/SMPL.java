@@ -12,7 +12,9 @@ public class SMPL {
 	
 		if(Class.forName("java.lang.Number").isInstance(obj)) return new SMPLNumbers("Numbers",(Integer)obj );
 		if(Class.forName("java.lang.String").isInstance(obj)) return new SMPLString("String",(String)obj );
+		if(Class.forName("java.lang.Boolean").isInstance(obj))return new SMPLBoolean("Boolean",(Boolean)obj );
 		if(Class.forName("Closure").isInstance(obj)) return new SMPLFunction("Func",(Closure)obj );
+
 
 	}catch(ClassNotFoundException ex) { 
 		System.out.println(ex.toString());

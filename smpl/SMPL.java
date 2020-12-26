@@ -7,37 +7,19 @@ public class SMPL {
     }
 
     public static SMPLObject makeInstance(ExpLit lit){
-	String type = lit.getType();
-
-	try{
-		if (type == "number") return new SMPLNumbers((Double) lit.getVal());
-		if (type == "boolean") return new SMPLBoolean((Boolean) lit.getVal());
-		if (type == "character") return new SMPLCharacter((Character) lit.getVal());
-		if (type == "string") return new SMPLString((String) lit.getVal());
-		if (type == "nill") return new SMPLNil();
-		if (type == "none") return new SMPLNone();
-	}catch(ClassNotFoundException ex) { 
-		System.out.println(ex.toString());
-		return null;// or make the none type
-	}//finally{ } 
-	return null;
-    }
-
-	public static SMPLObject makeInstance(ExpLit lit, ArrayList<SMPLObject> seq){
-	String type = lit.getType();
-
-	try{
-		if ((type == "pair") || (type == "list")) return new SMPLPair(seq);
-		if (type == "vector") return new SMPLVector(seq);
-	}catch(ClassNotFoundException ex) { 
-		System.out.println(ex.toString());
-		return null;// or make the none type
-	}//finally{ } 
-	return null;
-    }
-
-    public static SMPLObject makeInstance(Closure c){
-	return new SMPLFunction(c);
+	return makeInstance(lit.getType(), lit.getVal());
 	}
-
+	
+	public static SMPLObject makeInstance(String type, Object val){
+	if (type == "number") return new SMPLNumbers((Double) val);
+	if (type == "boolean") return new SMPLBoolean((Boolean) val);
+	if (type == "character") return new SMPLCharacter((Character) val);
+	if (type == "string") return new SMPLString((String) val);
+	if (type == "nill") return new SMPLNil();
+	if (type == "none") return new SMPLNone();
+	if ((type == "pair") || (type == "list")) return new SMPLPair((ArrayList<SMPLObject>) val);
+	if (type == "vector") return new SMPLVector((ArrayList<SMPLObject>) val);
+	if (type == "function") return new SMPLFunction((Closure) val);
+	return null;
+    }
 }

@@ -15,20 +15,29 @@ public interface Visitor<S, T> {
     // built-ins
     public T visitSubstr(Substr exp, S arg) throws VisitException;
 
-
     // statements
     public T visitStatement(Statement exp, S arg) throws VisitException ;
     public T visitStmtSequence(StmtSequence exp, S arg) throws VisitException ;
     public T visitStmtDefinition(StmtDefinition sd, S arg) throws VisitException;
-    public T visitStmtFunDefn(StmtFunDefn fd, S arg) throws VisitException;
+    public T visitStmtAssignment(StmtAssignment sa, S arg) throws VisitException;
 
+    public T visitStmtPrint(StmtPrint p, S arg) throws VisitException;
+    public T visitStmtPrintln(StmtPrintln p, S arg) throws VisitException;
+    
     // expressions
+    public T visitStmtFunDefn(StmtFunDefn fd, S arg) throws VisitException;
     public T visitExpFunCall(ExpFunCall fc, S arg) throws VisitException;
     public T visitExpCall(ExpCall fc, S arg) throws VisitException;
 
     public T visitExpIf(ExpIf ifStmt, S arg) throws VisitException;
     public T visitExpCase(ExpCase c, S arg) throws VisitException;
     public T visitExpClause(ExpClause c, S arg) throws VisitException;
+
+    public T visitExpLet(ExpLet l, S arg) throws VisitException;
+    public T visitExpBind(ExpBind b, S arg) throws VisitException;
+
+    public T visitExpRead(ExpRead r, S arg) throws VisitException;
+    public T visitExpReadInt(ExpReadInt r, S arg) throws VisitException;
 
     // bitwise expressions
     public T visitExpBitwiseNot(ExpBitwiseNot exp, S arg) throws VisitException;

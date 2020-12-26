@@ -1,4 +1,4 @@
-public class ExpNotEqual extends ExpBinComp {
+public class ExpNotEqual extends ExpBinOp {
 
     public ExpNotEqual(Exp e1, Exp e2) {
 	super("!=", e1, e2);

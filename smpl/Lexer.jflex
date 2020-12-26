@@ -65,11 +65,13 @@ alpha = [a-zA-Z_]
 
 alphanum = {alpha}|[0-9]
 
-special = [\+-\*/%\^&|~@\?!]
+special = ["+""-""*"/%"^"&|~@"?"!]
 
 allChar = {alphanum}|{special}
 
-stringChars = ~[\"\\]
+stringChar = ~[\"\\]
+
+blockCommentChar = ~["/*""*/"]
 
 hex = [0-9A-Fa-f]
 
@@ -146,18 +148,21 @@ hex = [0-9A-Fa-f]
 <LINE_COMMENT> {
 	{nl}	{yychar -=2;
 			yybegin(YYINITIAL);}
-	~{nl}+	{yychar -= yytext().length();}
+	(~{nl})+	{yychar -= yytext().length();}
 }
 
 <YYINITIAL>	"/*"	{nestedBlockCommentCount += 1;
+					yychar -= 2;
 					yybegin(BLK_COMMENT);}
 <BLK_COMMENT> {
+	"/*"	{nestedBlockCommentCount += 1;
+			yychar -= 2;}
 	"*/"	{nestedBlockCommentCount -= 1;
 			yychar -= 2;
-			if !(nestedBlockCommentCount){
+			if (nestedBlockCommentCount == 0){
 				yybegin(YYINITIAL);
 			}}
-	{~"*/"}+	{yychar -= yytext().length();}
+	{blockCommentChar}+	{yychar -= yytext().length();}
 }
 
 
@@ -184,14 +189,14 @@ hex = [0-9A-Fa-f]
 	    	return new Symbol(sym.DOUBLE, new Double(yytext()));
 		}
 
-<YYINITIAL>	"#t"	{return new Symbol(sym.BOOL, new Boolean(True));}
-<YYINITIAL>	"#f"	{return new Symbol(sym.BOOL, new Boolean(False));}
+<YYINITIAL>	"#t"	{return new Symbol(sym.BOOL, new Boolean(true));}
+<YYINITIAL>	"#f"	{return new Symbol(sym.BOOL, new Boolean(false));}
 
 <YYINITIAL>	"#c"{alpha}	{return new Symbol(sym.CHAR,
 						new Character(yytext().charAt(2)));}
 <YYINITIAL>	"#u"{hex}{4}	{int code = Integer.parseInt(yytext().substring(2), 16);
 							char[] c = Character.toChars(code);
-							return new Symbol(sym.CHAR, new Character(c[0]);}
+							return new Symbol(sym.CHAR, new Character(c[0]));}
 
 <YYINITIAL>	\"	{yybegin(SMPL_STRING);}
 <SMPL_STRING> {
@@ -211,7 +216,7 @@ hex = [0-9A-Fa-f]
             strBuff.append("\t");}
 	}
 
-	{stringChars}+	{strBuff.append(yytext());}
+	{stringChar}+	{strBuff.append(yytext());}
 }
 
 <YYINITIAL>	"#e"	{return new Symbol(sym.NIL);}

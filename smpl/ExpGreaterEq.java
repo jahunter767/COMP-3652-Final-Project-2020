@@ -1,4 +1,4 @@
-public class ExpGreaterEq extends ExpBinComp {
+public class ExpGreaterEq extends ExpBinOp {
 
     public ExpGreaterEq(Exp e1, Exp e2) {
 	super(">=", e1, e2);

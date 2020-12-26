@@ -22,7 +22,7 @@ public class StmtFunDefn extends Statement {
     }
 
     protected StmtFunDefn(ArrayList<String> parameters, String paramOvf, Exp body) {
-    super("funDef", body);
+    super("proc", body);
     this.params = parameters;
     this.paramOvf = paramOvf;
     }

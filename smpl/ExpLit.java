@@ -1,9 +1,9 @@
-public class ExpLit<D> extends Exp {
+public class ExpLit extends Exp {
 
     String type;
-    D val;
+    Object val;
 
-    public ExpLit(String t, D v) {
+    public ExpLit(String t, Object v) {
     super("literal");
     this.type = t;
 	this.val = v;
@@ -19,7 +19,7 @@ public class ExpLit<D> extends Exp {
 	return type;
     }
 
-    public D getVal() {
+    public Object getVal() {
 	return val;
     }
 

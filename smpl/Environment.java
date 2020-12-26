@@ -78,7 +78,7 @@ public class Environment<T> {
 	StmtSequence body = new StmtSequence(new Statement(new Substr(new ExpVar("string"),new ExpVar("start"),new ExpVar("end"))));
 	StmtFunDefn fd = new StmtFunDefn(parameters, body);
 	Closure closure = new Closure(fd,result);
-	SMPLObject substr = SMPL.makeInstance(closure);
+	SMPLObject substr = SMPL.makeInstance("function", closure);
 	
 	result.put("substr",(b) substr);
 	return result;

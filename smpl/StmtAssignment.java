@@ -1,13 +1,11 @@
 
-public class StmtDefinition extends Statement {
+public class StmtAssignment extends Statement {
 
     String var;
-    //Exp exp;
 
-    public StmtDefinition(String id, Exp e) {
-	super("def", e);
+    public StmtAssignment(String id, Exp e) {
+	super(":=", e);
 	var = id;
-	// exp = e;
     }
 
     public String getVar(){
@@ -19,10 +17,10 @@ public class StmtDefinition extends Statement {
     }
 
     public <S, T> T visit(Visitor<S, T> v, S arg) throws VisitException {
-	return v.visitStmtDefinition(this, arg);
+	return v.visitStmtAssignment(this, arg);
     }
 
     public String toString() {
-	return String.format("def %s %s", getVar(), getExp().toString());
+	return String.format("%s := %s", getVar(), getExp().toString());
     }
 }

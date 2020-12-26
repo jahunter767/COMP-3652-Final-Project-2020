@@ -1,4 +1,4 @@
-public class ExpLess extends ExpBinComp {
+public class ExpLess extends ExpBinOp {
 
     public ExpLess(Exp e1, Exp e2) {
 	super("<", e1, e2);

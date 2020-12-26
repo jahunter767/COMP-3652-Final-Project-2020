@@ -62,11 +62,27 @@ public class ToScheme implements Visitor<Void, String> {
 
     public String visitStmtDefinition(StmtDefinition sd, Void arg)
 	throws VisitException {
-	String valExp = (String) sd.getExp().visit(this,
-						   arg);
-	return "(define " + sd.getVar() + " " +
-	    valExp + ")";
+	String valExp = sd.getExp().visit(this, arg);
+	return "(define " + sd.getVar() + " " + valExp + ")";
     }
+
+	public String visitStmtAssignment(StmtAssignment sa, Void arg)
+	throws VisitException {
+	String valExp = sa.getExp().visit(this, arg);
+	return "(:= " + sa.getVar() + " " + valExp + ")";
+    }
+
+
+	public String visitStmtPrint(StmtPrint p, Void arg)
+	throws VisitException{
+	return "(print " + p.getExp().visit(this, arg) + ")";
+	}
+
+	public String visitStmtPrintln(StmtPrintln p, Void arg)
+	throws VisitException{
+	return "(print " + p.getExp().visit(this, arg) + ")";
+	}
+
 
     // expressions
 	public String visitStmtFunDefn(StmtFunDefn fd, Void arg)
@@ -131,6 +147,36 @@ public class ToScheme implements Visitor<Void, String> {
     }
 
 
+	public String visitExpLet(ExpLet l, Void arg)
+	throws VisitException{
+	ArrayList<ExpBind> bindLst = l.getBindings();
+	String result = "(let (bindings " + bindLst.remove(0).visit(this, arg);
+	for (ExpBind b: bindLst){
+		result = result + " " + b.visit(this, arg);
+	}
+	result = result + ") (body " + l.getBody().visit(this, arg) + ")";
+	return result;
+	}
+
+	public String visitExpBind(ExpBind b, Void arg)
+	throws VisitException{
+	String result = "(bind " + b.getName() + " ";
+	result = result + b.getExpr().visit(this, arg) + ")";
+	return result;
+	}
+
+
+	public String visitExpRead(ExpRead r, Void arg)
+	throws VisitException{
+	return "(read)";
+	}
+
+	public String visitExpReadInt(ExpReadInt r, Void arg)
+	throws VisitException{
+	return "(readInt)";
+	}
+
+
 	public String visitExpBitwiseAnd(ExpBitwiseAnd exp, Void arg)
 	throws VisitException{
 	String left = exp.getExpL().visit(this, arg);
@@ -154,98 +200,44 @@ public class ToScheme implements Visitor<Void, String> {
 
 	public String visitExpLess(ExpLess exp, Void arg)
 	throws VisitException {
-	Exp left = exp.getLeftPred();
-	Exp right = exp.getRightPred();
-	if (left instanceof ExpBinComp){
-		ExpBinComp l = (ExpBinComp) left;
-		ExpLess r = new ExpLess(l.getRightPred(), right);
-		ExpAnd temp = new ExpAnd(left, r);
-		return temp.visit(this, arg);
-	}else{
-		String left1 = exp.getLeftPred().visit(this, arg);
-		String right1 = exp.getRightPred().visit(this, arg);
-		return "(< " + left1 + " " + right1 + ")";
-	}
+	String left = exp.getExpL().visit(this, arg);
+	String right = exp.getExpR().visit(this, arg);
+	return "(< " + left + " " + right + ")";
 	}
 
 	public String visitExpLessEq(ExpLessEq exp, Void arg)
 	throws VisitException {
-	Exp left = exp.getLeftPred();
-	Exp right = exp.getRightPred();
-	if (left instanceof ExpBinComp){
-		ExpBinComp l = (ExpBinComp) left;
-		ExpLessEq r = new ExpLessEq(l.getRightPred(), right);
-		ExpAnd temp = new ExpAnd(left, r);
-		return temp.visit(this, arg);
-	}else{
-		String left1 = exp.getLeftPred().visit(this, arg);
-		String right1 = exp.getRightPred().visit(this, arg);
-		return "(<= " + left1 + " " + right1 + ")";
-	}
+	String left = exp.getExpL().visit(this, arg);
+	String right = exp.getExpR().visit(this, arg);
+	return "(<= " + left + " " + right + ")";
 	}
 
 	public String visitExpEqual(ExpEqual exp, Void arg)
 	throws VisitException {
-	Exp left = exp.getLeftPred();
-	Exp right = exp.getRightPred();
-	if (left instanceof ExpBinComp){
-		ExpBinComp l = (ExpBinComp) left;
-		ExpEqual r = new ExpEqual(l.getRightPred(), right);
-		ExpAnd temp = new ExpAnd(left, r);
-		return temp.visit(this, arg);
-	}else{
-		String left1 = exp.getLeftPred().visit(this, arg);
-		String right1 = exp.getRightPred().visit(this, arg);
-		return "(== " + left1 + " " + right1 + ")";
-	}
+	String left = exp.getExpL().visit(this, arg);
+	String right = exp.getExpR().visit(this, arg);
+	return "(== " + left + " " + right + ")";
 	}
 
 	public String visitExpGreaterEq(ExpGreaterEq exp, Void arg)
 	throws VisitException {
-	Exp left = exp.getLeftPred();
-	Exp right = exp.getRightPred();
-	if (left instanceof ExpBinComp){
-		ExpBinComp l = (ExpBinComp) left;
-		ExpGreaterEq r = new ExpGreaterEq(l.getRightPred(), right);
-		ExpAnd temp = new ExpAnd(left, r);
-		return temp.visit(this, arg);
-	}else{
-		String left1 = exp.getLeftPred().visit(this, arg);
-		String right1 = exp.getRightPred().visit(this, arg);
-		return "(>= " + left1 + " " + right1 + ")";
-	}
+	String left = exp.getExpL().visit(this, arg);
+	String right = exp.getExpR().visit(this, arg);
+	return "(>= " + left + " " + right + ")";
 	}
 
 	public String visitExpGreater(ExpGreater exp, Void arg)
 	throws VisitException {
-	Exp left = exp.getLeftPred();
-	Exp right = exp.getRightPred();
-	if (left instanceof ExpBinComp){
-		ExpBinComp l = (ExpBinComp) left;
-		ExpGreater r = new ExpGreater(l.getRightPred(), right);
-		ExpAnd temp = new ExpAnd(left, r);
-		return temp.visit(this, arg);
-	}else{
-		String left1 = exp.getLeftPred().visit(this, arg);
-		String right1 = exp.getRightPred().visit(this, arg);
-		return "(> " + left1 + " " + right1 + ")";
-	}
+	String left = exp.getExpL().visit(this, arg);
+	String right = exp.getExpR().visit(this, arg);
+	return "(> " + left + " " + right + ")";
 	}
 
 	public String visitExpNotEqual(ExpNotEqual exp, Void arg)
 	throws VisitException {
-	Exp left = exp.getLeftPred();
-	Exp right = exp.getRightPred();
-	if (left instanceof ExpBinComp){
-		ExpBinComp l = (ExpBinComp) left;
-		ExpNotEqual r = new ExpNotEqual(l.getRightPred(), right);
-		ExpAnd temp = new ExpAnd(left, r);
-		return temp.visit(this, arg);
-	}else{
-		String left1 = exp.getLeftPred().visit(this, arg);
-		String right1 = exp.getRightPred().visit(this, arg);
-		return "(!= " + left1 + " " + right1 + ")";
-	}
+	String left = exp.getExpL().visit(this, arg);
+	String right = exp.getExpR().visit(this, arg);
+	return "(!= " + left + " " + right + ")";
 	}
 
 

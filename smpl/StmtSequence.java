@@ -15,12 +15,12 @@ public class StmtSequence extends Statement {
 	super("sequence", s);
     }
 
-    public ArrayList<Exp> getSeq() {
+    public ArrayList<SMPLExp> getSeq() {
 	return getSubTrees();
     }
 
     public StmtSequence add(Statement s) {
-	ArrayList<Exp> seq = getSubTrees();
+	ArrayList<SMPLExp> seq = getSubTrees();
 	seq.add(s);
 	return this;
     }
@@ -30,7 +30,7 @@ public class StmtSequence extends Statement {
     }
 
     public String toString() {
-	Iterator<Exp> iter = getSubTrees().iterator();
+	Iterator<SMPLExp> iter = getSubTrees().iterator();
 
 	String result = "";
 	while (iter.hasNext()) {

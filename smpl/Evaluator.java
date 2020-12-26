@@ -1,4 +1,7 @@
 import java.util.*;
+import java.math.BigDecimal;
+import java.math.MathContext;
+
 
 public class Evaluator implements Visitor<Environment<Object>, Object> {
     /* For this visitor, the argument passed to all visit
@@ -55,7 +58,7 @@ public class Evaluator implements Visitor<Environment<Object>, Object> {
     public Object visitStmtDefinition(StmtDefinition sd,
 				      Environment<Object> env)
 	throws VisitException {
-	Double result;
+	Object result;
 	result = (Double) sd.getExp().visit(this, env);
 	env.put(sd.getVar(), result);
 	return result;
@@ -97,34 +100,34 @@ public class Evaluator implements Visitor<Environment<Object>, Object> {
 
     public Object visitExpAdd(ExpAdd exp, Environment<Object> env)
 	throws VisitException {
-	Double val1, val2;
-	val1 = (Double) exp.getExpL().visit(this, env);
-	val2 = (Double) exp.getExpR().visit(this, env);
-	return val1 + val2;
+	SMPLNumber val1, val2;
+	val1 = new SMPLNumber(exp.getExpL().visit(this, env),"SMPLNumber");
+	val2 = new SMPLNumber(exp.getExpR().visit(this, env),"SMPLNumber");
+	return val1.getVal().add(val2.getVal());
     }
 
     public Object visitExpSub(ExpSub exp, Environment<Object> env)
 	throws VisitException {
-	Double val1, val2;
-	val1 = (Double) exp.getExpL().visit(this, env);
-	val2 = (Double) exp.getExpR().visit(this, env);
-	return val1 - val2;
+	SMPLNumber val1, val2;
+	val1 = new SMPLNumber(exp.getExpL().visit(this, env),"SMPLNumber");
+	val2 = new SMPLNumber(exp.getExpR().visit(this, env),"SMPLNumber");
+	return val1.getVal().subtract(val2.getVal());
     }
 
     public Object visitExpMul(ExpMul exp, Environment<Object> env)
 	throws VisitException {
-	Double val1, val2;
-	val1 = (Double) exp.getExpL().visit(this, env);
-	val2 = (Double) exp.getExpR().visit(this, env);
-	return val1 * val2;
+	SMPLNumber val1, val2;
+	val1 = new SMPLNumber(exp.getExpL().visit(this, env),"SMPLNumber");
+	val2 = new SMPLNumber(exp.getExpR().visit(this, env),"SMPLNumber");
+	return val1.getVal().multiply(val2.getVal());
     }
 
     public Object visitExpDiv(ExpDiv exp, Environment<Object> env)
 	throws VisitException {
-	Double val1, val2;
-	val1 = (Double) exp.getExpL().visit(this, env);
-	val2 = (Double) exp.getExpR().visit(this, env);
-	return val1 / val2;
+	SMPLNumber val1, val2;
+	val1 = new SMPLNumber(exp.getExpL().visit(this, env),"SMPLNumber");
+	val2 = new SMPLNumber(exp.getExpR().visit(this, env),"SMPLNumber");
+	return val1.getVal().divide(val2.getVal(), MathContext.DECIMAL64);
     }
 
     public Object visitExpMod(ExpMod exp, Environment<Object> env)
@@ -142,87 +145,59 @@ public class Evaluator implements Visitor<Environment<Object>, Object> {
 
     public Object visitExpVar(ExpVar exp, Environment<Object> env)
 	throws VisitException {
-	return (Double) env.get(exp.getVar());
+	return env.get(exp.getVar());
     }
 	
 	public Object visitCompareL(CompareL exp,Environment<Object> env) 
 	throws VisitException {
-	Object val1;
-	Object val2;
-	val1 = (Object) exp.getExpL().visit(this, env);
-	val2 = (Object) exp.getExpR().visit(this, env);
 	Boolean r;
-	if (val2 instanceof Boolean){
-		Double val3 = (Double) CompareL.nextVal.visit(this,env);
-		//System.out.println(val1 + " " + val3 );
-		r = (Double) val1 < val3;
-		r = r & (Boolean) val2;
-	}else {
-		//System.out.println(val1 + " " + val2 );
-		r = (Double) val1 < (Double) val2;
+	if (exp.getExpR().visit(this, env) instanceof Boolean){
+		exp.setSubTree(1,CompareG.nextVal);
 	}
-	CompareL.nextVal = exp.getExpL();
+	SMPLNumber val1 = new SMPLNumber(exp.getExpL().visit(this, env),"");
+	SMPLNumber val2 = new SMPLNumber(exp.getExpR().visit(this, env),"");
+	r = val1.getVal().doubleValue() < val2.getVal().doubleValue(); 
+	CompareG.nextVal = exp.getExpL();
 	return r;
 	}
 
 	public Object visitCompareLE(CompareLE exp, Environment<Object> env) 
 	throws VisitException {
-	Object val1;
-	Object val2;
-	val1 = (Object) exp.getExpL().visit(this, env);
-	val2 = (Object) exp.getExpR().visit(this, env);
 	Boolean r;
-	if (val2 instanceof Boolean){
-		Double val3 = (Double) CompareLE.nextVal.visit(this,env);
-		//System.out.println(val1 + " " + val3 );
-		r = (Double) val1 <= val3;
-		r = r & (Boolean) val2;
-	}else {
-		//System.out.println(val1 + " " + val2 );
-		r = (Double) val1 <= (Double) val2;
+	if (exp.getExpR().visit(this, env) instanceof Boolean){
+		exp.setSubTree(1,CompareG.nextVal);
 	}
-	CompareLE.nextVal = exp.getExpL();
+	SMPLNumber val1 = new SMPLNumber(exp.getExpL().visit(this, env),"");
+	SMPLNumber val2 = new SMPLNumber(exp.getExpR().visit(this, env),"");
+	r = val1.getVal().doubleValue() <= val2.getVal().doubleValue(); 
+	CompareG.nextVal = exp.getExpL();
 	return r;
 	}
 	
 	
 	public Object visitCompareG(CompareG exp, Environment<Object> env) 
 	throws VisitException {
-	Object val1;
-	Object val2;
-	val1 = (Object) exp.getExpL().visit(this, env);
-	val2 = (Object) exp.getExpR().visit(this, env);
 	Boolean r;
-	if (val2 instanceof Boolean){
-		Double val3 = (Double) CompareG.nextVal.visit(this,env);
-		//System.out.println(val1 + " " + val3 );
-		r = (Double) val1 > val3;
-		r = r & (Boolean) val2;
-	}else {
-		//System.out.println(val1 + " " + val2 );
-		r = (Double) val1 > (Double) val2; 
+	if (exp.getExpR().visit(this, env) instanceof Boolean){
+		exp.setSubTree(1,CompareG.nextVal);
 	}
+	SMPLNumber val1 = new SMPLNumber(exp.getExpL().visit(this, env),"");
+	SMPLNumber val2 = new SMPLNumber(exp.getExpR().visit(this, env),"");
+	r = val1.getVal().doubleValue() > val2.getVal().doubleValue(); 
 	CompareG.nextVal = exp.getExpL();
 	return r;
 	}
 	
 	public Object visitCompareGE(CompareGE exp, Environment<Object> env) 
 	throws VisitException {
-	Object val1;
-	Object val2;
-	val1 = (Object) exp.getExpL().visit(this, env);
-	val2 = (Object) exp.getExpR().visit(this, env);
 	Boolean r;
-	if (val2 instanceof Boolean){
-		Double val3 = (Double) CompareGE.nextVal.visit(this,env);
-		//System.out.println(val1 + " " + val3 );
-		r = (Double) val1 >= val3;
-		r = r & (Boolean) val2;
-	}else {
-		//System.out.println(val1 + " " + val2 );
-		r = (Double) val1 >= (Double) val2; 
+	if (exp.getExpR().visit(this, env) instanceof Boolean){
+		exp.setSubTree(1,CompareG.nextVal);
 	}
-	CompareGE.nextVal = exp.getExpL();
+	SMPLNumber val1 = new SMPLNumber(exp.getExpL().visit(this, env),"");
+	SMPLNumber val2 = new SMPLNumber(exp.getExpR().visit(this, env),"");
+	r = val1.getVal().doubleValue() >= val2.getVal().doubleValue(); 
+	CompareG.nextVal = exp.getExpL();
 	return r;
 	}
 	
@@ -261,7 +236,7 @@ public class Evaluator implements Visitor<Environment<Object>, Object> {
 	
 	public Object visitStmtIfDefn(StmtIfDefn exp, Environment<Object> env) 
 	throws VisitException {
-	Exp p = exp.getPredicate();
+	SMPLExp p = exp.getPredicate();
 	StmtSequence c = exp.getConsequent();
 	Statement a = exp.getAlternative();
 	Boolean flag = (Boolean) p.visit(this, env);

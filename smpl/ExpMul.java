@@ -1,6 +1,6 @@
 public class ExpMul extends ExpBinOp {
 
-    public ExpMul(Exp e1, Exp e2) {
+    public ExpMul(SMPLExp e1, SMPLExp e2) {
 	super("*", e1, e2);
     }
 

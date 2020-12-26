@@ -1,6 +1,6 @@
 public class ExpMod extends ExpBinOp {
 
-    public ExpMod(Exp e1, Exp e2) {
+    public ExpMod(SMPLExp e1, SMPLExp e2) {
 	super("%", e1, e2);
     }
 

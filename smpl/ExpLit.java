@@ -1,15 +1,13 @@
-public class ExpLit<T> extends Exp {
+public abstract class ExpLit<T> extends SMPLExp {
 
-    private T V;
+    protected T V;
 
     public ExpLit(T value) {
 	super(value.toString());
 	V = value;
     }
 
-    public T getVal() {
-	return V;
-    }
+    public abstract T getVal();
 
     public <S, T> T visit(Visitor<S, T> v, S arg) throws VisitException {
 	return v.visitExpLit(this, arg);

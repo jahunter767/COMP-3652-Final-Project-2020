@@ -43,8 +43,8 @@ scan with {:
 /* Terminals (tokens returned by the scanner). */
 /* REMEMBER THESE ARE REASSIGNABLE BY THE USER */
 // built-ins
-terminal PAIR, CAR, CDR, PAIR_PRED, LIST;
-terminal SIZE;
+terminal PAIR, CAR,LIST;
+terminal SIZE, CDR, PAIR_PRED;
 terminal EQUIV_PRED, EQUAL_PRED;
 terminal SUBSTR;
 
@@ -98,16 +98,20 @@ non terminal ArrayList<Object> paramList;
 non terminal ArrayList<Object> paramListE;
 non terminal ExpFunCall funCall;
 non terminal StmtIfDefn ifStmt;
+non terminal SMPLPair pair;
 /* **** */
 
-non terminal Exp expression;
-non terminal Exp term;
-non terminal Exp factor;
+non terminal SMPLExp expression;
+non terminal SMPLExp term;
+non terminal SMPLExp factor;
 non terminal empty;
-non terminal Exp expression1; //Relational
-non terminal Exp expression2; //NOT
-non terminal Exp expression3; //AND
-non terminal Exp expression4; //OR
+non terminal SMPLExp expression1; //Relational
+non terminal SMPLExp expression2; //NOT
+non terminal SMPLExp expression3; //AND
+non terminal SMPLExp expression4; //OR
+non terminal SMPLExp car;
+non terminal SMPLExp cdr;
+non terminal SMPLExp isPair;
 /* Grammar rules */
 
 program ::= stmtList:s {: RESULT = new ArithProgram(s); :};
@@ -125,8 +129,10 @@ stmt ::= definition:d {: RESULT = d; :} |
 	 funDefn:f {:RESULT = f;:}  | ifStmt:i {:RESULT=i;:} ;
 
 ifStmt::= IF expression4:pred THEN stmtList:cons ELSE stmt:alt {: RESULT = new StmtIfDefn(pred,cons, alt);:};
-
-
+pair::= PAIR LPAREN expression4:p1 COMMA expression4:p2 RPAREN {: RESULT = new SMPLPair(p1,p2);:} | LPAREN expression4:p1 COMMA expression4:p2 RPAREN {: RESULT = new SMPLPair(p1,p2);:};
+car::= CAR pair:p {:RESULT = p.car();:};
+cdr::= CDR pair:p {:RESULT = p.cdr();:};
+isPair::= PAIR_PRED pair:p {:RESULT=LinkedList.isPair(p);:} | error:e  {: RESULT = new SMPLBoolean(new Boolean(false));:};
 funDefn ::= FUN VAR:v LPAREN paramListE:pe RPAREN BIND funDefe:fe {: RESULT = new StmtFunDefn(v,pe,fe);:};
 funDefe ::= LBRACE stmtList:sl RBRACE {: RESULT = sl;:} | expression4:e SEMI{: RESULT = new StmtSequence (new Statement(e));:} ;
 
@@ -146,28 +152,29 @@ expression1::= expression:e GREATER expression1:e1  {: RESULT = new CompareG(e,e
 			   expression:e LESSEQ expression1:e1 {: RESULT = new CompareLE(e,e1);:} |
 			   expression:e {: RESULT = e; :} ;
 expression ::= 	expression:e PLUS term:t {:
-			RESULT = new ExpAdd(e, t); :} |
+			RESULT = e.add(t); :} |
 		expression:e MINUS term:t {:
-			RESULT = new ExpSub(e, t); :} |
+			RESULT = e.sub(t); :} |
 		term:t {: RESULT = t; :} ; 
 
 term ::= term:t MUL factor:f {:
-		RESULT = new ExpMul(t, f); :} |
+		RESULT = t.mul(f); :} |
 	 term:t DIV factor:f {:
-		RESULT = new ExpDiv(t, f); :} |
+		RESULT = t.div(f); :} |
 	 term:t MOD factor:f {:
-		RESULT = new ExpMod(t, f); :} |
+		RESULT = t.mod(f); :} |
 	 factor:f {: RESULT = f; :};
 
-factor ::= STRING:ilit {: RESULT = new ExpLit(ilit); :} |
-		CHAR:ilit {: RESULT = new ExpLit(ilit); :} |
-		INT:ilit {: RESULT = new ExpLit(ilit); :} |
-		DOUBLE:ilit {: RESULT = new ExpLit(ilit); :} |
-		TRUE:ilit {: RESULT = new ExpLit(ilit); :} |
-		FALSE:ilit {: RESULT = new ExpLit(ilit); :} |
+factor ::= INT:ilit {: RESULT = new SMPLInteger(ilit); :} |
+		DOUBLE:ilit {: RESULT = new SMPLFloat(ilit); :} |
+		TRUE:ilit {: RESULT = new SMPLBoolean(new Boolean(true)); :} |
+		FALSE:ilit {: RESULT = new SMPLBoolean(new Boolean(false)); :} |
+		STRING:ilit {: RESULT = new SMPLString(ilit); :} |
+		CHAR:ilit {: RESULT = new SMPLCharacter(ilit); :} |
 	   VAR:var {: RESULT = new ExpVar(var); :} |
 	   LPAREN expression:e RPAREN {: RESULT = e; :}	|
-	   funCall:f {:RESULT = f;:} ;
+	   funCall:f {:RESULT = f;:} |
+	   pair:p {: RESULT = p;:}   | car:c {:RESULT = c;:} | cdr:c {:RESULT = c;:} | isPair:p {:RESULT=p;:}; 
 funCall ::= VAR:v LPAREN paramListE:pe RPAREN {:RESULT = new ExpFunCall(v,pe);:};
 
 empty ::= ;

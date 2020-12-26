@@ -2,7 +2,7 @@ import java.util.*;
 /**
  * IR Class to represent a function call
  */
-public class ExpFunCall extends Exp {
+public class ExpFunCall extends SMPLExp {
     
     // Implement this class
 	private String var;

@@ -1,6 +1,6 @@
 import java.util.ArrayList;
 
-public class Statement extends Exp {
+public class Statement extends SMPLExp {
 
     //Exp exp;
 
@@ -8,20 +8,20 @@ public class Statement extends Exp {
     // 	super();
     // }
     
-    protected Statement(String name, Exp... operands) {
+    protected Statement(String name, SMPLExp... operands) {
 	super(name, operands);
     }
 
-    protected Statement(String name, ArrayList<Exp> operandList) {
+    protected Statement(String name, ArrayList<SMPLExp> operandList) {
 	super(name, operandList);
     }
 
-    public Statement(Exp e) {
+    public Statement(SMPLExp e) {
 	//exp = e;
 	super("stmt", e);
     }
 
-    public Exp getExp() {
+    public SMPLExp getExp() {
 	return getSubTree(0);
     }
 

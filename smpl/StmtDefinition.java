@@ -4,7 +4,7 @@ public class StmtDefinition extends Statement {
     String var;
     //Exp exp;
 
-    public StmtDefinition(String id, Exp e) {
+    public StmtDefinition(String id, SMPLExp e) {
 	super(":=", e);
 	var = id;
 	// exp = e;
@@ -14,7 +14,7 @@ public class StmtDefinition extends Statement {
 	return var;
     }
 
-    public Exp getExp() {
+    public SMPLExp getExp() {
 	return getSubTree(0);
     }
 

@@ -1,4 +1,4 @@
-public class ExpVar extends Exp {
+public class ExpVar extends SMPLExp {
 
     String var;
 

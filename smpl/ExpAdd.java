@@ -1,6 +1,6 @@
 public class ExpAdd extends ExpBinOp {
 
-    public ExpAdd(Exp e1, Exp e2) {
+    public ExpAdd(SMPLExp e1, SMPLExp e2) {
 	super("+", e1, e2);
     }
 

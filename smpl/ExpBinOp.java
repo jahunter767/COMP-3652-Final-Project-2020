@@ -1,18 +1,18 @@
 /**
  * Class to represent an expression that is a binary operator.
  */
-public abstract class ExpBinOp extends Exp {
+public abstract class ExpBinOp extends SMPLExp {
 
-    protected ExpBinOp(String name, Exp exp1, Exp exp2){
+    protected ExpBinOp(String name, SMPLExp exp1, SMPLExp exp2){
 	super(name, exp1, exp2);
     }
 
-    public Exp getExpL() {
-	return (Exp) getSubTree(0);
+    public SMPLExp getExpL() {
+	return (SMPLExp) getSubTree(0);
     }
 
-    public Exp getExpR() {
-	return (Exp) getSubTree(1);
+    public SMPLExp getExpR() {
+	return (SMPLExp) getSubTree(1);
     }
 
     public String toString() {

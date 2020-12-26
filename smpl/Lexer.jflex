@@ -47,8 +47,6 @@ import java_cup.runtime.*;
 	return yytext();
     }
 %}
-
-
 %xstates STRING
 
 nl = [\n\r]
@@ -68,6 +66,8 @@ allChar = {alphanum}|{special}
 stringChars = ~[\"\\]
 
 hex = [0-9A-Fa-f]
+
+signed32 = [-]?([0-9]{1,9}|1[0-9]{1,9}|2[0]{9}|2147483[0-6][0-4][0-7]|2147[0-4][0-8][0-3][0-9]{3}|2[0-1][0-4][0-7][0-9]{6})
 
 LineTerminator = \r|\n|\r\n
 
@@ -168,7 +168,7 @@ CommentContent       = ( [^*] | \*+ [^/*] )*
 		}
 
 
-<YYINITIAL>    [-]{0,1}[0-9]+ {return new Symbol(sym.INT, new Integer(yytext()));}
+<YYINITIAL>    {signed32} {return new Symbol(sym.INT, new Integer(yytext()));}
 <YYINITIAL>    [-]{0,1}"#x"{hex}+ {
 			String I = yytext().replaceFirst("#x", "");
 			int i = Integer.parseInt(I, 16);
@@ -180,7 +180,7 @@ CommentContent       = ( [^*] | \*+ [^/*] )*
 			return new Symbol(sym.INT, new Integer(i));
 		}
 
-<YYINITIAL>    [-]{0,1}[([0-9]+\.[0-9]+) | (\.[0-9]+) | ([0-9]+\.)] {
+<YYINITIAL>    [-]{0,1}[0-9]*([0-9]\.|\.[0-9])[0-9]* {
 			// DOUBLE
 	    	return new Symbol(sym.DOUBLE, new Double(yytext()));
 		}

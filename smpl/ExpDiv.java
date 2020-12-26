@@ -1,6 +1,6 @@
 public class ExpDiv extends ExpBinOp {
 
-    public ExpDiv(Exp e1, Exp e2) {
+    public ExpDiv(SMPLExp e1, SMPLExp e2) {
 	super("/", e1, e2);
     }
 

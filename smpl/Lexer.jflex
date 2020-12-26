@@ -146,7 +146,7 @@ hex = [0-9A-Fa-f]
 <LINE_COMMENT> {
 	{nl}	{yychar -=2;
 			yybegin(YYINITIAL);}
-	{~nl}+	{yychar -= yytext().length();}
+	~{nl}+	{yychar -= yytext().length();}
 }
 
 <YYINITIAL>	"/*"	{nestedBlockCommentCount += 1;

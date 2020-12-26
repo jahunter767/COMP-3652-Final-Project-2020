@@ -17,6 +17,10 @@ public abstract class SMPLObject<T>{
 	return val;
     }
 
+    public void setVal(T val) {
+	this.val = val;
+    }
+
 
     public SMPLObject bitwiseAnd(SMPLObject object) throws TypeException {
 	throw new TypeException();
@@ -94,11 +98,11 @@ public abstract class SMPLObject<T>{
     }
 
 
-    public SMPLObject car(SMPLObject object) throws TypeException {
+    public SMPLObject car() throws TypeException {
 	throw new TypeException();
     }
 
-    public SMPLObject cdr(SMPLObject object) throws TypeException {
+    public SMPLObject cdr() throws TypeException {
 	throw new TypeException();
     }
 
@@ -110,7 +114,7 @@ public abstract class SMPLObject<T>{
 	throw new TypeException();
     }
 
-    public SMPLObject Substr(SMPLObject arg1, SMPLObject arg2) throws TypeException, SubstringException{
+    public SMPLObject substr(SMPLObject arg1, SMPLObject arg2) throws TypeException, SubstringException{
 	throw new TypeException();
     }
 

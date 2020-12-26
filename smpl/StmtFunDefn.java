@@ -28,7 +28,7 @@ public class StmtFunDefn extends Statement {
     }
 
 
-    public ArrayList<String> getParameters(){
+    public ArrayList<String> getParams(){
     return this.params;
     }
 

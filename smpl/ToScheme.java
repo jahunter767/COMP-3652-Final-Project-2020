@@ -24,13 +24,13 @@ public class ToScheme implements Visitor<Void, String> {
     }
 
 
-    public SMPLObject visitSubstr(Substr exp, Void arg)
+    public String visitSubstr(Substr exp, Void arg)
 	throws VisitException {
 	String arg1, arg2, arg3;
 	arg1 = exp.getArg1().toString() + " ";
 	arg2 = exp.getArg2().toString() + " ";
 	arg3 = exp.getArg3().toString();
-	return "(substr" + arg1 + + arg2 + arg3 ")";
+	return "(substr" + arg1 + arg2 + arg3 + ")";
     }
 
 
@@ -71,7 +71,7 @@ public class ToScheme implements Visitor<Void, String> {
     // expressions
 	public String visitStmtFunDefn(StmtFunDefn fd, Void arg)
 	throws VisitException {
-	ArrayList<String> params = fd.getParameters();
+	ArrayList<String> params = fd.getParams();
 	String result = "(proc (params " + params.remove(0);
 	for (String p : params){
 		result = result + " " + p;
@@ -114,12 +114,19 @@ public class ToScheme implements Visitor<Void, String> {
 
 	public String visitExpCase(ExpCase c, Void arg)
 	throws VisitException {
-	ArrayList<ExpClauses> clauses = c.getClauses();
-	String result = "(case " + clauses.remove(0).toString();
-	for (Exp c : clauses){
-		result = result + " " + c.toString();
+	ArrayList<Exp> clauses = c.getClauses();
+	String result = "(case " + clauses.remove(0).visit(this, arg);
+	for (Exp cl : clauses){
+		result = result + " " + cl.visit(this, arg);
 	}
-	result = result + " )"
+	result = result + " )";
+	return result;
+    }
+
+	public String visitExpClause(ExpClause c, Void arg)
+	throws VisitException {
+	String result = "(clause " + c.getPredicate().visit(this, arg) + 
+					" (consequence " + c.getConsequent().visit(this, arg) + ")";
 	return result;
     }
 
@@ -308,6 +315,7 @@ public class ToScheme implements Visitor<Void, String> {
     public String visitExpVar(ExpVar exp, Void arg)
 	throws VisitException {
 	return exp.getVar();
+	}
 
 	public String visitExpLit(ExpLit exp, Void arg)
 	throws VisitException {

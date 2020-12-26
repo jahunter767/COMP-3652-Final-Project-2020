@@ -1,9 +1,11 @@
 import java.util.ArrayList;
 
 public class SMPLVector extends SMPLObject<ArrayList<SMPLObject>> {
+    /*
     public SMPLVector(SMPLObject... vect) {
     super(vect);
     }
+    */
 
     public SMPLVector(ArrayList<SMPLObject> vect) {
     super(vect);
@@ -18,7 +20,7 @@ public class SMPLVector extends SMPLObject<ArrayList<SMPLObject>> {
     if (object instanceof SMPLNumbers){
         SMPLNumbers obj = (SMPLNumbers) object;
         if (obj.isInt()){
-            return obj.getVal().get(obj.getIntVal());
+            return getVal().get(obj.getIntVal());
         }else{
             throw new TypeException();
         }
@@ -28,7 +30,7 @@ public class SMPLVector extends SMPLObject<ArrayList<SMPLObject>> {
     }
 
     public SMPLObject get(int i) throws TypeException {
-    return obj.getVal().get(i);
+    return getVal().get(i);
     }
 
     public SMPLObject equalTo(SMPLObject object) throws TypeException {
@@ -36,9 +38,11 @@ public class SMPLVector extends SMPLObject<ArrayList<SMPLObject>> {
 		SMPLVector obj = (SMPLVector) object;
         boolean result = size() == obj.size();
         if (result){
+            SMPLBoolean p;
             int i = 0;
             while ((i < size()) && (result)){
-                result = result && get(i).equalTo(obj.get(i)).getVal();
+                p = (SMPLBoolean) get(i).equalTo(obj.get(i));
+                result = result && p.getVal().booleanValue();
             }
         }
 		return new SMPLBoolean(result);

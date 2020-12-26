@@ -10,12 +10,12 @@ public class SMPL {
 	String type = lit.getType();
 
 	try{
-		if(type == "number") return new SMPLNumbers(lit.getVal());
-		if(type == "boolean") return new SMPLBoolean(lit.getVal());
-		if(type == "character") return new SMPLCharacter(lit.getVal());
-		if(type == "string") return new SMPLString(lit.getVal());
-		if(type == "nill") return new SMPLNill();
-		if(type == "none") return new SMPLNone();
+		if (type == "number") return new SMPLNumbers((Double) lit.getVal());
+		if (type == "boolean") return new SMPLBoolean((Boolean) lit.getVal());
+		if (type == "character") return new SMPLCharacter((Character) lit.getVal());
+		if (type == "string") return new SMPLString((String) lit.getVal());
+		if (type == "nill") return new SMPLNil();
+		if (type == "none") return new SMPLNone();
 	}catch(ClassNotFoundException ex) { 
 		System.out.println(ex.toString());
 		return null;// or make the none type
@@ -27,8 +27,8 @@ public class SMPL {
 	String type = lit.getType();
 
 	try{
-		if((type == "pair") or (type == "list")) return new SMPLPair(seq);
-		if(type == "vector") return new SMPLVector(seq);
+		if ((type == "pair") || (type == "list")) return new SMPLPair(seq);
+		if (type == "vector") return new SMPLVector(seq);
 	}catch(ClassNotFoundException ex) { 
 		System.out.println(ex.toString());
 		return null;// or make the none type

@@ -8,7 +8,7 @@ public class SMPLBoolean extends SMPLObject<Boolean> {
 	if(object instanceof SMPLBoolean){
 		SMPLBoolean obj = (SMPLBoolean) object;
         Boolean val2 = obj.getVal();
-        Boolean result = getVal().intValue() && val2;
+        Boolean result = getVal().booleanValue() && val2;
         return new SMPLBoolean(result);
     }else {
 		throw new TypeException();
@@ -19,7 +19,7 @@ public class SMPLBoolean extends SMPLObject<Boolean> {
 	if(object instanceof SMPLBoolean){
 		SMPLBoolean obj = (SMPLBoolean) object;
         Boolean val2 = obj.getVal();
-        Boolean result = getVal().intValue() || val2;
+        Boolean result = getVal().booleanValue() || val2;
         return new SMPLBoolean(result);
     }else {
 		throw new TypeException();

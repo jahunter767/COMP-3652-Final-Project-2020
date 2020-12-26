@@ -42,13 +42,6 @@ scan with {:
 
 /* Terminals (tokens returned by the scanner). */
 
-/* REMEMBER THESE ARE REASSIGNABLE BY THE USER */
-// built-ins
-terminal PAIR, CAR, CDR, PAIR_PRED, LIST;
-terminal SIZE;
-terminal EQUIV_PRED, EQUAL_PRED;
-terminal SUBSTR;
-
 // keywords
 terminal DEF, PROC, CALL, LET, IF, THEN, ELSE, CASE;
 
@@ -57,7 +50,7 @@ terminal PRINT, PRINTLN, READ, READINT;
 
 // special symbols
 terminal LBRACE, RBRACE, LPAREN, RPAREN, LSQPAREN, RSQPAREN, VECT_OPEN, VECT_CLOSE;
-terminal ASSIGN, BIND, COMMA, SEMI;
+terminal ASSIGN, BIND, COMMA, DOT, COLON, SEMI;
 
 // compound data operators
 terminal LSTCONCAT;
@@ -81,7 +74,6 @@ terminal Double DOUBLE;
 terminal Boolean BOOL;
 terminal Character CHAR;
 terminal String STRING;
-terminal ExpLit<ArrayList> NIL;
 
 /* Non terminals */
 non terminal ArithProgram program;
@@ -120,6 +112,7 @@ non terminal Exp comparator;
 non terminal Exp arithExp;
 non terminal Exp term;
 non terminal Exp power;
+non terminal Exp lit;
 
 non terminal ExpFunCall funCall;
 non terminal ArrayList<Exp> argList;
@@ -221,7 +214,6 @@ lit ::= let:l {: RESULT = l; :} |
 		VAR:var {: RESULT = new ExpVar(var); :} |
 		vector:vect {: RESULT = vect; :} |
 		list:lst {: RESULT = lst; :} |
-		NIL {: RESULT = new ExpLit<String>("nil"); :} |
 		INT:ilit {: RESULT = new ExpLit<Integer>("number", ilit); :} |
 		DOUBLE:dlit {: RESULT = new ExpLit<Double>("number", dlit); :} |
 		BOOL:blit {: RESULT = new ExpLit<Boolean>("boolean", blit); :} |
@@ -268,7 +260,7 @@ clauseLst ::= clauseLst:cList COMMA clause:c {:
 				cList.add(c);
 				RESULT = cList; :} |
 			clause:c {:
-				ArrayList<ExpClause> cList = new ArrayList<ExpClause>();
+				ArrayList<Exp> cList = new ArrayList<Exp>();
 				cList.add(c);
 				RESULT = cList; :};
 

@@ -83,11 +83,11 @@ public class Evaluator implements Visitor<Environment<SMPLObject>, SMPLObject> {
 
     public SMPLObject visitExpFunCall(ExpFunCall fc, Environment<SMPLObject> env)
 	throws VisitException, MismatchedParamsException {
-	SMPLFunction Func = env.get(fc.getName());
+	SMPLFunction Func = (SMPLFunction) env.get(fc.getName());
 	Closure c = Func.getClosure();
 	StmtFunDefn myFunc = c.getFunction();
 	ArrayList<String> params = myFunc.getParams(); // getParam is within the function defintion
-	String paramOvf = myFunc.getparamOvf();
+	String paramOvf = myFunc.getParamOvf();
 	int paramCount = params.size();
 
 	/*
@@ -126,28 +126,26 @@ public class Evaluator implements Visitor<Environment<SMPLObject>, SMPLObject> {
 
 	public SMPLObject visitExpCall(ExpCall fc, Environment<SMPLObject> env)
 	throws VisitException, MismatchedParamsException {
-	SMPLFunction Func = fc.getFunction().visit(this, env);
+	SMPLFunction Func = (SMPLFunction) fc.getFunction().visit(this, env);
 	Closure c = Func.getClosure();
 	StmtFunDefn myFunc = c.getFunction();
 	ArrayList<String> params = myFunc.getParams(); // getParam is within the function defintion
 	String paramOvf = myFunc.getParamOvf();
 	int paramCount = params.size();
 
-	/*
-	SMPLFunction Func = null;
-	if(fc.getProcedure() != null){Func = (SMPLFunction)fc.getProcedure().visit(this,env);}
-	else if(fc.getName() != null){Func = (SMPLFunction)env.get(fc.getName());}
-	else {throw new VisitException("Error: Unknown function.");}
-	*/
-
-	SMPLPair arguements = fc.getArgs().visit(this, env); // expressions that we got as arguments
-	ArrayList<SMPLObject> args = new ArrayList<SMPLObject>();
-	SMPLObject temp = arguements.cdr();
-	while (! temp.equalTo(new SMPLNil()).getVal()){
-		args.add(temp);
-		temp = arguements.cdr();
+	SMPLPair lst = (SMPLPair) fc.getArgs().visit(this, env); // expressions that we got as arguments
+	ArrayList<SMPLObject> arguements = new ArrayList<SMPLObject>();
+	SMPLObject left = lst.car();
+	SMPLObject next = lst.cdr();
+	SMPLBoolean p = (SMPLBoolean) next.equalTo(new SMPLNil());
+	while (!p.getVal()){
+		arguements.add(left);
+		left = next.car();
+		next = next.cdr();
+		p = (SMPLBoolean) next.equalTo(new SMPLNil());
 	}
-	int argCount = args.size();
+	arguements.add(left);
+	int argCount = arguements.size();
 
 	if (((paramCount < argCount) && (paramOvf == null)) ||
 	(paramCount > argCount)){
@@ -158,14 +156,14 @@ public class Evaluator implements Visitor<Environment<SMPLObject>, SMPLObject> {
 	Environment newEnv;
 	int i;
 	for(i = 0; i < paramCount; i++){
-		args.add(arguements.get(i).visit(this, env));
+		args.add(arguements.get(i));
 	}
 
 	newEnv = new Environment(c.getClosingEnv(), params, args);
 	if (paramOvf != null){
 		ArrayList<SMPLObject> argOvf = new ArrayList<SMPLObject>();
 		for (i = paramCount; i < argCount; i++){
-			argOvf.add(arguements.get(i).visit(this, env));
+			argOvf.add(arguements.get(i));
 		}
 		newEnv.put(paramOvf, SMPL.makeInstance(new ExpLit<ArrayList<Exp>>("vector"), argOvf));
 	}
@@ -176,7 +174,7 @@ public class Evaluator implements Visitor<Environment<SMPLObject>, SMPLObject> {
 
 	public SMPLObject visitExpIf(ExpIf ifStmt, Environment<SMPLObject> env)
 	throws VisitException {
-	SMPLObject pred = ifStmt.getPredicate().visit(this, env);
+	SMPLBoolean pred = (SMPLBoolean) ifStmt.getPredicate().visit(this, env);
 	SMPLObject result;
 	
 	if (pred.getVal()){
@@ -189,17 +187,23 @@ public class Evaluator implements Visitor<Environment<SMPLObject>, SMPLObject> {
 
 	public SMPLObject visitExpCase(ExpCase c, Environment<SMPLObject> env)
 	throws VisitException {
-	ArrayList<ExpClauses> clauses = c.getClauses();
+	ArrayList<Exp> clauses = c.getClauses();
 	SMPLBoolean pred;
-	for (Exp c: clauses){
-		pred = c.getPredicate.visit(this, env);
-		if (pred.getValue()){
-			return c.getConsequent().visit(this, env);
+	ExpClause cl;
+	for (Exp clause: clauses){
+		cl = (ExpClause) clause;
+		pred = cl.getPredicate().visit(this, env);
+		if (pred.getVal()){
+			return cl.visit(this, env);
 		}
 	}
 	return SMPL.makeInstance(new ExpLit<String>("none"));
     }
 
+	public SMPLObject visitExpClause(ExpClause c, Environment<SMPLObject> env)
+	throws VisitException {
+	return c.getConsequent().visit(this, env);
+    }
 
     public SMPLObject visitExpBitwiseNot(ExpBitwiseNot exp, Environment<SMPLObject> env)
 	throws VisitException {
@@ -227,49 +231,49 @@ public class Evaluator implements Visitor<Environment<SMPLObject>, SMPLObject> {
 
 	public SMPLObject visitExpLess(ExpLess exp, Environment<SMPLObject> env)
 	throws VisitException {
-	SMPLObject val1,;
-	val1 = exp.getExpL().visit(this, env);
-	val2 = exp.getExpR().visit(this, env);
+	SMPLObject val1, val2;
+	val1 = exp.getLeftPred().visit(this, env);
+	val2 = exp.getRightPred().visit(this, env);
 	return val1.lessThan(val2);
     }
 
 	public SMPLObject visitExpLessEq(ExpLessEq exp, Environment<SMPLObject> env)
 	throws VisitException {
 	SMPLObject val1, val2;
-	val1 = .getExpL().visit(this, env);
-	val2 = exp.getExpR().visit(this, env);
+	val1 = exp.getLeftPred().visit(this, env);
+	val2 = exp.getRightPred().visit(this, env);
 	return val1.lessThanEq(val2);
     }
 
 	public SMPLObject visitExpEqual(ExpEqual exp, Environment<SMPLObject> env)
 	throws VisitException {
 	SMPLObject val1, val2;
-	val1 = .getExpL().visit(this, env);
-	val2 = exp.getExpR().visit(this, env);
+	val1 = exp.getLeftPred().visit(this, env);
+	val2 = exp.getRightPred().visit(this, env);
 	return val1.equalTo(val2);
     }
 
     public SMPLObject visitExpGreaterEq(ExpGreaterEq exp, Environment<SMPLObject> env)
 	throws VisitException {
 	SMPLObject val1, val2;
-	val1 = exp.getExpL().visit(this, env);
-	val2 = exp.getExpR().visit(this, env);
+	val1 = exp.getLeftPred().visit(this, env);
+	val2 = exp.getRightPred().visit(this, env);
 	return val1.greaterThanEq(val2);
     }
 
     public SMPLObject visitExpGreater(ExpGreater exp, Environment<SMPLObject> env)
 	throws VisitException {
 	SMPLObject val1, val2;
-	val1 = exp.getExpL().visit(this, env);
-	val2 = exp.getExpR().visit(this, env);
+	val1 = exp.getLeftPred().visit(this, env);
+	val2 = exp.getRightPred().visit(this, env);
 	return val1.greaterThan(val2);
     }
 
 	public SMPLObject visitExpNotEqual(ExpNotEqual exp, Environment<SMPLObject> env)
 	throws VisitException {
 	SMPLObject val1, val2;
-	val1 = exp.getExpL().visit(this, env);
-	val2 = exp.getExpR().visit(this, env);
+	val1 = exp.getLeftPred().visit(this, env);
+	val2 = exp.getRightPred().visit(this, env);
 	return val1.notEqualTo(val2);
     }
 
@@ -300,7 +304,7 @@ public class Evaluator implements Visitor<Environment<SMPLObject>, SMPLObject> {
 
 	public SMPLObject visitExpAdd(ExpAdd exp, Environment<SMPLObject> env)
 	throws VisitException {
-	SMPLObject val1,;
+	SMPLObject val1, val2;
 	val1 = exp.getExpL().visit(this, env);
 	val2 = exp.getExpR().visit(this, env);
 	return val1.add(val2);

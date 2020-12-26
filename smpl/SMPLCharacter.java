@@ -7,7 +7,7 @@ public class SMPLCharacter extends SMPLObject<Character> {
     public SMPLObject equalTo(SMPLObject object) throws TypeException {
     if(object instanceof SMPLCharacter){
 		SMPLCharacter obj = (SMPLCharacter) object;
-		Boolean val2 = obj.getVal();
+		Character val2 = obj.getVal();
 		return new SMPLBoolean(getVal() == val2);
     }else {
 		return new SMPLBoolean(false);

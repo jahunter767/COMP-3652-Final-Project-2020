@@ -69,7 +69,7 @@ special = ["+""-""*"/%"^"&|~@"?"!]
 
 allChar = {alphanum}|{special}
 
-stringChar = ~[\"\\]
+stringChar = [^\"\\]
 
 blockCommentChar = ~["/*""*/"]
 
@@ -184,7 +184,7 @@ hex = [0-9A-Fa-f]
 			return new Symbol(sym.INT, new Double(i));
 		}
 
-<YYINITIAL>    [-]{0,1}[([0-9]+\.[0-9]+) | (\.[0-9]+) | ([0-9]+\.)] {
+<YYINITIAL>    [-]{0,1}(([0-9]+\.[0-9]+) | (\.[0-9]+) | ([0-9]+\.)) {
 			// DOUBLE
 	    	return new Symbol(sym.DOUBLE, new Double(yytext()));
 		}

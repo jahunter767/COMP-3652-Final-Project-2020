@@ -79,6 +79,14 @@ public abstract class SMPLObject<T> {
 	throw new TypeException();
     }
 
+    public SMPLObject car() throws TypeException {
+	throw new TypeException();
+    }
+
+    public SMPLObject cdr() throws TypeException {
+	throw new TypeException();
+    }
+
 
 
 }

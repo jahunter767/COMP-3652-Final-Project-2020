@@ -142,6 +142,55 @@ public class Evaluator implements Visitor<Environment<SMPLObject>, SMPLObject> {
     }
 
 
+    public SMPLObject visitExpPair(ExpPair exp, Environment<SMPLObject> env)
+	throws VisitException {
+	SMPLObject obj1, obj2;
+	obj1 = exp.getExpL().visit(this, env);
+	obj2 = exp.getExpR().visit(this, env);
+	return SMPL.makeInstance(new Pair(obj1,obj2));
+    }
+
+
+    public SMPLObject visitExpList(ExpList lst, Environment<SMPLObject> env)
+	throws VisitException{
+
+
+	ArrayList<SMPLObject> args = new ArrayList<>();
+	ArrayList<Exp> exp = lst.getArgs(); // expressions that we got as arguments
+	
+	if(exp.size() <= 0) return SMPL.makeInstance(new Nil());
+	
+	for(int i = 0; i < exp.size(); i++){
+		args.add(exp.get(i).visit(this,env));
+	}
+	
+	return SMPL.makeInstance(new List(args));
+    }
+
+
+    public SMPLObject visitCar(Car exp, Environment<SMPLObject> env)
+	throws VisitException {
+	SMPLObject arg1;
+	arg1 = exp.getArg1().visit(this, env);
+	return arg1.car();
+    }
+
+    public SMPLObject visitCdr(Cdr exp, Environment<SMPLObject> env)
+	throws VisitException {
+	SMPLObject arg1;
+	arg1 = exp.getArg1().visit(this, env);
+	return arg1.cdr();
+    }
+
+
+    public SMPLObject visitisPair(isPair exp, Environment<SMPLObject> env)
+	throws VisitException {
+	SMPLObject arg1;
+	arg1 = exp.getArg1().visit(this, env);
+	return SMPL.makeInstance(arg1.isType("Pair",arg1.getType()));
+    }
+
+
 
     public SMPLObject visitExpLit(ExpLit exp, Environment<SMPLObject> env)
 	throws VisitException {
@@ -159,9 +208,6 @@ public class Evaluator implements Visitor<Environment<SMPLObject>, SMPLObject> {
 	throws VisitException {
 	return SMPL.makeInstance(exp.getString());// returns the SMPL object / instance//factory methods (eg smplobject.make())
     }
-
-
-
 
 
 }

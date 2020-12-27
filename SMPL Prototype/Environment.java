@@ -134,6 +134,50 @@ public class Environment<T> {
 	closure = new Closure(fd,result);
 	SMPLObject equal = SMPL.makeInstance(closure);
 	result.put("equal?", (b) equal);
+
+
+	// ----- BULTIN METHOD FOR PAIR -----
+	ArrayList<String> pairParameters = new ArrayList<String>();
+	pairParameters.add("pairObj1");pairParameters.add("pairObj2");
+	body = new StmtSequence(new Statement(new ExpPair(new ExpVar("pairObj1"),new ExpVar("pairObj2"))));
+	fd = new StmtFunDefn(pairParameters, body);
+	closure = new Closure(fd,result);
+	SMPLObject pair = SMPL.makeInstance(closure);
+	result.put("pair", (b) pair);
+
+
+	// ----- BULTIN METHOD FOR PAIR? -----
+	ArrayList<String> ispairParameters = new ArrayList<String>();
+	ispairParameters.add("ispairObj");
+	body = new StmtSequence(new Statement(new isPair(new ExpVar("ispairObj"))));
+	fd = new StmtFunDefn(ispairParameters, body);
+	closure = new Closure(fd,result);
+	SMPLObject ispair = SMPL.makeInstance(closure);
+	result.put("pair?", (b) ispair);
+
+	// ----- BULTIN METHOD FOR CAR -----
+	ArrayList<String> carParameters = new ArrayList<String>();
+	carParameters.add("carObj");
+	body = new StmtSequence(new Statement(new Car(new ExpVar("carObj"))));
+	fd = new StmtFunDefn(carParameters, body);
+	closure = new Closure(fd,result);
+	SMPLObject car = SMPL.makeInstance(closure);
+	result.put("car", (b) car);
+
+
+	// ----- BULTIN METHOD FOR CDR -----
+	ArrayList<String> cdrParameters = new ArrayList<String>();
+	cdrParameters.add("cdrObj");
+	body = new StmtSequence(new Statement(new Cdr(new ExpVar("cdrObj"))));
+	fd = new StmtFunDefn(cdrParameters, body);
+	closure = new Closure(fd,result);
+	SMPLObject cdr = SMPL.makeInstance(closure);
+	result.put("cdr", (b) cdr);
+
+
+
+	// ----- BULTIN METHOD FOR LIST -----
+	// to be implemented when functions can accept any number of inputs
 	
 	return result;
     }

@@ -45,7 +45,7 @@ scan with {:
 terminal FUN;
 
 // special symbols
-terminal LPAREN, RPAREN, SEMI,LBRACE,RBRACE,LSQPAREN,RSQPAREN,DEFINE,ASSIGN,COMMA;
+terminal LPAREN, RPAREN, SEMI,LBRACE,RBRACE,LSQPAREN,RSQPAREN,DEFINE,ASSIGN,COMMA,BIND;
 
 // arithmetic operators
 terminal PLUS, MINUS, MUL, DIV, MOD, EXP;
@@ -72,6 +72,7 @@ terminal EQUAL_PRED, EQUIV_PRED;
 //other terminals
 terminal DEF,PROC,PAIR,CAR,CDR,PAIR_PRED,LIST,SUBSTR,LSTCONCAT;
 terminal OPEN_QUOTE,CLOSE_QUOTE,DOUBLE,NEWLINE,TAB,BACKSLASH,CHAR;
+terminal CALL,PRINT,PRINTLN,READ,READINT,CASE,LET;
 
 // terminals with values
 terminal Integer INT;
@@ -144,6 +145,12 @@ non terminal Substr Substr; // for substrings
 non terminal Eqv Eqv; // for eqv
 non terminal Equal Equal; // for equals
 
+non terminal Exp Pair;// for pairs
+non terminal Exp List;// for list
+
+non terminal Car Car; // for car
+non terminal Cdr Cdr; // for cdr
+
 
 non terminal Exp empty;
 non terminal ArrayList<Exp> emptyA;
@@ -161,7 +168,7 @@ stmtList ::= stmtList:lst stmt:s {:
 		RESULT = new StmtSequence(s);
 		:};
 
-stmt ::= Eqv:eqv {:RESULT = new Statement(eqv); :} |Equal:equal {:RESULT = new Statement(equal); :} |Substr:subs {:RESULT = new Statement(subs); :} | funDefn:func {: RESULT = func; :} | definition:d {: RESULT = d; :} | str:s {: RESULT = new Statement(s); :} | arithmaticExpression:a {: RESULT = new Statement(a); :} SEMI; // |conditionalExpression:conditional {: RESULT = new Statement(conditional); :}; //
+stmt ::= Car:car {:RESULT = new Statement(car); :} | Cdr:cdr {:RESULT = new Statement(cdr); :} |Pair:pair {:RESULT = new Statement(pair);:} | List:lst {:RESULT = new Statement(lst); :} | Eqv:eqv {:RESULT = new Statement(eqv); :} |Equal:equal {:RESULT = new Statement(equal); :} |Substr:subs {:RESULT = new Statement(subs); :} | funDefn:func {: RESULT = func; :} | definition:d {: RESULT = d; :} | str:s {: RESULT = new Statement(s); :} | arithmaticExpression:a {: RESULT = new Statement(a); :} SEMI; // |conditionalExpression:conditional {: RESULT = new Statement(conditional); :}; //
 
 str ::= STRING:s {: RESULT = new StringExp(s); :};
 
@@ -170,6 +177,14 @@ str ::= STRING:s {: RESULT = new StringExp(s); :};
 Substr::= SUBSTR LPAREN expr:e COMMA arithmaticExpression:start COMMA arithmaticExpression:end RPAREN {: RESULT = new Substr(e,start,end); :};
 Eqv::= EQUIV_PRED LPAREN expr:exp1 COMMA expr:exp2  RPAREN {: RESULT = new Eqv(exp1,exp2); :};
 Equal ::= EQUAL_PRED LPAREN expr:exp1 COMMA expr:exp2  RPAREN {: RESULT = new Equal(exp1,exp2); :};
+
+Car::= CAR LPAREN expr:exp1 RPAREN {: RESULT = new Car(exp1); :};
+Cdr::= CDR LPAREN expr:exp1  RPAREN {: RESULT = new Cdr(exp1); :};
+
+Pair::= PAIR LPAREN expr:obj1 COMMA expr:obj2 RPAREN {: RESULT = new ExpPair(obj1,obj2);:};
+
+List::= LIST LPAREN argsE:arguments RPAREN {:RESULT = new ExpList(arguments); :};
+
 
 
 
@@ -193,8 +208,8 @@ paramListE ::= paramList:paramList {: RESULT = paramList; :} | emptyS:e {: RESUL
 
 definition ::= DEF VAR:v Defnexpr:exp {: RESULT = new StmtDefinition(v,exp); :};
 
-Defnexpr ::= arithmaticExpression:a SEMI {: RESULT = new Statement(a); :} | str:s {: RESULT = new Statement(s); :} | Substr:str {: RESULT = new Statement(str); :} | funDefn:func {: RESULT = func; :};
-expr ::= arithmaticExpression:a {: RESULT = new Statement(a); :} | str:s {: RESULT = new Statement(s); :} | Substr:str {: RESULT = new Statement(str); :} | funDefn:func {: RESULT = func; :};
+Defnexpr ::= arithmaticExpression:a SEMI {: RESULT = new Statement(a); :} | Car:car {:RESULT = new Statement(car); :} | Cdr:cdr {:RESULT = new Statement(cdr); :} | Pair:pair {:RESULT = new Statement(pair);:} | List:lst {:RESULT = new Statement(lst); :} | str:s {: RESULT = new Statement(s); :} | Substr:str {: RESULT = new Statement(str); :} | funDefn:func {: RESULT = func; :};
+expr ::= arithmaticExpression:a {: RESULT = new Statement(a); :} | Car:car {:RESULT = new Statement(car); :} | Cdr:cdr {:RESULT = new Statement(cdr); :} | Pair:pair {:RESULT = new Statement(pair);:} | List:lst {:RESULT = new Statement(lst); :} | str:s {: RESULT = new Statement(s); :} | Substr:str {: RESULT = new Statement(str); :} | funDefn:func {: RESULT = func; :};
 
 /*
 definition ::= VAR:v ASSIGN comparisonExpression:e SEMI {:

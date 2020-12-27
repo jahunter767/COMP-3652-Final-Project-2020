@@ -49,6 +49,16 @@ public interface Visitor<S, T> {
     public T visitStringExp(StringExp exp, S arg) throws VisitException;
 
     public T visitSubstr(Substr exp, S arg) throws VisitException;
+    public T visitEqv(Eqv exp, S arg) throws VisitException;
+    public T visitEqual(Equal exp, S arg) throws VisitException;
+
+    public T visitExpPair(ExpPair exp, S arg) throws VisitException;
+    public T visitExpList(ExpList exp, S arg) throws VisitException;
+
+    public T visitCar(Car exp, S arg) throws VisitException;
+    public T visitCdr(Cdr exp, S arg) throws VisitException;
+
+    public T visitisPair(isPair exp, S arg) throws VisitException;
 
     public T visitExpVar(ExpVar exp, S arg) throws VisitException;
 

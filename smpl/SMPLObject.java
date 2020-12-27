@@ -58,11 +58,32 @@ public abstract class SMPLObject<T> {
     }
 
 
-    protected SMPLObject sub(SMPLObject obj) throws TypeException {
+    public SMPLObject sub(SMPLObject obj) throws TypeException {
 	throw new TypeException();
     }
 
     public SMPLObject Substr(SMPLObject arg1, SMPLObject arg2) throws TypeException, SubstringException{
+	throw new TypeException();
+    }
+
+    public SMPLObject Eqv(SMPLObject obj) {
+	Boolean result = false;
+	if (this == obj) result = true;
+
+	return SMPL.makeInstance(result);
+
+    }
+
+
+    public SMPLObject Equal(SMPLObject obj) throws TypeException {
+	throw new TypeException();
+    }
+
+    public SMPLObject car() throws TypeException {
+	throw new TypeException();
+    }
+
+    public SMPLObject cdr() throws TypeException {
 	throw new TypeException();
     }
 

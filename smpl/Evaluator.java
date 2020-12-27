@@ -214,7 +214,7 @@ public class Evaluator implements Visitor<Environment<SMPLObject>, SMPLObject> {
 	ExpClause cl;
 	for (Exp clause: clauses){
 		cl = (ExpClause) clause;
-		pred = cl.getPredicate().visit(this, env);
+		pred = (SMPLBoolean) cl.getPredicate().visit(this, env);
 		if (pred.getVal()){
 			return cl.visit(this, env);
 		}

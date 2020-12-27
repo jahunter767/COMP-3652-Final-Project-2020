@@ -1,6 +1,6 @@
 public class ExpClause extends Exp {
 
-    Exp  predicate;
+    Exp predicate;
 
     protected ExpClause(Exp predicate, Exp consequent) {
     super("clause", consequent);

@@ -172,16 +172,16 @@ hex = [0-9A-Fa-f]
 		}
 
 
-<YYINITIAL>    [-]{0,1}[0-9]+ {return new Symbol(sym.INT, new Integer(yytext()));}
+<YYINITIAL>    [-]{0,1}[0-9]+ {return new Symbol(sym.INT, new Double(yytext()));}
 <YYINITIAL>    [-]{0,1}"#x"{hex}+ {
 			String I = yytext().replaceFirst("#x", "");
 			int i = Integer.parseInt(I, 16);
-			return new Symbol(sym.INT, new Integer(i));
+			return new Symbol(sym.INT, new Double(i));
 		}
 <YYINITIAL>    [-]{0,1}"#b"[01]+ {
 			String I = yytext().replaceFirst("#b", "");
 			int i = Integer.parseInt(I, 2);
-			return new Symbol(sym.INT, new Integer(i));
+			return new Symbol(sym.INT, new Double(i));
 		}
 
 <YYINITIAL>    [-]{0,1}[([0-9]+\.[0-9]+) | (\.[0-9]+) | ([0-9]+\.)] {

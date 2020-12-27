@@ -26,6 +26,8 @@ public class SMPLNumbers extends SMPLObject<Double> {
 			Integer val2 = obj.getVal().intValue();
 			Integer result = getVal().intValue() & val2;
 			return new SMPLNumbers(result);
+		}else {
+			throw new TypeException();
 		}
     }else {
 		throw new TypeException();
@@ -40,6 +42,8 @@ public class SMPLNumbers extends SMPLObject<Double> {
 			Integer val2 = obj.getVal().intValue();
 			Integer result = getVal().intValue() | val2;
 			return new SMPLNumbers(result);
+		}else {
+			throw new TypeException();
 		}
     }else {
 		throw new TypeException();
@@ -108,6 +112,8 @@ public class SMPLNumbers extends SMPLObject<Double> {
 			Integer val2 = obj.getVal().intValue();
 			Integer result = getVal().intValue() % val2;
 			return new SMPLNumbers(result);
+		}else {
+			throw new TypeException();
 		}
     }else {
 		throw new TypeException();

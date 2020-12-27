@@ -7,4 +7,5 @@ public class SMPLBoolean extends SMPLObject{
     public Boolean getVal(){
 	return (Boolean)V;	
 	}
+	
 }

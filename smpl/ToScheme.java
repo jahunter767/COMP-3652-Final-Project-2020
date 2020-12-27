@@ -56,8 +56,18 @@ public class ToScheme implements Visitor<Void, String> {
 	return "(define " + sd.getVar() + " " +
 	    valExp + ")";
     }
+	
+	public String visitExpCallStmt(ExpCallStmt fd, Void arg)
+	throws VisitException {
+	return "(define ";
+    }
+	
+	public String visitStmtProc(StmtProc fd, Void arg)
+	throws VisitException {
+	return "(define "+"( "+fd.getStmt().visit(this,arg)+" )";
+    }
 
-    public String visitStmtFunDefn(StmtFunDefn fd, Void arg)
+    public String visitStmtProcDefn(StmtProcDefn fd, Void arg)
 	throws VisitException {
 	// Convert parameters to String
 	StringBuffer sb = new StringBuffer();
@@ -66,10 +76,10 @@ public class ToScheme implements Visitor<Void, String> {
 	sb.append(" ");
 	}
 	String str = sb.toString();
-	return "(define "+"( "+fd.getFname()+" "+str+")"+fd.getStmt().visit(this,arg)+" )";
+	return "(define "+"( "+fd.getName()+" "+str+")"+fd.getStmt().visit(this,arg)+" )";
     }
 
-    public String visitExpFunCall(ExpFunCall fc, Void arg)
+    public String visitExpProcCall(ExpProcCall fc, Void arg)
 	throws VisitException {
 	// to be implemented
 	// Convert parameters to String
@@ -118,8 +128,8 @@ public class ToScheme implements Visitor<Void, String> {
     }
 
     public String visitExpLit(ExpLit exp, Void arg)
-	throws VisitException{
-	return "" + exp.getVal();
+	throws VisitException {
+	return exp.toString();
     }
 
     public String visitExpVar(ExpVar exp, Void arg)
@@ -131,6 +141,14 @@ public class ToScheme implements Visitor<Void, String> {
 		return "Greater than OR equal to";
 	}
 	public String visitCompareG(CompareG exp, Void arg) 
+	throws VisitException {
+		return "Greater than";
+	}
+	public String visitCompareE(CompareE exp, Void arg) 
+	throws VisitException {
+		return "Greater than";
+	}
+	public String visitCompareNE(CompareNE exp, Void arg) 
 	throws VisitException {
 		return "Greater than";
 	}
@@ -159,6 +177,11 @@ public class ToScheme implements Visitor<Void, String> {
 	}
 	
 	public String visitStmtIfDefn(StmtIfDefn exp, Void arg) 
+	throws VisitException {
+		return "IF-STATEMENT";
+	}
+	
+	public String visitStmtCaseDefn(StmtCaseDefn exp, Void arg) 
 	throws VisitException {
 		return "IF-STATEMENT";
 	}

@@ -1,4 +1,6 @@
 import java.io.*; 
+import java.util.*;
+
   
 // Java program to implement 
 // a Singly Linked List 
@@ -23,7 +25,7 @@ public class LinkedList {
     } 
       
     // Method to insert a new node 
-    public String insert(SMPLExp data) 
+    public void insert(SMPLExp data) 
     { 
         // Create a new node with given data 
         Node new_node = new Node(data); 
@@ -47,7 +49,6 @@ public class LinkedList {
         } 
    
         // Return the list by head 
-        return this.toString();
     } 
       
     // Method to print the LinkedList. 
@@ -70,7 +71,25 @@ public class LinkedList {
           
         return str; 
     }
+	public String toSMPLlist() 
+    { 
+        Node currNode = this.head;
 
+		String str = "[";
+   
+        // Traverse through the LinkedList 
+        while (currNode != null) { 
+            // Print the data at current node 
+            str = str + currNode.data.toString() + ", "; 
+   
+            // Go to next node 
+            currNode = currNode.next; 
+        }
+		str = str.substring(0, str.length()-2); 
+		str = str + "]";
+          
+        return str; 
+    }
 		public SMPLExp findByIndex(int ind) { 
         Node currNode = this.head; 
 		int count = 0;
@@ -100,5 +119,33 @@ public class LinkedList {
 		}else{
 			return new SMPLBoolean(new Boolean(true));
 		}
+	}
+	
+	public Node reverse(Node node)
+    {
+        Node prev = null;
+        Node current = node;
+        Node next = null;
+        while (current != null) {
+            next = current.next;
+            current.next = prev;
+            prev = current;
+            current = next;
+        }
+        node = prev;
+        return node;
+    }
+	
+	public static SMPLExp createSMPLTuple(LinkedList exp){
+		ArrayList<SMPLExp> temp = new ArrayList<SMPLExp>();
+		LinkedList.Node currNode = exp.head;
+        // Traverse through the LinkedList 
+        while (currNode != null) { 
+            // Add exp to arraylist
+            temp.add(currNode.data); 
+            currNode = currNode.next; 
+        }
+		
+		return SMPLTuple.createTuple(temp);
 	}
 } 

@@ -59,25 +59,87 @@ public class Evaluator implements Visitor<Environment<Object>, Object> {
 				      Environment<Object> env)
 	throws VisitException {
 	Object result;
-	result = (Double) sd.getExp().visit(this, env);
+	result = sd.getExp().visit(this, env);
 	env.put(sd.getVar(), result);
 	return result;
     }
-
-    public Object visitStmtFunDefn(StmtFunDefn fd, Environment<Object> env)
+	public Object visitExpCallStmt(ExpCallStmt fd, Environment<Object> env)
+	throws VisitException {
+	SMPLExp lst = fd.getList(); //variable holding list
+	SMPLTuple tupleList = null;
+	SMPLPair pairList  = null;
+	LinkedList args;
+	//Type-checking
+	try{
+	 tupleList = (SMPLTuple) lst.visit(this,env);	
+	}catch(Exception e){
+		try {
+			pairList = (SMPLPair) lst.visit(this,env);
+		}catch(Exception ex){
+			return 0D;
+		}
+	}
+	if (tupleList==null){
+		args = (LinkedList) pairList.getLit();
+	}else{
+		args = (LinkedList) tupleList.getLit();
+	}
+	//End-of-type-Checking - get arguments from list
+	ArrayList<SMPLExp> params = new ArrayList<SMPLExp>();
+	LinkedList.Node currNode = args.head;
+        // Traverse through the LinkedList 
+    while (currNode != null) { 
+        // Add exp to arraylist
+        params.add(currNode.data); 
+        currNode = currNode.next; 
+        }
+	//create a lambda expression with args and proc
+	SMPLExp p = fd.getProc(); //possibly a var or proc
+	StmtProc proc = null;
+	Closure var = null;
+	StmtProcDefn proc1;
+	//Type-checking
+	try{//Procedure found
+	 proc = (StmtProc) p;	
+	}catch(Exception e){ 
+		try {//Variable found with closure
+			var = (Closure) p.visit(this,env);
+			proc1 = (StmtProcDefn) var.getFunction();
+			StmtProc temp1 = new StmtProc(proc1.getExps(),proc1.getStmt(),new ArrayList<SMPLExp>());
+			proc = temp1;
+		}catch(Exception ex){
+			return 0D; //Neither return none
+		}
+	}
+	//End-of-type-Checking
+	StmtProc lambda = new StmtProc(proc.getExps(),proc.getStmt(),params);
+	return lambda.visit(this,env);
+    }
+	public Object visitStmtProc(StmtProc fd, Environment<Object> env)
+	throws VisitException {
+	if (fd.isLambda()==true){//Lambda proc found
+		//make closure
+		StmtProcDefn spd = new StmtProcDefn("p",fd.getExps(),fd.getStmt(),new ArrayList<SMPLExp>());
+		Double ret = (Double) spd.visit(this,env); //create closure
+		ExpProcCall epc = new ExpProcCall("p",fd.getArgs());
+		return epc.visit(this,env);
+	}
+	return 0D;
+    }
+    public Object visitStmtProcDefn(StmtProcDefn fd, Environment<Object> env)
 	throws VisitException {
 	Closure c = new Closure(fd, env);
-	env.put(fd.getFname(), c); //Add function defintion binding to environment
+	env.put(fd.getName(), c); //Add function defintion binding to environment
 	return 0D; 
     }
 
-    public Object visitExpFunCall(ExpFunCall fc, Environment<Object> env)
+    public Object visitExpProcCall(ExpProcCall fc, Environment<Object> env)
 	throws VisitException {
 	// to be implemented
-	StmtFunDefn function;
+	StmtProcDefn function;
     Environment<Object> closingEnv;
 	StmtSequence sseq;  //To be evaulated
-	ArrayList<Object> params,args;
+	ArrayList<SMPLExp> params,args;
 	//Extract function from closure object : Env Lookup
 	Closure c = (Closure) env.get(fc.getVar());
 	function = c.getFunction();
@@ -94,7 +156,7 @@ public class Evaluator implements Visitor<Environment<Object>, Object> {
 	closingEnv.put(var.getVar(), expLit.visit(this, env));	
 	}
 	//Evaulate function body with arg bindings
-	result = (Double) sseq.visit(this,closingEnv);
+	result = sseq.visit(this,closingEnv);
 	return result;
     }
 
@@ -140,7 +202,36 @@ public class Evaluator implements Visitor<Environment<Object>, Object> {
 
     public Object visitExpLit(ExpLit exp, Environment<Object> env)
 	throws VisitException {
-	return exp.getVal();
+	if (exp.getType()=="SMPLPair" || exp.getType()=="SMPLTuple"){
+		LinkedList lst =  new LinkedList();
+		LinkedList temp = (LinkedList) exp.getLit();
+		LinkedList.Node currNode = temp.head;
+		while (currNode != null) { 
+            // Print the data at current node 
+			
+            SMPLExp e = currNode.data;
+			SMPLNumber val1 = new SMPLNumber(0,"");
+			try{
+				val1 = new SMPLNumber(e.visit(this, env),"");
+			}catch(Exception ex){
+				
+			}
+			lst.insert(val1);
+            // Go to next node 
+            currNode = currNode.next; 
+        }
+		lst.head = lst.reverse(lst.head);
+		exp.setLit(lst); //resave evaluated tupe
+		if(exp.getType()=="SMPLPair" || exp.getType()=="SMPLTuple"){
+			System.out.println(lst.toSMPLPair());
+			return LinkedList.createSMPLTuple(lst);
+		}
+		
+	}
+	else{
+		return exp.getVal();
+		}
+	return null;
     }
 
     public Object visitExpVar(ExpVar exp, Environment<Object> env)
@@ -173,7 +264,30 @@ public class Evaluator implements Visitor<Environment<Object>, Object> {
 	CompareG.nextVal = exp.getExpL();
 	return r;
 	}
-	
+	public Object visitCompareE(CompareE exp, Environment<Object> env) 
+	throws VisitException {
+	Boolean r;
+	if (exp.getExpR().visit(this, env) instanceof Boolean){
+		exp.setSubTree(1,CompareG.nextVal);
+	}
+	SMPLNumber val1 = new SMPLNumber(exp.getExpL().visit(this, env),"");
+	SMPLNumber val2 = new SMPLNumber(exp.getExpR().visit(this, env),"");
+	r = val1.getVal().doubleValue() == val2.getVal().doubleValue(); 
+	CompareG.nextVal = exp.getExpL();
+	return r;
+	}
+	public Object visitCompareNE(CompareNE exp, Environment<Object> env) 
+	throws VisitException {
+	Boolean r;
+	if (exp.getExpR().visit(this, env) instanceof Boolean){
+		exp.setSubTree(1,CompareG.nextVal);
+	}
+	SMPLNumber val1 = new SMPLNumber(exp.getExpL().visit(this, env),"");
+	SMPLNumber val2 = new SMPLNumber(exp.getExpR().visit(this, env),"");
+	r = val1.getVal().doubleValue() != val2.getVal().doubleValue(); 
+	CompareG.nextVal = exp.getExpL();
+	return r;
+	}
 	
 	public Object visitCompareG(CompareG exp, Environment<Object> env) 
 	throws VisitException {
@@ -247,6 +361,28 @@ public class Evaluator implements Visitor<Environment<Object>, Object> {
 	}
 	
 	return result;
+	}
+	
+	public Object visitStmtCaseDefn(StmtCaseDefn exp, Environment<Object> env) 
+	throws VisitException {
+	ArrayList<Pair> clauses = exp.getClauses();
+	Boolean flag = false;
+	Boolean r;
+	int i = 0;
+	for(int c=0; c<clauses.size();c++){
+		r = (Boolean) clauses.get(c).getPred().visit(this,env) ;
+		if( r == true){
+			flag =true;
+			i = c;
+			break;
+		}
+	}
+	if(flag == true){
+	return clauses.get(i).getConseq().visit(this,env);
+	}
+	else{
+		return false;
+	}
 	}
 	
 	

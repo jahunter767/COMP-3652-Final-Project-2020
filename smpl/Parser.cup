@@ -49,14 +49,15 @@ terminal EQUIV_PRED, EQUAL_PRED;
 terminal SUBSTR;
 
 // keywords
-terminal DEF, PROC, CALL, LET, IF, THEN, ELSE, CASE, FUN;
+terminal DEF, PROC, CALL, LET, IF, THEN; 
+terminal ELSE, CASE, FUN;
 
 // standard I/O
 terminal PRINT, PRINTLN, READ, READINT;
 
 // special symbols
 terminal LBRACE, RBRACE, LPAREN, RPAREN, LSQPAREN, RSQPAREN, VECT_OPEN, VECT_CLOSE;
-terminal ASSIGN, BIND, COMMA, SEMI;
+terminal ASSIGN, BIND, COMMA, SEMI, COLON;
 
 // compound data operators
 terminal LSTCONCAT;
@@ -88,17 +89,23 @@ non terminal ArithProgram program;
 non terminal StmtSequence stmtList;
 non terminal StmtSequence elseStmt;
 non terminal Statement stmt;
-non terminal Statement stmt1;
 non terminal StmtDefinition definition;
+non terminal StmtDefinition assignment;
 
 /* ** Fix these declarations ** */
-non terminal StmtFunDefn funDefn;
-non terminal StmtSequence funDefe;
-non terminal ArrayList<Object> paramList;
-non terminal ArrayList<Object> paramListE;
-non terminal ExpFunCall funCall;
+non terminal StmtProc procDefn; //unamed proc
+non terminal StmtProc LamdbaProcDefn; //unamed lamba
+non terminal StmtProcDefn procName; //named proc/lambda
+non terminal StmtSequence body;
+non terminal ArrayList<SMPLExp> paramList;
+non terminal ArrayList<SMPLExp> paramListE;
+non terminal ArrayList<Pair> clauseListE;
+non terminal ArrayList<Pair> clauseList;
+non terminal ExpProcCall procCall;
 non terminal StmtIfDefn ifStmt;
 non terminal SMPLPair pair;
+non terminal StmtCaseDefn caseStmt;
+non terminal ExpCallStmt call;
 /* **** */
 
 non terminal SMPLExp expression;
@@ -109,9 +116,12 @@ non terminal SMPLExp expression1; //Relational
 non terminal SMPLExp expression2; //NOT
 non terminal SMPLExp expression3; //AND
 non terminal SMPLExp expression4; //OR
+non terminal SMPLExp expression5;
 non terminal SMPLExp car;
 non terminal SMPLExp cdr;
 non terminal SMPLExp isPair;
+non terminal SMPLExp tuple;
+non terminal SMPLExp list;
 /* Grammar rules */
 
 program ::= stmtList:s {: RESULT = new ArithProgram(s); :};
@@ -124,25 +134,37 @@ stmtList ::= stmtList:lst stmt:s {:
 		RESULT = new StmtSequence(s);
 		:};
 
-stmt ::= definition:d {: RESULT = d; :} |
-	 expression4:e {: RESULT = new Statement(e); :} SEMI |
-	 funDefn:f {:RESULT = f;:}  | ifStmt:i {:RESULT=i;:} ;
+stmt ::= definition:d {: RESULT = d; :} | assignment:a {:RESULT = a;:} |
+		expression4:e {: RESULT = new Statement(e); :} SEMI |
+		ifStmt:i {:RESULT=i;:} | caseStmt:cs {:RESULT=cs;:} | 
+		procName:pn {:RESULT = pn;:} | procDefn:p {:RESULT = p;:} ;
 
 ifStmt::= IF expression4:pred THEN stmtList:cons ELSE stmt:alt {: RESULT = new StmtIfDefn(pred,cons, alt);:};
-pair::= PAIR LPAREN expression4:p1 COMMA expression4:p2 RPAREN {: RESULT = new SMPLPair(p1,p2);:} | LPAREN expression4:p1 COMMA expression4:p2 RPAREN {: RESULT = new SMPLPair(p1,p2);:};
-car::= CAR pair:p {:RESULT = p.car();:};
-cdr::= CDR pair:p {:RESULT = p.cdr();:};
-isPair::= PAIR_PRED pair:p {:RESULT=LinkedList.isPair(p);:} | error:e  {: RESULT = new SMPLBoolean(new Boolean(false));:};
-funDefn ::= FUN VAR:v LPAREN paramListE:pe RPAREN BIND funDefe:fe {: RESULT = new StmtFunDefn(v,pe,fe);:};
-funDefe ::= LBRACE stmtList:sl RBRACE {: RESULT = sl;:} | expression4:e SEMI{: RESULT = new StmtSequence (new Statement(e));:} ;
-
-paramList ::= expression4:e COMMA paramList:p {: p.add(e); RESULT = p;:}| expression4:e {:ArrayList<Object> result = new ArrayList<>();result.add(e);RESULT = result;:} ; /* complete this */
-
+pair::= PAIR LPAREN expression4:p1 COMMA expression4:p2 RPAREN {: RESULT = new SMPLPair(p1,p2);:};
+list::= LIST tuple:t {:RESULT=t;:};
+tuple::= LPAREN paramListE:pe RPAREN {:int s = pe.size(); if(s==1){RESULT = (SMPLExp) pe.get(0);}else{RESULT=SMPLTuple.createTuple(pe);}:};
+car::= CAR tuple:p {: SMPLPair pair = (SMPLPair) p; RESULT = pair.car();:};
+cdr::= CDR tuple:p {: SMPLPair pair = (SMPLPair) p; RESULT = pair.cdr();:};
+isPair::= PAIR_PRED tuple:p {: try {SMPLPair pair = (SMPLPair)p; RESULT=LinkedList.isPair(pair);}catch(Exception e){RESULT = new SMPLBoolean(new Boolean(false));}:} 
+			| error:e  {: RESULT = new SMPLBoolean(new Boolean(false));:};
+procDefn ::= PROC LPAREN paramListE:pe RPAREN body:b {: RESULT = new StmtProc(pe,b,new ArrayList<SMPLExp>());:} ;
+LamdbaProcDefn::= LPAREN procDefn:pd RPAREN LPAREN paramListE:e RPAREN {: RESULT = new StmtProc(pd.getExps(),pd.getStmt(),e);:} ;
+procName::=  DEF VAR:v procDefn:p {:RESULT = new StmtProcDefn(v,p.getExps(),p.getStmt(),new ArrayList<SMPLExp>());:} ;
+body ::= LBRACE stmtList:sl RBRACE {: RESULT = sl;:} | expression4:e SEMI{: RESULT = new StmtSequence (new Statement(e));:} ;
+paramList ::= expression4:e COMMA paramList:p {: p.add(e); RESULT = p;:}| expression4:e {:ArrayList<SMPLExp> result = new ArrayList<>();result.add(e);RESULT = result;:} ; /* complete this */
 paramListE ::= paramList:p {:RESULT = p;:} | empty ;
-
-definition ::= VAR:v ASSIGN expression4:e SEMI {:
+clauseList::= expression4:e1 COLON expression4:e2 COMMA clauseList:cl {:Pair p = new Pair(e1,e2); cl.add(p); RESULT = cl;:} |  
+			  expression4:e1 COLON expression4:e2 {:ArrayList<Pair> result = new ArrayList<Pair>();Pair p = new Pair(e1,e2); result.add(p); RESULT = result;:} |
+			  ELSE COLON expression4:e2 {:ArrayList<Pair> result = new ArrayList<Pair>();Pair p = new Pair(new SMPLBoolean(new Boolean(true)),e2); result.add(p); RESULT = result;:}; 
+clauseListE::= clauseList:cl {:RESULT=cl;:} | empty ; 			  
+caseStmt::= CASE LBRACE LSQPAREN clauseListE:ce RSQPAREN RBRACE {:RESULT = new StmtCaseDefn(ce);:};
+call::= CALL LPAREN expression4:p COMMA expression4:l RPAREN {:RESULT = new ExpCallStmt(p,l);:} |
+		 CALL LPAREN stmt:p COMMA expression4:l RPAREN {:RESULT = new ExpCallStmt(p,l);:};
+assignment ::= VAR:v ASSIGN expression4:e SEMI {:
 		   RESULT = new StmtDefinition(v, e);:} | 
 		   VAR:v ASSIGN ifStmt:i {: RESULT = new StmtDefinition(v, i);:} ;
+definition::= DEF VAR:v expression4:e SEMI {:
+		   RESULT = new StmtDefinition(v, e);:} ;
 expression4::= expression3:e3 OR expression4:e4 {:RESULT = new StmtOr(e3,e4);:}   | expression3: e3 {:RESULT = e3; :};
 expression3::= expression2:e2 AND expression3:e3 {:RESULT = new StmtAnd(e2,e3);:} | expression2: e2 {:RESULT = e2; :};
 expression2::= NOT expression1:e1  {: RESULT = new StmtNot(e1); :} | expression1:e1 {: RESULT = e1; :} ; 
@@ -150,9 +172,11 @@ expression1::= expression:e GREATER expression1:e1  {: RESULT = new CompareG(e,e
 			   expression:e GREATEREQ expression1:e1 {: RESULT = new CompareGE(e,e1);:}  |
 			   expression:e LESS expression1:e1 {: RESULT = new CompareL(e,e1);:}   |
 			   expression:e LESSEQ expression1:e1 {: RESULT = new CompareLE(e,e1);:} |
+			   expression:e EQUAL expression1:e1 {: RESULT = new CompareE(e,e1);:} |
+			   expression:e NEQUAL expression1:e1 {: RESULT = new CompareNE(e,e1);:} |
 			   expression:e {: RESULT = e; :} ;
 expression ::= 	expression:e PLUS term:t {:
-			RESULT = e.add(t); :} |
+			RESULT = new ExpAdd(e,t); :} |
 		expression:e MINUS term:t {:
 			RESULT = e.sub(t); :} |
 		term:t {: RESULT = t; :} ; 
@@ -172,10 +196,11 @@ factor ::= INT:ilit {: RESULT = new SMPLInteger(ilit); :} |
 		STRING:ilit {: RESULT = new SMPLString(ilit); :} |
 		CHAR:ilit {: RESULT = new SMPLCharacter(ilit); :} |
 	   VAR:var {: RESULT = new ExpVar(var); :} |
-	   LPAREN expression:e RPAREN {: RESULT = e; :}	|
-	   funCall:f {:RESULT = f;:} |
-	   pair:p {: RESULT = p;:}   | car:c {:RESULT = c;:} | cdr:c {:RESULT = c;:} | isPair:p {:RESULT=p;:}; 
-funCall ::= VAR:v LPAREN paramListE:pe RPAREN {:RESULT = new ExpFunCall(v,pe);:};
+	   procCall:f {:RESULT = f;:} |
+	   car:c {:RESULT = c;:}  | cdr:c {:RESULT = c;:} | isPair:p {:RESULT=p;:} |
+	   pair:p {:RESULT = p;:} | tuple:t {:RESULT=t;:} | list:l {:RESULT=l;:} | 
+	   call:c {:RESULT=c;:} | LamdbaProcDefn:lpd {:RESULT = lpd;:} ;
+procCall ::= VAR:v LPAREN paramListE:pe RPAREN {:RESULT = new ExpProcCall(v,pe);:};
 
 empty ::= ;
 

@@ -113,7 +113,8 @@ CommentContent       = ( [^*] | \*+ [^/*] )*
 
 <YYINITIAL>	" @ "	{return new Symbol(sym.LSTCONCAT);}
 
-<YYINITIAL>	":="	{return new Symbol(sym.ASSIGN);}
+<YYINITIAL>	":=" {return new Symbol(sym.ASSIGN);}
+<YYINITIAL>	":"	{return new Symbol(sym.COLON);}
 <YYINITIAL>	";"	{return new Symbol(sym.SEMI);}
 <YYINITIAL>	"{"	{return new Symbol(sym.LBRACE);}
 <YYINITIAL>	"}"	{return new Symbol(sym.RBRACE);}

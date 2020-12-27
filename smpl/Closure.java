@@ -4,15 +4,15 @@
  * @param T the type of values stored in the closing environment.
  */
 public class Closure<T> {
-    private StmtFunDefn function;
+    private StmtProcDefn function;
     private Environment<T> closingEnv;
 
-    public Closure(StmtFunDefn fun, Environment<T> env) {
+    public Closure(StmtProcDefn fun, Environment<T> env) {
 	function = fun;
 	closingEnv = env;
     }
 
-    public StmtFunDefn getFunction() {
+    public StmtProcDefn getFunction() {
 	return function;
     }
 

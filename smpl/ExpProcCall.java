@@ -2,13 +2,13 @@ import java.util.*;
 /**
  * IR Class to represent a function call
  */
-public class ExpFunCall extends SMPLExp {
+public class ExpProcCall extends SMPLExp {
     
     // Implement this class
 	private String var;
-	private ArrayList<Object> exp;
+	private ArrayList<SMPLExp> exp;
 
-    public ExpFunCall(String v, ArrayList<Object> xps) {	// placeholder; can be removed eventually
+    public ExpProcCall(String v, ArrayList<SMPLExp> xps) {	// placeholder; can be removed eventually
 	super("call");
 	var = v;
 	exp = xps;
@@ -18,7 +18,7 @@ public class ExpFunCall extends SMPLExp {
 	return var;
 	}
 	
-	public ArrayList<Object> getExp(){
+	public ArrayList<SMPLExp> getExp(){
 	return exp;
 	}
 	
@@ -27,7 +27,7 @@ public class ExpFunCall extends SMPLExp {
     }
 	
 	public <S, T> T visit(Visitor<S, T> v, S arg) throws VisitException {
-	return v.visitExpFunCall(this, arg);
+	return v.visitExpProcCall(this, arg);
     }
 
 }

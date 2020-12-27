@@ -7,5 +7,5 @@ public class SMPLCharacter extends SMPLObject{
     public Character getVal(){
 		return (Character) V;	
 	}
-	
+
 }

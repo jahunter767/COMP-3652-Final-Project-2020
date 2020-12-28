@@ -53,14 +53,98 @@ public abstract class SMPLObject<T> {
 	} // use to print the content of the object
 
 
-    public SMPLObject add(SMPLObject obj) throws TypeException {
+
+// ----- FROM JASON'S CODE ------
+
+    public SMPLObject bitwiseAnd(SMPLObject object) throws TypeException {
+	throw new TypeException();
+    }
+
+    public SMPLObject bitwiseOr(SMPLObject object) throws TypeException {
+	throw new TypeException();
+    }
+
+    public SMPLObject bitwiseNot() throws TypeException {
 	throw new TypeException();
     }
 
 
-    public SMPLObject sub(SMPLObject obj) throws TypeException {
+    public SMPLObject and(SMPLObject object) throws TypeException {
 	throw new TypeException();
     }
+
+    public SMPLObject or(SMPLObject object) throws TypeException {
+	throw new TypeException();
+    }
+
+    public SMPLObject not() throws TypeException {
+	throw new TypeException();
+    }
+
+
+    public SMPLObject lessThan(SMPLObject object) throws TypeException {
+	throw new TypeException();
+    }
+
+    public SMPLObject lessThanEq(SMPLObject object) throws TypeException {
+	throw new TypeException();
+    }
+
+    public SMPLObject equalTo(SMPLObject object) throws TypeException {
+	throw new TypeException();
+    }
+
+    public SMPLObject greaterThanEq(SMPLObject object) throws TypeException {
+	throw new TypeException();
+    }
+
+    public SMPLObject greaterThan(SMPLObject object) throws TypeException {
+	throw new TypeException();
+    }
+
+    public SMPLObject notEqualTo(SMPLObject object) throws TypeException {
+	throw new TypeException();
+    }
+
+
+    public SMPLObject add(SMPLObject object) throws TypeException {
+	throw new TypeException();
+    }
+
+    public SMPLObject subtract(SMPLObject object) throws TypeException {
+	throw new TypeException();
+    }
+
+    public SMPLObject multiply(SMPLObject object) throws TypeException {
+	throw new TypeException();
+    }
+
+    public SMPLObject divide(SMPLObject object) throws TypeException {
+	throw new TypeException();
+    }
+
+    public SMPLObject mod(SMPLObject object) throws TypeException {
+	throw new TypeException();
+    }
+
+    public SMPLObject pow(SMPLObject object) throws TypeException {
+	throw new TypeException();
+    }
+
+
+
+    public SMPLObject concat(SMPLObject object) throws TypeException {
+	throw new TypeException();
+    }
+
+
+
+
+
+//----------------------------------
+
+
+
 
     public SMPLObject Substr(SMPLObject arg1, SMPLObject arg2) throws TypeException, SubstringException{
 	throw new TypeException();

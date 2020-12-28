@@ -17,6 +17,9 @@ public interface Visitor<S, T> {
     public T visitStatement(Statement exp, S arg) throws VisitException ;
     public T visitStmtSequence(StmtSequence exp, S arg) throws VisitException ;
 
+    public T visitStmtPrint(StmtPrint p, S arg) throws VisitException;
+    public T visitStmtPrintln(StmtPrintln p, S arg) throws VisitException;
+
 
     public T visitStmtDefinition(StmtDefinition sd, S arg) throws VisitException;
 
@@ -37,13 +40,10 @@ public interface Visitor<S, T> {
     public T visitExpAdd(ExpAdd exp, S arg) throws VisitException;
 
 
-/*
     public T visitExpSub(ExpSub exp, S arg) throws VisitException;
     public T visitExpMul(ExpMul exp, S arg) throws VisitException;
     public T visitExpDiv(ExpDiv exp, S arg) throws VisitException;
     public T visitExpMod(ExpMod exp, S arg) throws VisitException;
-
-*/
 
     public T visitExpLit(ExpLit exp, S arg) throws VisitException;
     public T visitStringExp(StringExp exp, S arg) throws VisitException;
@@ -62,24 +62,31 @@ public interface Visitor<S, T> {
 
     public T visitExpVar(ExpVar exp, S arg) throws VisitException;
 
-/*
+
     public T visitExpPow(ExpPow exp, S arg) throws VisitException;
 
-    // comparator expressions
-    public T visitExpLessThan(ExpLessThan exp, S arg) throws VisitException;
+    public T visitExpRead(ExpRead r, S arg) throws VisitException;
+    public T visitExpReadInt(ExpReadInt r, S arg) throws VisitException;
 
-    public T visitExpLessThanEqual(ExpLessThanEqual exp, S arg) throws VisitException;
-    public T visitExpGreaterThan(ExpGreaterThan exp, S arg) throws VisitException;
-    public T visitExpGreaterThanEqual(ExpGreaterThanEqual exp, S arg) throws VisitException;
+
+    // bitwise expressions
+    public T visitExpBitwiseNot(ExpBitwiseNot exp, S arg) throws VisitException;
+    public T visitExpBitwiseAnd(ExpBitwiseAnd exp, S arg) throws VisitException;
+    public T visitExpBitwiseOr(ExpBitwiseOr exp, S arg) throws VisitException;
+
+    // comparator expressions
+    public T visitExpLess(ExpLess exp, S arg) throws VisitException;
+    public T visitExpLessEq(ExpLessEq exp, S arg) throws VisitException;
     public T visitExpEqual(ExpEqual exp, S arg) throws VisitException;
+    public T visitExpGreaterEq(ExpGreaterEq exp, S arg) throws VisitException;
+    public T visitExpGreater(ExpGreater exp, S arg) throws VisitException;
     public T visitExpNotEqual(ExpNotEqual exp, S arg) throws VisitException;
 
-    public T visitExpComparator(ExpComparator exp, S arg) throws VisitException;
+    //public T visitExpComparator(ExpComparator exp, S arg) throws VisitException;
 
     // boolean expressions
     public T visitExpNot(ExpNot exp, S arg) throws VisitException;
     public T visitExpAnd(ExpAnd exp, S arg) throws VisitException;
     public T visitExpOr(ExpOr exp, S arg) throws VisitException;
 
-*/
 }

@@ -1,2 +1,38 @@
-fun f(x) = x + 1;
-f(2);
+1;
+
+"1"
+
+1 + 1;
+
+
+def num1 10;
+
+def num2 20;
+
+def sum num1 + num2;
+
+def bool pair?(pair(num1,num2));
+
+bool and bool;
+
+not bool and bool;
+
+not bool or bool;
+
+not (not bool and bool);
+
+
+def name "Hello world"
+
+num1 - num2;
+num2 / num1;
+num1 * num2;
+num1 % num2;
+num1 ^ 2;
+
+
+
+name;
+
+
+

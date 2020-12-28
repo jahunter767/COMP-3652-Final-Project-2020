@@ -1,3 +1,3 @@
-y := 3;
-fun f(x) = x + y;
+def y 3;
+def f proc(x){ x + y;}
 f(2);

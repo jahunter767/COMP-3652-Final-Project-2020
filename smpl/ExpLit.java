@@ -1,13 +1,13 @@
-public class ExpLit extends Exp {
+public class ExpLit <Type> extends Exp {
 
-    int val;
+    Type val;
 
-    public ExpLit(Integer v) {
+    public ExpLit(Type v) {
 	super(v.toString());
-	val = v.intValue();
+	val = v;
     }
 
-    public int getVal() {
+    public Type getVal() {
 	return val;
     }
 
@@ -16,7 +16,7 @@ public class ExpLit extends Exp {
     }
 
     public String toString() {
-	return Integer.toString(val);
+	return val.toString();//Integer.toString(val);
     }
 }
 

@@ -1,6 +1,25 @@
-y := 3;
-fun f(x) = {
-    y := 4;
-    x + y;
-    }
-f(2);
+def name "john brown"
+def age 20;
+
+def lst list(name,age)
+
+def pr pair(name,age);
+
+
+car(lst);
+cdr(lst);
+
+car(pr);
+cdr(pr);
+
+pair?(pr);
+
+pair?(lst);
+
+equal?(pr,lst);
+
+equal?(pr,pr);
+
+def lastname substr(car(pr),0,4);
+
+lastname;

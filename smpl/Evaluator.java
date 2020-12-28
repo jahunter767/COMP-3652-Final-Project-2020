@@ -155,8 +155,8 @@ public class Evaluator implements Visitor<Environment<SMPLObject>, SMPLObject> {
 	String paramOvf = myFunc.getParamOvf();
 	int paramCount = params.size();
 
-	SMPLPair lst = (SMPLPair) fc.getArgs().visit(this, env); // expressions that we got as arguments
 	ArrayList<SMPLObject> arguements = new ArrayList<SMPLObject>();
+	SMPLPair lst = (SMPLPair) fc.getArgs().visit(this, env); // expressions that we got as arguments
 	SMPLObject left = lst.car();
 	SMPLObject next = lst.cdr();
 	SMPLBoolean p = (SMPLBoolean) next.equalTo(new SMPLNil());
@@ -256,7 +256,7 @@ public class Evaluator implements Visitor<Environment<SMPLObject>, SMPLObject> {
 	public SMPLObject visitExpReadInt(ExpReadInt r, Environment<SMPLObject> env)
 	throws VisitException{
 	Scanner sc = new Scanner(System.in);
-	return SMPL.makeInstance("number", sc.nextInt());
+	return SMPL.makeInstance("number", new Double(sc.nextInt()));
 	}
 
 

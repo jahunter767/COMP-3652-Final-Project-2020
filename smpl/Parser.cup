@@ -50,7 +50,7 @@ terminal PRINT, PRINTLN, READ, READINT;
 
 // special symbols
 terminal LBRACE, RBRACE, LPAREN, RPAREN, LSQPAREN, RSQPAREN, VECT_OPEN, VECT_CLOSE;
-terminal ASSIGN, BIND, COMMA, DOT, COLON, SEMI;
+terminal ASSIGN, EQUAL, COMMA, DOT, COLON, SEMI;
 
 // compound data operators
 terminal LSTCONCAT;
@@ -62,7 +62,7 @@ terminal PLUS, MINUS, MUL, DIV, MOD, EXP;
 terminal BIT_AND, BIT_OR, BIT_NOT;
 
 // comparators
-terminal LESS, LESSEQ, EQUAL, GREATEREQ, GREATER, NEQUAL;
+terminal LESS, LESSEQ, GREATEREQ, GREATER, NEQUAL;
 
 // boolean operators
 terminal AND, OR, NOT;
@@ -240,7 +240,7 @@ bindList ::= bindList:bindLst COMMA binding:b {:
                 result.add(b);
                 RESULT = result; :};
 
-binding ::= VAR:v BIND expression:e {: RESULT = new ExpBind(v, e); :};
+binding ::= VAR:v EQUAL expression:e {: RESULT = new ExpBind(v, e); :};
 
 
 funDefn ::= PROC LPAREN paramListE:pListE RPAREN compoundExpr:b {:

@@ -135,8 +135,8 @@ public class SMPLNumbers extends SMPLObject<Double> {
     public SMPLObject lessThan(SMPLObject object) throws TypeException {
     if(object instanceof SMPLNumbers){
 		SMPLNumbers obj = (SMPLNumbers) object;
-		Double val2 = obj.getVal();
-		return new SMPLBoolean(getVal() < val2);
+		double val2 = obj.getVal().doubleValue();
+		return new SMPLBoolean(getVal().doubleValue() < val2);
     }else {
 		throw new TypeException();
 	}
@@ -145,8 +145,8 @@ public class SMPLNumbers extends SMPLObject<Double> {
     public SMPLObject lessThanEq(SMPLObject object) throws TypeException {
     if(object instanceof SMPLNumbers){
 		SMPLNumbers obj = (SMPLNumbers) object;
-		Double val2 = obj.getVal();
-		return new SMPLBoolean(getVal() <= val2);
+		double val2 = obj.getVal().doubleValue();
+		return new SMPLBoolean(getVal().doubleValue() <= val2);
     }else {
 		throw new TypeException();
 	}
@@ -155,8 +155,8 @@ public class SMPLNumbers extends SMPLObject<Double> {
     public SMPLObject equalTo(SMPLObject object) throws TypeException {
     if(object instanceof SMPLNumbers){
 		SMPLNumbers obj = (SMPLNumbers) object;
-		Double val2 = obj.getVal();
-		return new SMPLBoolean(getVal() == val2);
+		double val2 = obj.getVal().doubleValue();
+		return new SMPLBoolean(getVal().doubleValue() == val2);
     }else {
 		return new SMPLBoolean(false);
 	}
@@ -165,8 +165,8 @@ public class SMPLNumbers extends SMPLObject<Double> {
     public SMPLObject greaterThanEq(SMPLObject object) throws TypeException {
     if(object instanceof SMPLNumbers){
 		SMPLNumbers obj = (SMPLNumbers) object;
-		Double val2 = obj.getVal();
-		return new SMPLBoolean(getVal() >= val2);
+		double val2 = obj.getVal().doubleValue();
+		return new SMPLBoolean(getVal().doubleValue() >= val2);
     }else {
 		throw new TypeException();
 	}
@@ -175,8 +175,8 @@ public class SMPLNumbers extends SMPLObject<Double> {
     public SMPLObject greaterThan(SMPLObject object) throws TypeException {
     if(object instanceof SMPLNumbers){
 		SMPLNumbers obj = (SMPLNumbers) object;
-		Double val2 = obj.getVal();
-		return new SMPLBoolean(getVal() > val2);
+		double val2 = obj.getVal().doubleValue();
+		return new SMPLBoolean(getVal().doubleValue() > val2);
     }else {
 		throw new TypeException();
 	}
@@ -185,8 +185,8 @@ public class SMPLNumbers extends SMPLObject<Double> {
     public SMPLObject notEqualTo(SMPLObject object) throws TypeException {
     if(object instanceof SMPLNumbers){
 		SMPLNumbers obj = (SMPLNumbers) object;
-		Double val2 = obj.getVal();
-		return new SMPLBoolean(getVal() != val2);
+		double val2 = obj.getVal().doubleValue();
+		return new SMPLBoolean(getVal().doubleValue() != val2);
     }else {
 		throw new TypeException();
 	}

@@ -51,7 +51,7 @@ import java_cup.runtime.*;
 %debug
 
 %xstates SMPL_STRING, CHAR_ESCAPE
-%xstates LINE_COMMENT, BLK_COMMENT
+%xstates BLK_COMMENT
 
 nl = [\n\r]
 
@@ -65,13 +65,15 @@ alpha = [a-zA-Z_]
 
 alphanum = {alpha}|[0-9]
 
-special = ["+""-""*"/%"^"&|~@"?"!]
+special = ["+""-""*"/%"^"&|~@"?"!#]
 
-allChar = {alphanum}|{special}
+varChar = {alphanum}|{special}
+
+varStartChar = {alphanum}| !(!{special}|![^"/*""//"#])
 
 stringChar = [^\"\\]
 
-blockCommentChar = ~["/*""*/"]
+blockCommentChar = [^"/*""*/"]
 
 hex = [0-9A-Fa-f]
 
@@ -84,13 +86,13 @@ hex = [0-9A-Fa-f]
 			 // skip whitespace
 			}
 
-<YYINITIAL>	{space}"and"{space}	{return new Symbol(sym.AND);}
-<YYINITIAL>	{space}"or"{space}	{return new Symbol(sym.OR);}
-<YYINITIAL>	{space}"not"{space}	{return new Symbol(sym.NOT);}
+<YYINITIAL>	"and"	{return new Symbol(sym.AND);}
+<YYINITIAL>	"or"	{return new Symbol(sym.OR);}
+<YYINITIAL>	"not"	{return new Symbol(sym.NOT);}
 
 <YYINITIAL>	{space}"<"{space}	{return new Symbol(sym.LESS);}
 <YYINITIAL>	{space}"<="{space}	{return new Symbol(sym.LESSEQ);}
-<YYINITIAL>	{space}"=="{space}	{return new Symbol(sym.EQUAL);}
+<YYINITIAL>	{space}"="{space}	{return new Symbol(sym.EQUAL);}
 <YYINITIAL>	{space}">="{space}	{return new Symbol(sym.GREATEREQ);}
 <YYINITIAL>	{space}">"{space}	{return new Symbol(sym.GREATER);}
 <YYINITIAL>	{space}"!="{space}	{return new Symbol(sym.NEQUAL);}
@@ -126,7 +128,6 @@ hex = [0-9A-Fa-f]
 <YYINITIAL>	"call"	{return new Symbol(sym.CALL);}
 
 <YYINITIAL>	"let"	{return new Symbol(sym.LET);}
-<YYINITIAL>	{space}"="{space}	{return new Symbol(sym.BIND);}
 
 <YYINITIAL> "if" {return new Symbol(sym.IF);}
 <YYINITIAL> "then" {return new Symbol(sym.THEN);}
@@ -143,13 +144,7 @@ hex = [0-9A-Fa-f]
 <YYINITIAL>	"readint"	{return new Symbol(sym.READINT);}
 
 
-<YYINITIAL>	"//"	{yychar -= 2;
-					yybegin(LINE_COMMENT);}
-<LINE_COMMENT> {
-	{nl}	{yychar -=2;
-			yybegin(YYINITIAL);}
-	(~{nl})+	{yychar -= yytext().length();}
-}
+<YYINITIAL>	"//"~{nl}	{/* Line comment. Do Nothing*/}
 
 <YYINITIAL>	"/*"	{nestedBlockCommentCount += 1;
 					yychar -= 2;
@@ -166,27 +161,32 @@ hex = [0-9A-Fa-f]
 }
 
 
-<YYINITIAL>    {allChar}*{alpha}{allChar}* {
+<YYINITIAL>    {varStartChar}*{alpha}{varChar}* {
 	       // VAR
 	       return new Symbol(sym.VAR, yytext());
 		}
 
 
-<YYINITIAL>    [-]{0,1}[0-9]+ {return new Symbol(sym.INT, new Double(yytext()));}
+<YYINITIAL>    [-]{0,1}[0-9]+ {
+				String num = yytext().replaceAll(" ", "");
+				return new Symbol(sym.INT, new Double(num));}
 <YYINITIAL>    [-]{0,1}"#x"{hex}+ {
-			String I = yytext().replaceFirst("#x", "");
-			int i = Integer.parseInt(I, 16);
+			String num = yytext().replaceFirst("#x", "");
+			num = num.replaceAll(" ", "");
+			int i = Integer.parseInt(num, 16);
 			return new Symbol(sym.INT, new Double(i));
 		}
 <YYINITIAL>    [-]{0,1}"#b"[01]+ {
-			String I = yytext().replaceFirst("#b", "");
-			int i = Integer.parseInt(I, 2);
+			String num = yytext().replaceFirst("#b", "");
+			num = yytext().replaceAll(" ", "");
+			int i = Integer.parseInt(num, 2);
 			return new Symbol(sym.INT, new Double(i));
 		}
 
 <YYINITIAL>    [-]{0,1}(([0-9]+\.[0-9]+) | (\.[0-9]+) | ([0-9]+\.)) {
 			// DOUBLE
-	    	return new Symbol(sym.DOUBLE, new Double(yytext()));
+			String num = yytext().replaceAll(" ", "");
+	    	return new Symbol(sym.DOUBLE, new Double(num));
 		}
 
 <YYINITIAL>	"#t"	{return new Symbol(sym.BOOL, new Boolean(true));}

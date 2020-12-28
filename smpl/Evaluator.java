@@ -140,7 +140,7 @@ public class Evaluator implements Visitor<Environment<SMPLObject>, SMPLObject> {
 		for (i = paramCount; i < argCount; i++){
 			argOvf.add(arguements.get(i).visit(this, env));
 		}
-		newEnv.put(paramOvf, SMPL.makeInstance("vector", argOvf));
+		newEnv.put(paramOvf, SMPL.makeInstance("list", argOvf));
 	}
 
 	return myFunc.getBody().visit(this, newEnv);
@@ -187,7 +187,7 @@ public class Evaluator implements Visitor<Environment<SMPLObject>, SMPLObject> {
 		for (i = paramCount; i < argCount; i++){
 			argOvf.add(arguements.get(i));
 		}
-		newEnv.put(paramOvf, SMPL.makeInstance("vector", argOvf));
+		newEnv.put(paramOvf, SMPL.makeInstance("list", argOvf));
 	}
 
 	return myFunc.getBody().visit(this, newEnv);

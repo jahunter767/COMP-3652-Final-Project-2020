@@ -71,11 +71,11 @@ public class LinkedList {
           
         return str; 
     }
-	public String toSMPLlist() 
+	public String toSMPLVector() 
     { 
         Node currNode = this.head;
 
-		String str = "[";
+		String str = "[:";
    
         // Traverse through the LinkedList 
         while (currNode != null) { 
@@ -86,7 +86,7 @@ public class LinkedList {
             currNode = currNode.next; 
         }
 		str = str.substring(0, str.length()-2); 
-		str = str + "]";
+		str = str + ":]";
           
         return str; 
     }

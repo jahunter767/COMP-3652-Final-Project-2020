@@ -185,4 +185,9 @@ public class ToScheme implements Visitor<Void, String> {
 	throws VisitException {
 		return "IF-STATEMENT";
 	}
+	
+	public String visitSubVector(SubVector exp, Void arg) 
+	throws VisitException {
+		return "IF-STATEMENT";
+	}
 }

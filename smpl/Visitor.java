@@ -21,6 +21,7 @@ public interface Visitor<S, T> {
     public T visitExpProcCall(ExpProcCall fc, S arg) throws VisitException;
 	public T visitStmtProc(StmtProc fc, S arg) throws VisitException;
 	public T visitExpCallStmt(ExpCallStmt fc, S arg) throws VisitException;
+	public T visitSubVector(SubVector fc, S arg) throws VisitException;
 
 
 

@@ -68,21 +68,26 @@ public class Evaluator implements Visitor<Environment<Object>, Object> {
 	SMPLExp lst = fd.getList(); //variable holding list
 	SMPLTuple tupleList = null;
 	SMPLPair pairList  = null;
+	SMPLExp num = null;
 	LinkedList args;
 	//Type-checking
 	try{
-	 tupleList = (SMPLTuple) lst.visit(this,env);	
+	 tupleList = (SMPLTuple) lst.visit(this,env);
+	 args = (LinkedList) tupleList.getLit();	 
 	}catch(Exception e){
 		try {
 			pairList = (SMPLPair) lst.visit(this,env);
+			args = (LinkedList) pairList.getLit();
 		}catch(Exception ex){
-			return 0D;
+			try{
+				num = (SMPLExp)(new SMPLInteger(((Integer)((BigDecimal)lst.visit(this,env)).intValue())));
+				LinkedList t = new LinkedList();
+				t.insert((SMPLExp)num);
+				args = t;
+			}catch(Exception ep){
+				return 0D;
+			}
 		}
-	}
-	if (tupleList==null){
-		args = (LinkedList) pairList.getLit();
-	}else{
-		args = (LinkedList) tupleList.getLit();
 	}
 	//End-of-type-Checking - get arguments from list
 	ArrayList<SMPLExp> params = new ArrayList<SMPLExp>();
@@ -113,6 +118,7 @@ public class Evaluator implements Visitor<Environment<Object>, Object> {
 	}
 	//End-of-type-Checking
 	StmtProc lambda = new StmtProc(proc.getExps(),proc.getStmt(),params);
+	System.out.println(params);
 	return lambda.visit(this,env);
     }
 	public Object visitStmtProc(StmtProc fd, Environment<Object> env)
@@ -149,10 +155,10 @@ public class Evaluator implements Visitor<Environment<Object>, Object> {
 	params = function.getExps();
 	args = fc.getExp();
 	ExpVar var;
-	ExpLit expLit;
+	SMPLExp expLit;
 	for (int i = 0; i < params.size(); i++){
 	var = (ExpVar) params.get(i);
-	expLit = (ExpLit) args.get(i);
+	expLit = (SMPLExp) args.get(i);
 	closingEnv.put(var.getVar(), expLit.visit(this, env));	
 	}
 	//Evaulate function body with arg bindings
@@ -227,6 +233,65 @@ public class Evaluator implements Visitor<Environment<Object>, Object> {
 			return LinkedList.createSMPLTuple(lst);
 		}
 		
+	}else if(exp.getType()=="SMPLVector"){
+		SMPLTuple tup = null;
+		SMPLPair pair = null;
+		SMPLNumber val = null;
+		LinkedList args = null; //holds temporary data
+		LinkedList lst =  new LinkedList();
+		LinkedList temp = (LinkedList) exp.getLit();
+		LinkedList.Node currNode = temp.head;
+		while (currNode != null) { 
+            // Print the data at current node 
+			
+            SMPLExp e = currNode.data;
+			SMPLNumber val1 = new SMPLNumber(0,"");
+			try{
+				tup = (SMPLTuple) e.visit(this,env);
+				args = (LinkedList) tup.getLit();	 //traverse args and add to 
+				args.head = args.reverse(args.head);
+				LinkedList.Node currNode1 = args.head;
+				while(currNode1!=null){
+					SMPLExp ex = currNode1.data;
+					SMPLNumber val2 = new SMPLNumber(0,"");
+					try{
+						val2 = new SMPLNumber(ex.visit(this, env),"");
+						}catch(Exception ex3){
+						}
+					lst.insert(val2);
+					currNode1 = currNode1.next;
+				}
+				}catch(Exception ep1){
+				try {
+					pair = (SMPLPair) e.visit(this,env);
+					args = (LinkedList) pair.getLit();
+					args.head = args.reverse(args.head);
+					LinkedList.Node currNode1 = args.head;
+					while(currNode1!=null){
+					SMPLExp ex = currNode1.data;
+					SMPLNumber val2 = new SMPLNumber(0,"");
+					try{
+						val2 = new SMPLNumber(ex.visit(this, env),"");
+						}catch(Exception ex3){
+						}
+					lst.insert(val2);
+					currNode1 = currNode1.next;
+				}
+				}catch(Exception ex1){
+					try{
+						val = new SMPLNumber(e.visit(this, env),"");
+						lst.insert((SMPLExp)val);
+						}catch(Exception ep){
+							return 0D;
+											}
+									}
+								}
+            currNode = currNode.next; 
+        }
+		lst.head = lst.reverse(lst.head);
+		exp.setLit(lst); //resave evaluated tupe
+		System.out.println(lst.toSMPLVector());
+		return LinkedList.createSMPLTuple(lst);
 	}
 	else{
 		return exp.getVal();
@@ -385,5 +450,34 @@ public class Evaluator implements Visitor<Environment<Object>, Object> {
 	}
 	}
 	
-	
+	public Object visitSubVector(SubVector exp, Environment<Object> env) 
+	throws VisitException {
+	LinkedList subVector = new LinkedList();
+	Pair SubV = exp.getSubVectorExp();
+	SMPLNumber c = new SMPLNumber(SubV.getPred().visit(this, env),""); //can either be var or raw lit
+	StmtProc proc = null;
+	StmtProc p = null;
+	Closure cs = null;
+	try{
+		p = (StmtProc) SubV.getConseq();
+		proc = p;                                           //Proc
+	}catch(Exception e){
+		try{
+			cs = (Closure) SubV.getConseq().visit(this,env); //variable
+			StmtProc temp = new StmtProc(cs.getFunction().getExps(),cs.getFunction().getStmt(),new ArrayList<SMPLExp>());
+			proc = temp;
+		}catch(Exception ex){
+			return 0D;
+		}
+	}
+	int b = ((BigDecimal) c.visit(this,env)).intValue();
+	for(int i = 0; i<b; i++){
+		ArrayList<SMPLExp> args = new ArrayList<SMPLExp>();
+		args.add(new SMPLInteger(i));
+		StmtProc eval = new StmtProc(proc.getExps(),proc.getStmt(),args);
+		subVector.insert((SMPLExp)(new SMPLInteger(((Integer)((BigDecimal)eval.visit(this,env)).intValue()))));
+	}
+	System.out.println(subVector.toSMPLVector());
+	return LinkedList.createSMPLTuple(subVector);
+	}
 }

@@ -71,7 +71,9 @@ varChar = {alphanum}|{special}
 
 varStartChar = {alphanum}| !(!{special}|![^"/*""//"#])
 
-stringChar = [^\"\\]
+stringChar = [^\"\\\r\n\t]
+
+stringBreak = {nl}+({nl}|{ws})*|[\t]+ 
 
 blockCommentChar = [^"/*""*/"]
 
@@ -167,23 +169,23 @@ hex = [0-9A-Fa-f]
 		}
 
 
-<YYINITIAL>    [-]{0,1}[0-9]+ {
+<YYINITIAL>    "- "{0,1}[0-9]+ {
 				String num = yytext().replaceAll(" ", "");
 				return new Symbol(sym.INT, new Double(num));}
-<YYINITIAL>    [-]{0,1}"#x"{hex}+ {
+<YYINITIAL>    "- "{0,1}"#x"{hex}+ {
 			String num = yytext().replaceFirst("#x", "");
 			num = num.replaceAll(" ", "");
 			int i = Integer.parseInt(num, 16);
 			return new Symbol(sym.INT, new Double(i));
 		}
-<YYINITIAL>    [-]{0,1}"#b"[01]+ {
+<YYINITIAL>    "- "{0,1}"#b"[01]+ {
 			String num = yytext().replaceFirst("#b", "");
 			num = yytext().replaceAll(" ", "");
 			int i = Integer.parseInt(num, 2);
 			return new Symbol(sym.INT, new Double(i));
 		}
 
-<YYINITIAL>    [-]{0,1}(([0-9]+\.[0-9]+) | (\.[0-9]+) | ([0-9]+\.)) {
+<YYINITIAL>    "- "{0,1}(([0-9]+\.[0-9]+) | (\.[0-9]+) | ([0-9]+\.)) {
 			// DOUBLE
 			String num = yytext().replaceAll(" ", "");
 	    	return new Symbol(sym.DOUBLE, new Double(num));
@@ -216,6 +218,7 @@ hex = [0-9A-Fa-f]
             strBuff.append("\t");}
 	}
 
+	{stringBreak}	{ /* User generated line break within a string. Do nothing */ }
 	{stringChar}+	{strBuff.append(yytext());}
 }
 

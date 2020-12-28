@@ -69,7 +69,7 @@ public class Evaluator implements Visitor<Environment<SMPLObject>, SMPLObject> {
 	SMPLObject result;
 	result = sd.getExp().visit(this, env);
 	env.put(sd.getVar(), result);
-	return result;
+	return SMPL.makeInstance("none", null);
     }
 
 	public SMPLObject visitStmtAssignment(StmtAssignment sa,
@@ -77,8 +77,8 @@ public class Evaluator implements Visitor<Environment<SMPLObject>, SMPLObject> {
 	throws VisitException {
 	SMPLObject result;
 	result = sa.getExp().visit(this, env);
-	env.put(sa.getVar(), result);
-	return result;
+	env.update(sa.getVar(), result);
+	return SMPL.makeInstance("none", null);
     }
 
 
@@ -111,13 +111,6 @@ public class Evaluator implements Visitor<Environment<SMPLObject>, SMPLObject> {
 	ArrayList<String> params = myFunc.getParams(); // getParam is within the function defintion
 	String paramOvf = myFunc.getParamOvf();
 	int paramCount = params.size();
-
-	/*
-	SMPLFunction Func = null;
-	if(fc.getProcedure() != null){Func = (SMPLFunction)fc.getProcedure().visit(this,env);}
-	else if(fc.getName() != null){Func = (SMPLFunction)env.get(fc.getName());}
-	else {throw new VisitException("Error: Unknown function.");}
-	*/
 
 	ArrayList<Exp> arguements = fc.getArgs(); // expressions that we got as arguments
 	int argCount = arguements.size();

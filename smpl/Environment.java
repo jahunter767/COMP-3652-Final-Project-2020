@@ -97,7 +97,7 @@ public class Environment<T> {
 
 
     /**
-     * Return the int associated with the given identifier.
+     * Return the value associated with the given identifier.
      *
      * @param id the identifier.
      * @return the int associated with the identifier in
@@ -113,6 +113,25 @@ public class Environment<T> {
 		return parent.get(id);
 	else
 	    return result;
+    }
+
+    /**
+     * Updates the value associated with the given identifier.
+     *
+     * @param id the identifier.
+     * @exception Exception if <code>id</code> is unbound
+     */
+    public void update(String id, T value) throws UnboundVarException {
+	T result = dictionary.get(id);
+	if (result == null){
+	    if (parent == null){
+    		throw new UnboundVarException(id);
+        }else{
+            parent.update(id, value);
+        }
+    }else{
+        dictionary.replace(id, value);
+    }
     }
 
 

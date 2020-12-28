@@ -1,0 +1,154 @@
+def x 1 /*x := 6*/;
+def y - 2; // print(x + y);
+def z - 3.; /* 
+y := 7*/
+def a - .4;
+def b - 5.6;
+def c 7.8;
+
+def d #b1001; // 9
+def e - #b1010; // -10
+def f #xB; // 11
+def g - #xc; // -12
+def h - #xFf; // -255
+
+def i x - y - z - a - b + c + d - e + f - g - h; // 316.8
+def j 10 - 9 + 8 * 7 / 6 % 2 ^ 8 | 2 & 4;
+def k ~ (12 - - 2);
+
+def l not (1 < 2.6 and - 2. > 3.7 or #b100 <= #x5 and - #x5 >= -#b110 or - .7 = .7) and #t or #f; // false
+def m - 9.8 != 0;
+
+def n [1, - 2, 3.0, 4., .5, - .6, - 7., -8.0, #b1001, - #b1010, #xB, - #xc];
+def o [#ca, #u0062, #t, #f, "test", #e, pair(2, 6), [1, 2, 3], [:1, 2, 3:]];
+def p n @ o;
+def q pair(n, p);
+def r car(q);
+def s cdr(q);
+def t pair?(q);
+def u pair?(n);
+def v list(1, 2, 3, 4, 5);
+def w pair(v);
+
+def X [:1, - 2, 3.0, 4., .5, - .6, - 7., -8.0, #b1001, - #b1010, #xB, - #xc,
+    #ca, #u0062, #t, #f, "test", #e, pair(2, 6), [1, 2, 3], [:1, 2, 3:]:];
+def Y X[x];
+def Z size(X);
+def A X[#x10]; // gets "test" from the vector
+
+def B eqv?(A, "test"); // false
+def C equal?(A, "test"); // true
+def D eqv?(p, X); // false
+def E equal?(p, X; // false
+
+def F substr(A, a, -z); // "est"
+def R "If the line breaks in this are doubled and this string has tabs\n
+    you need to fix the string rules in the lexer."
+
+def G proc (x) x + 10;
+def H proc (y . o) o @ y;
+def I proc z z @ o;
+def J proc () {
+    def x read();
+    def y readint();
+    print("Your first input - ");
+    println(x);
+    print("Your second input + 40 = ");
+    println(y + 40);
+};
+def K proc call(G, [1]);
+def L proc H(1, 2, 3, 4, 5, 6);
+def M proc I(1, 2);
+
+def N let (x = 20) x ^ 2;
+def O let (y = 20) {y ^ a;}; // 20 ^ -0.4
+
+def P if #t then 5;
+P := if P != 5 then #e else {
+    P ^ 2;
+};
+
+def Q case{
+    equal?(P, #e) : n,
+    P = 25 : {
+        print("Looks like the code is working so far...");
+        proc x println(x);
+    },
+    #t : "If you got here then the previous clause failed.\n
+    You probably need to fix something in your code."
+};
+
+def S Q("Here are the results of the tests: ");
+println("Base 10 Numbers tests: ");
+print("\tx = "); println(x);
+print("\ty = "); println(y);
+print("\tz = "); println(z);
+print("\ta = "); println(a);
+print("\tb = "); println(b);
+print("\tc = "); println(c);
+
+println("Hex and binary tests: ");
+print("\td = "); println(d);
+print("\te = "); println(e);
+print("\tf = "); println(f);
+print("\tg = "); println(g);
+print("\th = "); println(h);
+
+println("Arithmetic tests: ");
+print("\ti = "); println(i);
+print("\tj = "); println(j);
+print("\tk = "); println(k);
+
+println("Boolean Ops and comparators tests: ");
+print("\tl = "); println(l);
+print("\tm = "); println(m);
+
+println("Lists and Pairs tests (with builtins): ");
+print("\tn = "); println(n);
+print("\to = "); println(o);
+print("\tp = "); println(p);
+print("\tq = "); println(q);
+print("\tr = "); println(r);
+print("\ts = "); println(s);
+print("\tt = "); println(t);
+print("\tu = "); println(u);
+print("\tv = "); println(v);
+print("\tw = "); println(w);
+
+println("Vector tests: ");
+print("\tX = "); println(X);
+print("\tY = "); println(Y);
+print("\tZ = "); println(Z);
+print("\tA = "); println(A);
+
+println("Eqv and equal tests: ");
+print("\tB = "); println(B);
+print("\tC = "); println(C);
+print("\tD = "); println(D);
+print("\tE = "); println(E);
+
+println("String tests: ");
+print("\tF = "); println(F);
+print("\tR = "); println(R);
+
+println("Proc and calls tests: ");
+print("\tG = "); println(G);
+print("\tH = "); println(H);
+print("\tI = "); println(I);
+print("\tJ = "); println(J);
+print("\tK = "); println(K);
+print("\tL = "); println(L);
+print("\tM = "); println(M);
+
+println("Let tests: ");
+print("\tN = "); println(N);
+print("\tO = "); println(O);
+
+println("if tests: ");
+print("\tP = "); println(P);
+
+println("Case tests: ");
+print("\tQ = "); println(Q);
+
+println("Last proc test: ");
+print("\tS = "); println(S);

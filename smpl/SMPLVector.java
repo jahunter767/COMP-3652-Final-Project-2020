@@ -1,19 +1,19 @@
 import java.util.ArrayList;
 
-public class SMPLVector extends SMPLObject<ArrayList<SMPLObject>> {
+public class SMPLVector extends SMPLObject<Vector> {
     /*
     public SMPLVector(SMPLObject... vect) {
     super(vect);
     }
     */
 
-    public SMPLVector(ArrayList<SMPLObject> vect) {
+    public SMPLVector(Vector vect) {
     super(vect);
     }
 
 
-    public int size(){
-        return getVal().size();
+    public int length(){
+        return getVal().length();
     }
 
     public SMPLObject get(SMPLObject object) throws TypeException {
@@ -36,11 +36,11 @@ public class SMPLVector extends SMPLObject<ArrayList<SMPLObject>> {
     public SMPLObject equalTo(SMPLObject object) throws TypeException {
     if (object instanceof SMPLVector){
 		SMPLVector obj = (SMPLVector) object;
-        boolean result = size() == obj.size();
+        boolean result = length() == obj.length();
         if (result){
             SMPLBoolean p;
             int i = 0;
-            while ((i < size()) && (result)){
+            while ((i < length()) && (result)){
                 p = (SMPLBoolean) get(i).equalTo(obj.get(i));
                 result = result && p.getVal().booleanValue();
             }
@@ -53,6 +53,15 @@ public class SMPLVector extends SMPLObject<ArrayList<SMPLObject>> {
 
     public SMPLObject eqv(SMPLObject object) throws TypeException {
 	return new SMPLBoolean(this == object);
+    }
+
+
+    public void set(SMPLObject index, SMPLObject val) throws TypeException, IndexOutOfBoundsException {
+	getVal().set(index.getIntVal(), val);
+    }
+
+    public SMPLObject size() throws TypeException {
+	return SMPL.makeInstance(length);
     }
 
 

@@ -39,6 +39,18 @@ public interface Visitor<S, T> {
     public T visitExpRead(ExpRead r, S arg) throws VisitException;
     public T visitExpReadInt(ExpReadInt r, S arg) throws VisitException;
 
+    public T visitExpPair(ExpPair exp, S arg) throws VisitException;
+    public T visitCar(Car exp, S arg) throws VisitException;
+    public T visitCdr(Cdr exp, S arg) throws VisitException;
+    public T visitisPair(isPair exp, S arg) throws VisitException;
+
+    public T visitExpList(ExpList exp, S arg) throws VisitException;
+
+    public T visitExpVector(ExpVector exp, S arg) throws VisitException;
+    public T visitSize(Size exp, S arg) throws VisitException;
+    public T visitExpGetVectEl(ExpGetVectEl exp, S arg) throws VisitException;
+    public T visitExpSetVectEl(ExpSetVectEl exp, S arg) throws VisitException;
+
     // bitwise expressions
     public T visitExpBitwiseNot(ExpBitwiseNot exp, S arg) throws VisitException;
     public T visitExpBitwiseAnd(ExpBitwiseAnd exp, S arg) throws VisitException;

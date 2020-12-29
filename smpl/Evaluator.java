@@ -253,6 +253,84 @@ public class Evaluator implements Visitor<Environment<SMPLObject>, SMPLObject> {
 	}
 
 
+    public SMPLObject visitExpPair(ExpPair exp, Environment<SMPLObject> env)
+	throws VisitException {
+	SMPLObject obj1, obj2;
+	obj1 = exp.getExpL().visit(this, env);
+	obj2 = exp.getExpR().visit(this, env);
+	return SMPL.makeInstance(new Pair(obj1,obj2));
+    }
+
+    public SMPLObject visitCar(Car exp, Environment<SMPLObject> env)
+	throws VisitException {
+	SMPLObject arg1;
+	arg1 = exp.getArg1().visit(this, env);
+	return arg1.car();
+    }
+
+    public SMPLObject visitCdr(Cdr exp, Environment<SMPLObject> env)
+	throws VisitException {
+	SMPLObject arg1;
+	arg1 = exp.getArg1().visit(this, env);
+	return arg1.cdr();
+    }
+
+    public SMPLObject visitisPair(isPair exp, Environment<SMPLObject> env)
+	throws VisitException {
+	SMPLObject arg;
+	arg = exp.getArg1().visit(this, env);
+	return SMPL.makeInstance(arg instanceof SMPLPair);
+    }
+
+
+    public SMPLObject visitExpList(ExpList lst, Environment<SMPLObject> env)
+	throws VisitException{
+	ArrayList<SMPLObject> args = new ArrayList<>();
+	ArrayList<Exp> exp = lst.getArgs(); // expressions that we got as arguments
+	if(exp.size() <= 0) return SMPL.makeInstance(new Nil());	
+	for(int i = 0; i < exp.size(); i++){
+		args.add(exp.get(i).visit(this, env));
+	}
+	return SMPL.makeInstance(new List(args));
+    }
+
+
+    public SMPLObject visitExpVector(ExpVector vect, Environment<SMPLObject> env)
+	throws VisitException{
+	ArrayList<SMPLObject> args = new ArrayList<>();
+	ArrayList<Exp> exp = vect.getVal();	
+	for(int i = 0; i < exp.size(); i++){
+		args.add(exp.get(i).visit(this, env));
+	}
+	return SMPL.makeInstance(new Vector(args));
+    }
+
+	public SMPLObject visitSize(Size exp, Environment<SMPLObject> env)
+	throws VisitException{
+	SMPLVector arg = (SMPLVector) env.get(exp.getArg1());
+	return arg.size();
+    }
+
+	public SMPLObject visitExpGetVectEl(ExpGetVectEl exp, Environment<SMPLObject> env)
+	throws VisitException{
+	SMPLVector vect;
+	SMPLObject index;
+	vect = (SMPLVector) env.get(exp.getId());
+	index = exp.getIndex().visit(this, env);
+	return vect.get(index);
+    }
+
+	public SMPLObject visitExpSetVectEl(ExpSetVectEl exp, Environment<SMPLObject> env)
+	throws VisitException{
+	SMPLVector vect;
+	SMPLObject index, val;
+	vect = (SMPLVector) env.get(exp.getId());
+	index = exp.getIndex().visit(this, env);
+	val = exp.getValue().visit(this, env);
+	return vect.set(index, val);
+    }
+
+
     public SMPLObject visitExpBitwiseNot(ExpBitwiseNot exp, Environment<SMPLObject> env)
 	throws VisitException {
 	SMPLObject val1;

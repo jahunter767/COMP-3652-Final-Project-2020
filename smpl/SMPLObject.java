@@ -118,6 +118,20 @@ public abstract class SMPLObject<T>{
 	throw new TypeException();
     }
 
+
+    public SMPLObject get(SMPLObject index) throws TypeException {
+	throw new TypeException();
+    }
+
+    public void set(SMPLObject index, SMPLObject val) throws TypeException, IndexOutOfBoundsException {
+	throw new TypeException();
+    }
+
+    public void size() throws TypeException {
+	throw new TypeException();
+    }
+
+
     public abstract String toString();
 
 }

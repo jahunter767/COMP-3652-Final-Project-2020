@@ -21,5 +21,9 @@ public class SMPLVector extends SMPLObject{
 		return vector.toSMPLVector();
 	}
 	
+	public void insert(SMPLExp v){
+		vector.insert(v);
+	}
+	
 }
 		

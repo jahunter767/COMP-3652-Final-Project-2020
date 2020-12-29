@@ -8,5 +8,9 @@ public class SMPLString extends SMPLObject{
 		return (String) V;	
 	}
 	
+	public SMPLExp subStr(SMPLExp e1, SMPLExp e2){
+		return new SliceOperations(this,e1,e2);
+	}
+	
 	
 }

@@ -18,6 +18,9 @@ public class SMPLPair extends SMPLObject{
 	public SMPLExp getExp2(){
 		return p2;
 	}
+	public LinkedList getTuple(){
+		return pair;
+	}
 	public String getVal(){
 		return pair.toSMPLPair();
 	}
@@ -28,11 +31,15 @@ public class SMPLPair extends SMPLObject{
 		this.V = pair;
 	}
 	public SMPLExp car(){
-		return pair.findByIndex(0);
+		TupleOperations t = new TupleOperations(this);
+		t.get(new SMPLInteger(new Integer(0)));
+		return t;
 	}
 	
 	public SMPLExp cdr(){
-		return pair.findByIndex(1);
+		TupleOperations t = new TupleOperations(this);
+		t.get(new SMPLInteger(new Integer(1)));
+		return t;
 	}
 	public void insert(SMPLExp exp){
 		pair.insert(exp);

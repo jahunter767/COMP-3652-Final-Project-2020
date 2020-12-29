@@ -190,4 +190,29 @@ public class ToScheme implements Visitor<Void, String> {
 	throws VisitException {
 		return "IF-STATEMENT";
 	}
+	
+	public String visitTupleOperations(TupleOperations exp, Void arg) 
+	throws VisitException {
+		return "IF-STATEMENT";
+	}
+	public String visitPrintLn(PrintLn exp, Void arg) 
+	throws VisitException {
+		return "IF-STATEMENT";
+	}
+	
+	public String visitEqualityOperations(EqualityOperations exp, Void arg) 
+	throws VisitException {
+		return "IF-STATEMENT";
+	}
+	
+	public String visitLetStmt(LetStmt exp, Void arg) 
+	throws VisitException {
+		return "IF-STATEMENT";
+	}
+	
+	public String visitSliceOperations(SliceOperations exp, Void arg) 
+	throws VisitException {
+		return "IF-STATEMENT";
+	}
+	
 }

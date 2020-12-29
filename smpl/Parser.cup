@@ -1,6 +1,7 @@
 import java_cup.runtime.*;
 import java.io.*;
 import java.util.*;
+import java.util.Scanner;
 
 /* Preliminaries to set up and use the scanner.  */
 parser code {:
@@ -97,10 +98,13 @@ non terminal StmtProc procDefn; //unamed proc
 non terminal StmtProc LamdbaProcDefn; //unamed lamba
 non terminal StmtProcDefn procName; //named proc/lambda
 non terminal StmtSequence body;
+non terminal LetStmt letExp;
 non terminal ArrayList<SMPLExp> paramList;
 non terminal ArrayList<SMPLExp> paramListE;
 non terminal ArrayList<Pair> clauseListE;
 non terminal ArrayList<Pair> clauseList;
+non terminal ArrayList<Pair> bindingsListE;
+non terminal ArrayList<Pair> bindingsList;
 non terminal ArrayList<SMPLExp> clauseVector;
 non terminal ArrayList<SMPLExp> clauseVectorE;
 non terminal ExpProcCall procCall;
@@ -110,6 +114,12 @@ non terminal StmtCaseDefn caseStmt;
 non terminal ExpCallStmt call;
 non terminal SubVector subvector;
 non terminal SMPLVector vector;
+non terminal SMPLString read;
+non terminal SMPLInteger readint;
+non terminal PrintLn print;
+non terminal PrintLn println;
+non terminal SMPLExp equals;
+non terminal SMPLExp equiv;
 /* **** */
 
 non terminal SMPLExp expression;
@@ -126,9 +136,11 @@ non terminal SMPLExp cdr;
 non terminal SMPLExp isPair;
 non terminal SMPLExp tuple;
 non terminal SMPLExp list;
+non terminal SMPLExp vectOps;
+non terminal SMPLExp substring;
 /* Grammar rules */
 
-precedence left COLON;
+precedence left COLON,RSQPAREN;
 
 program ::= stmtList:s {: RESULT = new ArithProgram(s); :};
 
@@ -143,7 +155,8 @@ stmtList ::= stmtList:lst stmt:s {:
 stmt ::= definition:d {: RESULT = d; :} | assignment:a {:RESULT = a;:} |
 		expression4:e {: RESULT = new Statement(e); :} SEMI |
 		ifStmt:i {:RESULT=i;:} | caseStmt:cs {:RESULT=cs;:} | 
-		procName:pn {:RESULT = pn;:} | procDefn:p {:RESULT = p;:} | subvector:sv {:RESULT=sv;:} ;
+		procName:pn {:RESULT = pn;:} | procDefn:p {:RESULT = p;:} | subvector:sv {:RESULT=sv;:} |
+		letExp:le {:RESULT=le;:};
 
 ifStmt::= IF expression4:pred THEN stmtList:cons ELSE stmt:alt {: RESULT = new StmtIfDefn(pred,cons, alt);:};
 pair::= PAIR LPAREN expression4:p1 COMMA expression4:p2 RPAREN {: RESULT = new SMPLPair(p1,p2);:};
@@ -151,8 +164,8 @@ list::= LIST tuple:t {:RESULT=t;:};
 subvector::= expression4:num COLON stmt:proc {:RESULT = new SubVector(num,proc);:} ;
 tuple::= LPAREN paramListE:pe RPAREN {:int s = pe.size(); if(s==1){RESULT = (SMPLExp) pe.get(0);}else{RESULT=SMPLTuple.createTuple(pe);}:} |
 		 LSQPAREN paramListE:pe RSQPAREN {:RESULT=SMPLTuple.createTuple(pe);:};
-car::= CAR tuple:p {: SMPLPair pair = (SMPLPair) p; RESULT = pair.car();:};
-cdr::= CDR tuple:p {: SMPLPair pair = (SMPLPair) p; RESULT = pair.cdr();:};
+car::= CAR tuple:p {: SMPLPair pair = (SMPLPair) p; RESULT = pair.car();:} | CAR VAR:p {:TupleOperations op = new TupleOperations(new ExpVar(p)); op.get(new SMPLInteger(new Integer(0)));; RESULT =op;:} ;
+cdr::= CDR tuple:p {: SMPLPair pair = (SMPLPair) p; RESULT = pair.cdr();:} | CDR VAR:p {:TupleOperations op = new TupleOperations(new ExpVar(p)); op.get(new SMPLInteger(new Integer(1)));; RESULT =op;:};
 isPair::= PAIR_PRED tuple:p {: try {SMPLPair pair = (SMPLPair)p; RESULT=LinkedList.isPair(pair);}catch(Exception e){RESULT = new SMPLBoolean(new Boolean(false));}:} 
 			| error:e  {: RESULT = new SMPLBoolean(new Boolean(false));:};
 procDefn ::= PROC LPAREN paramListE:pe RPAREN body:b {: RESULT = new StmtProc(pe,b,new ArrayList<SMPLExp>());:} ;
@@ -166,23 +179,44 @@ clauseList::= expression4:e1 COLON expression4:e2 COMMA clauseList:cl {:Pair p =
 			  expression4:e1 COLON expression4:e2 {:ArrayList<Pair> result = new ArrayList<Pair>();Pair p = new Pair(e1,e2); result.add(p); RESULT = result;:} |
 			  ELSE COLON expression4:e2 {:ArrayList<Pair> result = new ArrayList<Pair>();Pair p = new Pair(new SMPLBoolean(new Boolean(true)),e2); result.add(p); RESULT = result;:}; 
 clauseListE::= clauseList:cl {:RESULT=cl;:} | empty ;
-
+bindingsList::= VAR:id BIND expression4:exp COMMA bindingsList:bl {:Pair p = new Pair(new ExpVar(id),exp); bl.add(p); RESULT = bl;:} | 
+				 VAR:id BIND expression4:exp {:ArrayList<Pair> result = new ArrayList<Pair>();Pair p = new Pair(new ExpVar(id),exp); result.add(p); RESULT = result;:};
+bindingsListE::= bindingsList:bl {:RESULT=bl;:} | empty ;
+letExp::= LET LPAREN bindingsListE:be RPAREN body:b {:RESULT = new LetStmt(b, be);:};
 clauseVector::= stmt:e COMMA clauseVector:p {: p.add(e); RESULT = p;:}| stmt:e {:ArrayList<SMPLExp> result = new ArrayList<>();result.add(e);RESULT = result;:} |
 				expression4:e COMMA clauseVector:p {: p.add(e); RESULT = p;:}| expression4:e {:ArrayList<SMPLExp> result = new ArrayList<>();result.add(e);RESULT = result;:};  
 clauseVectorE::= clauseVector:p {:RESULT = p;:} | empty ;
 vector::= VECT_OPEN clauseVectorE:cve VECT_CLOSE {:RESULT = new SMPLVector(cve);:};
- 			  
+vectOps::= vector:e LSQPAREN expression4:e1 RSQPAREN {:TupleOperations op = new TupleOperations(e); op.get(e1); RESULT =op;:} |
+		   VAR:e LSQPAREN expression4:e1 RSQPAREN {:TupleOperations op = new TupleOperations(new ExpVar(e)); op.get(e1); RESULT=op;:} |
+			tuple:e LSQPAREN expression4:e1 RSQPAREN {:TupleOperations op = new TupleOperations(e); op.get(e1); RESULT=op;:} 	|	
+			LSQPAREN expression4:e1 RSQPAREN vector:v {:TupleOperations op = new TupleOperations(v); op.set(e1); RESULT=op;:} | 
+			LSQPAREN expression4:e1 RSQPAREN VAR:v {:TupleOperations op = new TupleOperations(new ExpVar(v)); op.set(e1); RESULT=op;:}   |
+			LSQPAREN expression4:e1 RSQPAREN tuple:v {:TupleOperations op = new TupleOperations(v); op.set(e1); RESULT=op;:} |
+			SIZE LPAREN expression:e RPAREN  {:TupleOperations op = new TupleOperations(e); op.size(); RESULT=op;:} ;
+readint::= READINT LPAREN RPAREN {:int n = Integer.parseInt(System.console().readLine()); RESULT = (new SMPLInteger(new Integer(n)));:} ;
+read::= READ LPAREN RPAREN {:String s = System.console().readLine(); RESULT = (new SMPLString(new String(s)));:} ;
+print::= PRINT LPAREN expression4:e RPAREN {:RESULT = new PrintLn(e,new Boolean(false));:} ;
+println::= PRINTLN LPAREN expression4:e RPAREN {:RESULT = new PrintLn(e,new Boolean(true));:} ;
 caseStmt::= CASE LBRACE LSQPAREN clauseListE:ce RSQPAREN RBRACE {:RESULT = new StmtCaseDefn(ce);:};
 call::= CALL LPAREN expression4:p COMMA expression4:l RPAREN {:RESULT = new ExpCallStmt(p,l);:} |
 		 CALL LPAREN stmt:p COMMA expression4:l RPAREN {:RESULT = new ExpCallStmt(p,l);:};
+equals::= EQUAL_PRED LPAREN expression4:e1 COMMA expression4:e2 RPAREN {:RESULT = e1.equal(e2,"equal?");:} ;
+equiv::= EQUIV_PRED LPAREN expression4:e1 COMMA expression4:e2 RPAREN {:RESULT = e1.equal(e2,"eqv?");:} ;
+substring::= SUBSTR LPAREN expression4:e1 COMMA expression4:e2 COMMA expression4:e3 RPAREN {:RESULT = new SliceOperations(e1,e2,e3);:} ;
 assignment ::= VAR:v ASSIGN expression4:e SEMI {:RESULT = new StmtDefinition(v, e);:} | 
 			   VAR:v ASSIGN ifStmt:i {: RESULT = new StmtDefinition(v, i);:} |
-			   VAR:v ASSIGN subvector:i {: RESULT = new StmtDefinition(v, i);:};
+			   VAR:v ASSIGN subvector:i {: RESULT = new StmtDefinition(v, i);:} |
+			   VAR:v ASSIGN letExp:i {: RESULT = new StmtDefinition(v, i);:}
+			   ;
 definition::= DEF VAR:v expression4:e SEMI {:
 		   RESULT = new StmtDefinition(v, e);:}  |
 		   DEF VAR:v subvector:e {:
 		   RESULT = new StmtDefinition(v, e);:} 
-		   ;
+												 |
+		   DEF VAR:v letExp:e {:
+		   RESULT = new StmtDefinition(v, e);:} 
+												 ;
 	
 expression4::= expression3:e3 OR expression4:e4 {:RESULT = new StmtOr(e3,e4);:}   | expression3: e3 {:RESULT = e3; :};
 expression3::= expression2:e2 AND expression3:e3 {:RESULT = new StmtAnd(e2,e3);:} | expression2: e2 {:RESULT = e2; :};
@@ -218,7 +252,10 @@ factor ::= INT:ilit {: RESULT = new SMPLInteger(ilit); :} |
 	   procCall:f {:RESULT = f;:} |
 	   car:c {:RESULT = c;:}  | cdr:c {:RESULT = c;:} | isPair:p {:RESULT=p;:} |
 	   pair:p {:RESULT = p;:} | tuple:t {:RESULT=t;:} | list:l {:RESULT=l;:} | 
-	   call:c {:RESULT=c;:} | LamdbaProcDefn:lpd {:RESULT = lpd;:} | vector:v {:RESULT =v;:};
+	   call:c {:RESULT=c;:} | LamdbaProcDefn:lpd {:RESULT = lpd;:} | vector:v {:RESULT =v;:} |
+	   vectOps:ops {:RESULT=ops;:} | readint:ri {:RESULT = ri;:} | read:r {:RESULT=r;:} |
+		print:p {:RESULT = p;:}   | println:pl {:RESULT = pl;:} | equals:s {:RESULT = s;:} |
+		equiv:e {:RESULT = e;:}  | substring:str {:RESULT = str;:} ; 
 procCall ::= VAR:v LPAREN paramListE:pe RPAREN {:RESULT = new ExpProcCall(v,pe);:};
 
 empty ::= ;

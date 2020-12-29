@@ -11,6 +11,7 @@ public class SMPLTuple extends SMPLObject{
 		}
 		this.V = tuple;
 	}
+	
 	public LinkedList getTuple(){
 		return tuple;
 	}
@@ -27,6 +28,9 @@ public class SMPLTuple extends SMPLObject{
 	
 	public SMPLExp cdr(){
 		return tuple.findByIndex(1);
+	}
+	public void setType(String type){
+		this.SMPLType = type;
 	}
 	
 	public static SMPLExp createTuple(ArrayList<SMPLExp> exp){

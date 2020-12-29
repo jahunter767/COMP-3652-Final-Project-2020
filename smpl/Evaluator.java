@@ -226,10 +226,12 @@ public class Evaluator implements Visitor<Environment<Object>, Object> {
             // Go to next node 
             currNode = currNode.next; 
         }
-		lst.head = lst.reverse(lst.head);
+		if(exp.getType() == "SMPLTuple"){
+			lst.head = lst.reverse(lst.head);
+		} 
 		exp.setLit(lst); //resave evaluated tupe
 		if(exp.getType()=="SMPLPair" || exp.getType()=="SMPLTuple"){
-			System.out.println(lst.toSMPLPair());
+			//System.out.println(lst.toSMPLPair());
 			return LinkedList.createSMPLTuple(lst);
 		}
 		
@@ -265,7 +267,7 @@ public class Evaluator implements Visitor<Environment<Object>, Object> {
 				try {
 					pair = (SMPLPair) e.visit(this,env);
 					args = (LinkedList) pair.getLit();
-					args.head = args.reverse(args.head);
+					//args.head = args.reverse(args.head);
 					LinkedList.Node currNode1 = args.head;
 					while(currNode1!=null){
 					SMPLExp ex = currNode1.data;
@@ -290,8 +292,15 @@ public class Evaluator implements Visitor<Environment<Object>, Object> {
         }
 		lst.head = lst.reverse(lst.head);
 		exp.setLit(lst); //resave evaluated tupe
-		System.out.println(lst.toSMPLVector());
-		return LinkedList.createSMPLTuple(lst);
+		ArrayList<SMPLExp> argList = new ArrayList<SMPLExp>();
+		LinkedList.Node currNode2 = lst.head;
+		while(currNode2!=null){
+			argList.add((SMPLExp) currNode2.data);
+			currNode2 = currNode2.next;
+		}
+		SMPLVector s = new SMPLVector(argList);
+		//System.out.println(s.getVal());
+		return s;
 	}
 	else{
 		return exp.getVal();
@@ -301,7 +310,30 @@ public class Evaluator implements Visitor<Environment<Object>, Object> {
 
     public Object visitExpVar(ExpVar exp, Environment<Object> env)
 	throws VisitException {
-	return env.get(exp.getVar());
+	SMPLTuple t = null;
+	SMPLPair p = null;
+	SMPLVector v = null;
+	try {
+		v = (SMPLVector) env.get(exp.getVar());
+		System.out.println(v.getVal());
+		return v;
+		
+	}catch(Exception e){
+		try {
+			t = (SMPLTuple) env.get(exp.getVar());
+			System.out.println(t.getVal());
+			return t;
+		}catch(Exception e1){
+			try{
+				 p = (SMPLPair) env.get(exp.getVar());
+				 System.out.println(p.getVal());
+				 return p;
+			}catch(Exception e2){
+				return env.get(exp.getVar());
+			}
+		}
+	}
+	
     }
 	
 	public Object visitCompareL(CompareL exp,Environment<Object> env) 
@@ -480,4 +512,166 @@ public class Evaluator implements Visitor<Environment<Object>, Object> {
 	System.out.println(subVector.toSMPLVector());
 	return LinkedList.createSMPLTuple(subVector);
 	}
+	public Object visitTupleOperations(TupleOperations exp, Environment<Object> env) 
+	throws VisitException {
+	 SMPLTuple tup = null;
+	 SMPLPair pair = null;
+	 SMPLVector vect = null;
+	 String type = null ;
+	 String op = null;
+	 Boolean variableFound = false;
+	 ExpVar var = null;
+		 try{
+			 tup = (SMPLTuple) exp.getTup().visit(this, env);
+			 type = "SMPLTuple";
+			 variableFound = true;
+			 var = (ExpVar) exp.getTup();
+		 }catch(Exception e){
+			  try{
+				  pair = (SMPLPair) exp.getTup().visit(this, env);
+				  type = "SMPLPair";
+				  variableFound = true;
+				  var = (ExpVar) exp.getTup();
+			  }catch(Exception e1){
+				  try{
+					  vect = (SMPLVector) exp.getTup().visit(this, env);
+					  type = "SMPLVector";
+					  variableFound = true;
+					  var = (ExpVar) exp.getTup();
+				  }catch(Exception e2){
+					  try{
+						  tup = (SMPLTuple) exp.getTup();
+						  type = "SMPLTuple";
+					  }catch(Exception e3){
+						  try{
+							  pair = (SMPLPair) exp.getTup();
+							  type = "SMPLPair";
+						  }catch(Exception e4){
+							  try{
+							  vect = (SMPLVector) exp.getTup();
+							  type = "SMPLVector";
+							  }catch(Exception e5)
+							  {
+								  op = exp.getOp();
+							  }
+						  }
+					  }
+				  }
+				  
+			  }
+		 }
+		 //Check for var
+			if (var == null){
+				variableFound = false;
+			}else
+			{
+				variableFound = true;
+			}
+		 //End of Check
+		 SMPLNumber c = null; //expression : index or value
+		 op = exp.getOp();   // operation 
+		 if(op == "get"){
+			if (type == "SMPLVector"){
+				c = new SMPLNumber(exp.getVal().visit(this, env),"");
+				return vect.getTuple().findByIndex(((BigDecimal)c.getVal()).intValue());
+			} else if(type=="SMPLPair"){
+				c = new SMPLNumber(exp.getVal().visit(this, env),"");
+				System.out.println(pair.getVal());
+				return pair.getTuple().findByIndex(((BigDecimal)c.getVal()).intValue());
+			}
+		 }else if(op == "set"){
+			 if(type == "SMPLVector"){
+				 if(variableFound==true){//set variable return variable or vector
+					 c = new SMPLNumber(exp.getVal().visit(this, env),"");
+					 vect.insert((SMPLExp) c);
+					 env.put(var.getVar(),vect);
+					 return vect.getVal();
+				 }else{//return new vector
+					 c = new SMPLNumber(exp.getVal().visit(this, env),"");
+					 LinkedList rev = vect.getTuple();
+					 rev.head = rev.reverse(rev.head);
+					 vect.setVal(rev);
+					 vect.insert((SMPLExp) c); 
+					 return vect.getVal();
+				 }
+			 }
+		 }else if(op =="size"){
+			  LinkedList vectt =null;
+			 if(type=="SMPLVector"){
+				 vectt = vect.getTuple();
+				 if(variableFound==true){
+					 LinkedList.Node currNode = vectt.head;
+						Integer count = new Integer(0);
+						while(currNode!=null){
+							currNode = currNode.next;
+							count = count + 1;
+						}
+						return new SMPLInteger(count);
+						//return vect.getVal();
+				 }else{
+						LinkedList.Node currNode = vectt.head;
+						Integer count = new Integer(0);
+						while(currNode!=null){
+							currNode = currNode.next;
+							count = count + 1;
+						}
+						LinkedList rev = vect.getTuple();
+						rev.head = rev.reverse(rev.head);
+						vect.setVal(rev);
+						return new SMPLInteger(count);
+						//return vect.getVal();
+				 }
+				 
+			 }
+				
+		 }
+		 
+		 return op;
+	}
+	public Object visitPrintLn(PrintLn exp, Environment<Object> env) 
+	throws VisitException {
+	if(exp.getFlag() == false){
+		System.out.print(exp.getExp().visit(this,env));
+	}else{
+		System.out.println(exp.getExp().visit(this,env));
+
+	}
+	return 0D;
+	}
+	
+	public Object visitEqualityOperations(EqualityOperations exp, Environment<Object> env) 
+	throws VisitException {
+	SMPLExp x,y;
+	ExpLit z,w;
+	if(exp.getOp()=="equal?"){
+	return new SMPLBoolean(new Boolean(exp.getObj1().visit(this,env).equals(exp.getObj2().visit(this,env))));
+	}else{
+	return new SMPLBoolean(new Boolean(exp.getObj1().visit(this,env)==exp.getObj2().visit(this,env)));
+	}
+	}
+	public Object visitLetStmt(LetStmt exp, Environment<Object> env) 
+	throws VisitException {
+	ArrayList<Pair> bindings = exp.getBindings();
+	for(Pair b : bindings){
+		env.put(((ExpVar)b.getPred()).getVar(),b.getConseq().visit(this,env));
+	}
+	return exp.getBody().visit(this,env);
+	}
+	
+	public Object visitSliceOperations(SliceOperations exp, Environment<Object> env) 
+	throws VisitException {
+	String s = null;
+	SMPLString s1 = null;
+	ExpVar v;
+	try{
+		s = (String) exp.getObj().visit(this,env);
+	}catch(Exception e){
+		s1 = (SMPLString) exp.getObj(); 
+	}
+	int start = ((BigDecimal)exp.getInit().visit(this,env)).intValue();
+	int end =   ((BigDecimal)exp.getEnd().visit(this,env)).intValue();
+	
+	return new SMPLString(new String(s.substring(start,end)));
+	}
+	
 }

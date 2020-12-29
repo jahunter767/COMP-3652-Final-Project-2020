@@ -22,6 +22,13 @@ public interface Visitor<S, T> {
 	public T visitStmtProc(StmtProc fc, S arg) throws VisitException;
 	public T visitExpCallStmt(ExpCallStmt fc, S arg) throws VisitException;
 	public T visitSubVector(SubVector fc, S arg) throws VisitException;
+	public T visitTupleOperations(TupleOperations fc, S arg) throws VisitException;
+	public T visitEqualityOperations(EqualityOperations fc, S arg) throws VisitException;
+	public T visitStmtIfDefn(StmtIfDefn exp, S arg) throws VisitException;
+	public T visitStmtCaseDefn(StmtCaseDefn exp, S arg) throws VisitException;
+	public T visitPrintLn(PrintLn exp, S arg) throws VisitException;
+	public T visitLetStmt(LetStmt exp, S arg) throws VisitException;
+	public T visitSliceOperations(SliceOperations exp, S arg) throws VisitException;
 
 
 
@@ -34,6 +41,8 @@ public interface Visitor<S, T> {
     public T visitExpVar(ExpVar exp, S arg) throws VisitException;
 	public T visitExpLit(ExpLit exp, S arg) throws VisitException;
 	
+
+	
 	//Relational or Compare expressions
 	public T visitCompareL(CompareL exp, S arg) throws VisitException;
 	public T visitCompareLE(CompareLE exp, S arg) throws VisitException;
@@ -45,8 +54,4 @@ public interface Visitor<S, T> {
 	public T visitStmtNot(StmtNot exp, S arg) throws VisitException;
 	public T visitStmtAnd(StmtAnd exp, S arg) throws VisitException;
 	public T visitStmtOr(StmtOr exp, S arg) throws VisitException;
-	//IF Statement
-	public T visitStmtIfDefn(StmtIfDefn exp, S arg) throws VisitException;
-	public T visitStmtCaseDefn(StmtCaseDefn exp, S arg) throws VisitException;
-	//SMPL Objects
 }

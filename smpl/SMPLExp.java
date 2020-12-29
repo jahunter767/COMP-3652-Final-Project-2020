@@ -41,4 +41,7 @@ public abstract class SMPLExp extends ASTNode<SMPLExp> {
 	public String getType(){
 		return SMPLType;
 	}
+	public EqualityOperations equal(SMPLExp o, String op) {
+            return new EqualityOperations(this,o,op);
+    }
 }

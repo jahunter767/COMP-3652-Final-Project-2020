@@ -14,6 +14,12 @@ public class ExpList extends Exp {
     }
 
 
+    protected ExpList() {
+	super("Empty List", new ArrayList<>());
+	this.arguments = new ArrayList<>();
+    }
+
+
     public ArrayList<Exp> getArgs() {
 	return this.arguments;
     }

@@ -1,4 +1,4 @@
-def name "john brown"
+def name "john brown";
 def age 20;
 
 def lst list(name,age)

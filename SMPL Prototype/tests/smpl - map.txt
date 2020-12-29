@@ -1,0 +1,12 @@
+def map proc(f, lst) {
+/* return a new list contining
+f(x) for each x in list */
+if lst = #e
+then #e
+else pair(f(car(lst)),
+map(f, cdr(lst)));
+
+}
+
+car(map(proc(x){x * x;},[10,20,30])); //[100,400,900]
+

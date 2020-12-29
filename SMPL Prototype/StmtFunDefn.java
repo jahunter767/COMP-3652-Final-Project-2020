@@ -22,6 +22,14 @@ public class StmtFunDefn extends Statement {
 	
     }
 
+
+    protected StmtFunDefn(ArrayList<String> funcParams, Exp funcBody) {	// placeholder; can be removed eventually
+	super("funDef", new StmtSequence(new Statement(funcBody)));
+	this.parameters = funcParams;
+	this.body = new StmtSequence(new Statement(funcBody));
+	
+    }
+
 /*
     public String getName() {	
 	return this.name;

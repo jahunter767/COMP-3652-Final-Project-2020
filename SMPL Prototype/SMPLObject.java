@@ -91,7 +91,7 @@ public abstract class SMPLObject<T> {
     }
 
     public SMPLObject equalTo(SMPLObject object) throws TypeException {
-	throw new TypeException();
+	return Equal(object);
     }
 
     public SMPLObject greaterThanEq(SMPLObject object) throws TypeException {

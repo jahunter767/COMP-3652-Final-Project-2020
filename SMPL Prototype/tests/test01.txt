@@ -14,14 +14,14 @@ def h -#xFf; // -255
 
 def i x - y - z - a - b + c + d - e + f - g - h; // 316.8
 
-def result if #t then { if 5 > 10 % 2 then {"true"} else #f;} else #cC;
+def result if #t then { if 5 > 10 % 2 then {"true";} else #f;} else #cC;
 
 //def j 10 - 9 + 8 * 7 / 6 % 2 ^ 8 | 2 & 4;
 
 
 //def k ~ (12 - - 2);
 
-def l not (1 < 2.6 and -2. > 3.7 or #b100 <= #x5 and -#x5 >= -#b110 or -.7 == .7) and #t or #f; // false
+def l not (1 < 2.6 and -2. > 3.7 or #b100 <= #x5 and -#x5 >= -#b110 or -.7 = .7) and #t or #f; // false
 def m -9.8 != 0;
 
 def n [1, -2, 3.0, 4., .5, -.6, -7., -8.0, #b1001, -#b1010, #xB, -#xc]

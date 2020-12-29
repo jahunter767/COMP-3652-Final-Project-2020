@@ -1,12 +1,9 @@
-/**
- * IR Class to represent an if statement
- */
-public class ExpIf extends Exp {
+public class ExpClause extends Exp {
 
-    Exp  predicate;
+    Exp predicate;
 
-    protected ExpIf(Exp predicate, Exp consequent, Exp alternative) {
-    super("if", consequent, alternative);
+    protected ExpClause(Exp predicate, Exp consequent) {
+    super("clause", consequent);
     this.predicate = predicate;
     }
 
@@ -18,12 +15,8 @@ public class ExpIf extends Exp {
     return super.getSubTree(0);
     }
 
-    public Exp getAlternative(){
-    return super.getSubTree(1);
-    }
-
     public <S, T> T visit(Visitor<S,T> v, S arg) throws VisitException {
-    return v.visitExpIf(this, arg);
+    return v.visitExpClause(this, arg);
     }
 
     public String toString(){

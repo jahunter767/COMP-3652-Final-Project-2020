@@ -146,6 +146,42 @@ public class Evaluator implements Visitor<Environment<SMPLObject>, SMPLObject> {
 	}
 
 */
+
+	public SMPLObject visitExpIf(ExpIf ifStmt, Environment<SMPLObject> env)
+	throws VisitException {
+	SMPLBoolean pred = (SMPLBoolean) ifStmt.getPredicate().visit(this, env);
+	SMPLObject result;
+	
+	if (pred.getVal()){
+		result = ifStmt.getConsequent().visit(this, env);
+	}else{
+		result = ifStmt.getAlternative().visit(this, env);
+	}
+	return result;
+    }
+
+
+	public SMPLObject visitExpCase(ExpCase c, Environment<SMPLObject> env)
+	throws VisitException {
+	ArrayList<Exp> clauses = c.getClauses();
+	SMPLBoolean pred;
+	ExpClause cl;
+	for (Exp clause: clauses){
+		cl = (ExpClause) clause;
+		pred = (SMPLBoolean) cl.getPredicate().visit(this, env);
+		if (pred.getVal()){
+			return cl.visit(this, env);
+		}
+	}
+	return SMPL.makeInstance();
+    }
+
+	public SMPLObject visitExpClause(ExpClause c, Environment<SMPLObject> env)
+	throws VisitException {
+	return c.getConsequent().visit(this, env);
+    }
+
+
 	public SMPLObject visitExpRead(ExpRead r, Environment<SMPLObject> env)
 	throws VisitException{
 	Scanner sc = new Scanner(System.in);

@@ -7,6 +7,12 @@ public class ExpLit <Type> extends Exp {
 	val = v;
     }
 
+    public ExpLit() {
+	super("None");
+	val = null;
+    }
+
+
     public Type getVal() {
 	return val;
     }

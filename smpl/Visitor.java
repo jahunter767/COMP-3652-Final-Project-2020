@@ -28,18 +28,13 @@ public interface Visitor<S, T> {
 
     public T visitExpFunCall(ExpFunCall fc, S arg) throws VisitException;
 
-/*
-    //conditionals
-    public T visitExpConditional(ExpConditional cs, S arg) throws VisitException;
-    public T visitStmtConditionalStmt(StmtConditionalStmt cs, S arg) throws VisitException;
-    public T visitStmtConditionalElseStmt(StmtConditionalElseStmt cs, S arg) throws VisitException;
-*/
-
 
     // expressions
+    public T visitExpIf(ExpIf ifStmt, S arg) throws VisitException;
+    public T visitExpCase(ExpCase c, S arg) throws VisitException;
+    public T visitExpClause(ExpClause c, S arg) throws VisitException;
+
     public T visitExpAdd(ExpAdd exp, S arg) throws VisitException;
-
-
     public T visitExpSub(ExpSub exp, S arg) throws VisitException;
     public T visitExpMul(ExpMul exp, S arg) throws VisitException;
     public T visitExpDiv(ExpDiv exp, S arg) throws VisitException;

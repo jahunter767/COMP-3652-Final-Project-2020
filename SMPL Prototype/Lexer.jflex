@@ -120,6 +120,7 @@ CommentContent       = ( [^*] | \*+ [^/*] )*
 <YYINITIAL>	"("	{return new Symbol(sym.LPAREN);}
 <YYINITIAL>	")"	{return new Symbol(sym.RPAREN);}
 <YYINITIAL>	","	{return new Symbol(sym.COMMA);}
+<YYINITIAL>	":"	{return new Symbol(sym.COLON);}
 <YYINITIAL>	"["	{return new Symbol(sym.LSQPAREN);}
 <YYINITIAL>	"]"	{return new Symbol(sym.RSQPAREN);}
 
@@ -180,13 +181,15 @@ CommentContent       = ( [^*] | \*+ [^/*] )*
 			return new Symbol(sym.INT, new Integer(i));
 		}
 
-<YYINITIAL>    [-]{0,1}[([0-9]+\.[0-9]+) | (\.[0-9]+) | ([0-9]+\.)] {
+// FROM JASON's CODE
+<YYINITIAL>    [-]{0,1}(([0-9]+\.[0-9]+) | (\.[0-9]+) | ([0-9]+\.)) {
 			// DOUBLE
-	    	return new Symbol(sym.DOUBLE, new Double(yytext()));
+			String num = yytext().replaceAll(" ", "");
+	    	return new Symbol(sym.DOUBLE, new Double(num));
 		}
 
-<YYINITIAL>	"#t"	{return new Symbol(sym.TRUE, new String(yytext()));}
-<YYINITIAL>	"#f"	{return new Symbol(sym.FALSE, new String(yytext()));}
+<YYINITIAL>	"#t"	{return new Symbol(sym.BOOL, new Boolean(true));}
+<YYINITIAL>	"#f"	{return new Symbol(sym.BOOL, new Boolean(false));}
 
 <YYINITIAL>	"#c"{alpha}	{return new Symbol(sym.CHAR,
 						new Character(yytext().charAt(2)));}

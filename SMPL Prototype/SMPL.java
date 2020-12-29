@@ -16,8 +16,10 @@ public class SMPL {
 
 	try{
 	
-		if(Class.forName("java.lang.Number").isInstance(obj)) return new SMPLNumbers("Numbers",(Integer)obj );
+		if(Class.forName("java.lang.Integer").isInstance(obj)) return new SMPLNumbers("Numbers",(Integer)obj );
+		if(Class.forName("java.lang.Double").isInstance(obj)) return new SMPLNumbers("Numbers",(Double)obj );
 		if(Class.forName("java.lang.String").isInstance(obj)) return new SMPLString("String",(String)obj );
+		if(Class.forName("java.lang.Character").isInstance(obj)) return new SMPLCharacter("Character",(Character)obj );
 		if(Class.forName("java.lang.Boolean").isInstance(obj))return new SMPLBoolean("Boolean",(Boolean)obj );
 		if(Class.forName("Closure").isInstance(obj)) return new SMPLFunction("Func",(Closure)obj );
 		if(Class.forName("Nil").isInstance(obj)) return new SMPLNil("Nil",(Nil)obj );

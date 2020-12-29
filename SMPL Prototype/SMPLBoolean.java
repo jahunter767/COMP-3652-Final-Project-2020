@@ -31,9 +31,6 @@ public class SMPLBoolean extends SMPLObject<Boolean> {
     }
 
 
-
-
-
     public String toString(){
 	return "Type: " + getType() + "\nValue: " + getVal();
     }
@@ -43,6 +40,50 @@ public class SMPLBoolean extends SMPLObject<Boolean> {
 	return String.valueOf(getVal());
     }
 
+
+//------- FROM JASON's CODE--------
+
+    public SMPLObject and(SMPLObject object) throws TypeException {
+	if(object instanceof SMPLBoolean){
+		SMPLBoolean obj = (SMPLBoolean) object;
+        Boolean val2 = obj.getVal();
+        Boolean result = getVal().booleanValue() && val2;
+        return SMPL.makeInstance(result);
+    }else {
+		throw new TypeException();
+	}
+    }
+
+    public SMPLObject or(SMPLObject object) throws TypeException {
+	if(object instanceof SMPLBoolean){
+		SMPLBoolean obj = (SMPLBoolean) object;
+        Boolean val2 = obj.getVal();
+        Boolean result = getVal().booleanValue() || val2;
+        return SMPL.makeInstance(result);
+    }else {
+		throw new TypeException();
+	}
+    }
+
+    public SMPLObject not() throws TypeException {
+    return SMPL.makeInstance(!getVal());
+    }
+
+
+    public SMPLObject equalTo(SMPLObject object) throws TypeException {
+    if(object instanceof SMPLBoolean){
+		SMPLBoolean obj = (SMPLBoolean) object;
+		Boolean val2 = obj.getVal();
+		return SMPL.makeInstance(getVal() == val2);
+    }else {
+		return SMPL.makeInstance(false);
+	}
+    }
+
+
+
+
+//----------------------------------
 
 
 

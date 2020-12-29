@@ -56,6 +56,29 @@ public class Evaluator implements Visitor<Environment<SMPLObject>, SMPLObject> {
 	return result;
     }
 
+
+//------ FROM JASON's CODE---------
+
+	public SMPLObject visitStmtPrint(StmtPrint p, Environment<SMPLObject> env)
+	throws VisitException{
+	System.out.print(p.getExp().visit(this, env));
+	return SMPL.makeInstance();
+	}
+
+	public SMPLObject visitStmtPrintln(StmtPrintln p, Environment<SMPLObject> env)
+	throws VisitException{
+	System.out.println(p.getExp().visit(this, env));
+	return SMPL.makeInstance();
+	}
+
+
+
+
+
+
+
+//--------------------------------
+
     public SMPLObject visitStmtDefinition(StmtDefinition sd,
 				      Environment<SMPLObject> env)
 	throws VisitException {
@@ -113,6 +136,205 @@ public class Evaluator implements Visitor<Environment<SMPLObject>, SMPLObject> {
 	val2 = exp.getExpR().visit(this, env);
 	return val1.add(val2);
     }
+
+
+// ------ FROM JASON'S CODE ------
+/*
+	public SMPLObject visitExpBind(ExpBind b, Environment<SMPLObject> env)
+	throws VisitException{
+	return b.getExpr().visit(this, env);
+	}
+
+*/
+
+	public SMPLObject visitExpIf(ExpIf ifStmt, Environment<SMPLObject> env)
+	throws VisitException {
+	SMPLBoolean pred = (SMPLBoolean) ifStmt.getPredicate().visit(this, env);
+	SMPLObject result;
+	
+	if (pred.getVal()){
+		result = ifStmt.getConsequent().visit(this, env);
+	}else{
+		result = ifStmt.getAlternative().visit(this, env);
+	}
+	return result;
+    }
+
+
+	public SMPLObject visitExpCase(ExpCase c, Environment<SMPLObject> env)
+	throws VisitException {
+	ArrayList<Exp> clauses = c.getClauses();
+	SMPLBoolean pred;
+	ExpClause cl;
+	for (Exp clause: clauses){
+		cl = (ExpClause) clause;
+		pred = (SMPLBoolean) cl.getPredicate().visit(this, env);
+		if (pred.getVal()){
+			return cl.visit(this, env);
+		}
+	}
+	return SMPL.makeInstance();
+    }
+
+	public SMPLObject visitExpClause(ExpClause c, Environment<SMPLObject> env)
+	throws VisitException {
+	return c.getConsequent().visit(this, env);
+    }
+
+
+	public SMPLObject visitExpRead(ExpRead r, Environment<SMPLObject> env)
+	throws VisitException{
+	Scanner sc = new Scanner(System.in);
+	return SMPL.makeInstance(sc.next());
+	}
+
+	public SMPLObject visitExpReadInt(ExpReadInt r, Environment<SMPLObject> env)
+	throws VisitException{
+	Scanner sc = new Scanner(System.in);
+	return SMPL.makeInstance(sc.nextInt());
+	}
+
+    public SMPLObject visitExpBitwiseNot(ExpBitwiseNot exp, Environment<SMPLObject> env)
+	throws VisitException {
+	SMPLObject val1;
+	val1 = exp.getPredicate().visit(this, env);
+	return val1.bitwiseNot();
+    }
+
+    public SMPLObject visitExpBitwiseAnd(ExpBitwiseAnd exp, Environment<SMPLObject> env)
+	throws VisitException {
+	SMPLObject val1, val2;
+	val1 = exp.getExpL().visit(this, env);
+	val2 = exp.getExpR().visit(this, env);
+	return val1.bitwiseAnd(val2);
+    }
+
+    public SMPLObject visitExpBitwiseOr(ExpBitwiseOr exp, Environment<SMPLObject> env)
+	throws VisitException {
+	SMPLObject val1, val2;
+	val1 = exp.getExpL().visit(this, env);
+	val2 = exp.getExpR().visit(this, env);
+	return val1.bitwiseOr(val2);
+    }
+
+
+	public SMPLObject visitExpLess(ExpLess exp, Environment<SMPLObject> env)
+	throws VisitException {
+	SMPLObject val1, val2;
+	val1 = exp.getExpL().visit(this, env);
+	val2 = exp.getExpR().visit(this, env);
+	return val1.lessThan(val2);
+    }
+
+	public SMPLObject visitExpLessEq(ExpLessEq exp, Environment<SMPLObject> env)
+	throws VisitException {
+	SMPLObject val1, val2;
+	val1 = exp.getExpL().visit(this, env);
+	val2 = exp.getExpR().visit(this, env);
+	return val1.lessThanEq(val2);
+    }
+
+	public SMPLObject visitExpEqual(ExpEqual exp, Environment<SMPLObject> env)
+	throws VisitException {
+	SMPLObject val1, val2;
+	val1 = exp.getExpL().visit(this, env);
+	val2 = exp.getExpR().visit(this, env);
+	return val1.equalTo(val2);
+    }
+
+    public SMPLObject visitExpGreaterEq(ExpGreaterEq exp, Environment<SMPLObject> env)
+	throws VisitException {
+	SMPLObject val1, val2;
+	val1 = exp.getExpL().visit(this, env);
+	val2 = exp.getExpR().visit(this, env);
+	return val1.greaterThanEq(val2);
+    }
+
+    public SMPLObject visitExpGreater(ExpGreater exp, Environment<SMPLObject> env)
+	throws VisitException {
+	SMPLObject val1, val2;
+	val1 = exp.getExpL().visit(this, env);
+	val2 = exp.getExpR().visit(this, env);
+	return val1.greaterThan(val2);
+    }
+
+	public SMPLObject visitExpNotEqual(ExpNotEqual exp, Environment<SMPLObject> env)
+	throws VisitException {
+	SMPLObject val1, val2;
+	val1 = exp.getExpL().visit(this, env);
+	val2 = exp.getExpR().visit(this, env);
+	return val1.notEqualTo(val2);
+    }
+
+
+	public SMPLObject visitExpNot(ExpNot exp, Environment<SMPLObject> env)
+	throws VisitException {
+	SMPLObject val1;
+	val1 = exp.getPredicate().visit(this, env);
+	return val1.not();
+    }
+
+    public SMPLObject visitExpAnd(ExpAnd exp, Environment<SMPLObject> env)
+	throws VisitException {
+	SMPLObject val1, val2;
+	val1 = exp.getExpL().visit(this, env);
+	val2 = exp.getExpR().visit(this, env);
+	return val1.and(val2);
+    }
+
+    public SMPLObject visitExpOr(ExpOr exp, Environment<SMPLObject> env)
+	throws VisitException {
+	SMPLObject val1, val2;
+	val1 = exp.getExpL().visit(this, env);
+	val2 = exp.getExpR().visit(this, env);
+	return val1.or(val2);
+    }
+
+
+    public SMPLObject visitExpSub(ExpSub exp, Environment<SMPLObject> env)
+	throws VisitException {
+	SMPLObject val1, val2;
+	val1 = exp.getExpL().visit(this, env);
+	val2 = exp.getExpR().visit(this, env);
+	return val1.subtract(val2);
+    }
+
+    public SMPLObject visitExpMul(ExpMul exp, Environment<SMPLObject> env)
+	throws VisitException {
+	SMPLObject val1, val2;
+	val1 = exp.getExpL().visit(this, env);
+	val2 = exp.getExpR().visit(this, env);
+	return val1.multiply(val2);
+    }
+
+    public SMPLObject visitExpDiv(ExpDiv exp, Environment<SMPLObject> env)
+	throws VisitException {
+	SMPLObject val1, val2;
+	val1 = exp.getExpL().visit(this, env);
+	val2 = exp.getExpR().visit(this, env);
+	return val1.divide(val2);
+    }
+
+    public SMPLObject visitExpMod(ExpMod exp, Environment<SMPLObject> env)
+	throws VisitException {
+	SMPLObject val1, val2;
+	val1 = exp.getExpL().visit(this, env);
+	val2 = exp.getExpR().visit(this, env);
+	return val1.mod(val2);
+    }
+
+    public SMPLObject visitExpPow(ExpPow exp, Environment<SMPLObject> env)
+	throws VisitException {
+	SMPLObject val1, val2;
+	val1 = exp.getExpL().visit(this, env);
+	val2 = exp.getExpR().visit(this, env);
+	return val1.pow(val2);
+    }
+
+
+
+
+//------------------------
 
 
     public SMPLObject visitSubstr(Substr exp, Environment<SMPLObject> env)

@@ -1,0 +1,11 @@
+def foldr proc(op, base, lst){
+/* fold right LST using binary operator OP
+and base value BASE */
+if lst = #e
+then base
+else op(car(lst),
+foldr(op, base, cdr(lst)));
+
+}
+
+foldr(proc(x,y){x - y;},0,[1,2,3,4]); //-2

@@ -1,6 +1,6 @@
 1;
 
-"1"
+"1";
 
 1 + 1;
 
@@ -21,9 +21,9 @@ not bool or bool;
 
 not (not bool and bool);
 
-def result if #t then { if 5 > 10 % 2 then {"true"} else #f;} else #cC;
+def result if #t then { if 5 > 10 % 2 then {"true";} else #f;} else #cC;
 
-def name "Hello world"
+def name "Hello world";
 
 num1 - num2;
 num2 / num1;

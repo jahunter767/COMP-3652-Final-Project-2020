@@ -209,6 +209,7 @@ public class Environment<T> {
      * this environment.
      * @exception Exception if <code>id</code> is unbound
      */
+
     public T get(String id) throws UnboundVarException {
 	T result = dictionary.get(id);
 	if (result == null)
@@ -233,6 +234,25 @@ public class Environment<T> {
     }
 
 */
+
+
+// ------ FROM JASON's CODE --------
+
+    public void update(String id, T value) throws UnboundVarException {
+	T result = dictionary.get(id);
+	if (result == null){
+	    if (parent == null){
+    		throw new UnboundVarException(id);
+        }else{
+            parent.update(id, value);
+        }
+    }else{
+        dictionary.replace(id, value);
+    }
+    }
+
+
+//----------------------------------
 
     /**
      * Create a string representation of this environment.

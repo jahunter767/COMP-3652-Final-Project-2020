@@ -54,6 +54,7 @@ public interface Visitor<S, T> {
 
     public T visitExpPair(ExpPair exp, S arg) throws VisitException;
     public T visitExpList(ExpList exp, S arg) throws VisitException;
+    public T visitExpListConcat(ExpListConcat exp, S arg) throws VisitException;
 
     public T visitCar(Car exp, S arg) throws VisitException;
     public T visitCdr(Cdr exp, S arg) throws VisitException;

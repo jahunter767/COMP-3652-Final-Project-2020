@@ -1,3 +1,4 @@
+// basic operations
 1;
 
 "1";
@@ -11,6 +12,15 @@ def num2 20;
 
 def sum num1 + num2;
 
+
+num1 - num2;
+num2 / num1;
+num1 * num2;
+num1 % num2;
+num1 ^ 2;
+
+// boolean and bitwise
+
 def bool pair?(pair(num1,num2));
 
 bool and bool;
@@ -21,17 +31,26 @@ not bool or bool;
 
 not (not bool and bool);
 
+def a 10;
+
+def b 5;
+
+def c 20;
+
+def d -10;
+
+ ~ d; // 9
+ ~ a; // -11
+
+a < b and a < c; //false && true = false 
+// a < b & a < c;//false & true = false - omitted
+
+// conditionals
+
 def result if #t then { if 5 > 10 % 2 then {"true";} else #f;} else #cC;
 
+// String
 def name "Hello world";
-
-num1 - num2;
-num2 / num1;
-num1 * num2;
-num1 % num2;
-num1 ^ 2;
-
-
 
 name;
 

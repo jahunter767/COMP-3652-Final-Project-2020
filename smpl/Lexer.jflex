@@ -148,7 +148,7 @@ CommentContent       = ( [^*] | \*+ [^/*] )*
 
 <YYINITIAL>	"[:"	{return new Symbol(sym.VECT_OPEN);}
 <YYINITIAL>	":]"	{return new Symbol(sym.VECT_CLOSE);}
-<YYINITIAL>	"size"	{return new Symbol(sym.SIZE);} // REMEMBER THIS IS REASSIGNABLE BY THE USER
+//<YYINITIAL>	"size"	{return new Symbol(sym.SIZE);} // REMEMBER THIS IS REASSIGNABLE BY THE USER
 
 /* REMEMBER THESE ARE REASSIGNABLE BY THE USER */
 //<YYINITIAL>	"eqv?"	{return new Symbol(sym.EQUIV_PRED);}

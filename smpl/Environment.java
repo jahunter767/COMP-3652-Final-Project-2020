@@ -175,6 +175,15 @@ public class Environment<T> {
 	result.put("cdr", (b) cdr);
 
 
+    // ----- BULTIN METHOD FOR SIZE -----
+	ArrayList<String> sizeParameters = new ArrayList<String>();
+	sizeParameters.add("sizeObj");
+	body = new StmtSequence(new Statement(new Size(new ExpVar("sizeObj"))));
+	fd = new StmtFunDefn(sizeParameters, body);
+	closure = new Closure(fd,result);
+	SMPLObject size = SMPL.makeInstance(closure);
+	result.put("size", (b) size);
+
 
 	// ----- BULTIN METHOD FOR LIST -----
 	// to be implemented when functions can accept any number of inputs

@@ -1,3 +1,5 @@
+import java.util.ArrayList;
+
 public class SMPLList extends SMPLObject<List> {
 
     public SMPLList(String type, List val) {
@@ -12,29 +14,63 @@ public class SMPLList extends SMPLObject<List> {
 	return getVal().getFirstEl(); // [1,[2,[3,[4,nil]]]]
     }
 
-    public SMPLObject cdr() throws TypeException {
+    public SMPLObject cdr() throws TypeException {// RETURNS A LIST!
 	if (isType("Nil", getVal().getSecondEl().getType())) return getVal().getSecondEl();// [1,nill] returns a nill object
-	return makeLst();	//((SMPLPair)getVal().getSecondEl()).car();// [1,[2,nill]]
+	return getRestofLst();	//((SMPLPair)getVal().getSecondEl()).car();// [1,[2,nill]]
     }
 
+/*
+	-- obsolete --
 
     private SMPLObject makeLst(){
 	if (isType("Nil", getVal().getSecondEl().getType())) return getVal().getSecondEl();// [1,nill] returns a nill object
+	SMPLPair pair = getRestofLst(); // get pair
+	
 	return SMPL.makeInstance(new List(((SMPLPair)getVal().getSecondEl()).getVal(),length()));// return a pair [1,[2,nill]] -> [2,nill]
     }
 
+*/
 
 
 
-// This method should be adjusted to check return list and not pairs
-    private SMPLObject getRestofLst() throws TypeException {//
-	if (isType("Nil", getVal().getSecondEl().getType())) return getVal().getSecondEl();// [1,nill] 
-	return (SMPLPair) getVal().getSecondEl();// [1,[2,[3,[4,nil]]]] => [2,[3,[4,nill]]]
+// This method should be adjusted to check return list and not pairs - check.
+    private SMPLObject getRestofLst() throws TypeException {
+	if (isType("Nil", getVal().getSecondEl().getType())) return getVal().getSecondEl();// [1,nill]
+	
+	Pair pair = ((SMPLPair) getVal().getSecondEl()).getVal();// [1,[2,[3,[4,nil]]]] => [2,[3,[4,nill]]]
+	
+	ArrayList<SMPLObject> elements = getVal().getElements();
+
+	return SMPL.makeInstance(new List(pair,length(),elements));
+
     }
 
     public int length(){
 	return getVal().length();
     }
+
+
+    public SMPLObject concat(SMPLObject arg1) throws TypeException{
+	if(isEqualType(arg1.getType())){
+		SMPLList otherlst = (SMPLList)arg1;
+
+		ArrayList<SMPLObject> mergedEl = (ArrayList)getVal().getElements().clone(); // just to ensure that I not modify the og list
+    		ArrayList<SMPLObject> otherEl = (ArrayList)otherlst.getVal().getElements().clone();
+		
+		mergedEl.addAll(otherEl);
+		
+		return SMPL.makeInstance(new List(mergedEl));
+	} else {
+		
+		throw new TypeException();
+	}
+
+    }
+
+
+
+
+
 
 
 

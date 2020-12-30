@@ -437,6 +437,14 @@ public class Evaluator implements Visitor<Environment<SMPLObject>, SMPLObject> {
 	return SMPL.makeInstance(new Pair(obj1,obj2));
     }
 
+    public SMPLObject visitExpListConcat(ExpListConcat exp, Environment<SMPLObject> env)
+	throws VisitException {
+	SMPLObject obj1, obj2;
+	obj1 = exp.getExpL().visit(this, env);
+	obj2 = exp.getExpR().visit(this, env);
+	return obj1.concat(obj2);
+    }
+
 
     public SMPLObject visitExpList(ExpList lst, Environment<SMPLObject> env)
 	throws VisitException{

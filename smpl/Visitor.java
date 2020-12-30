@@ -23,6 +23,8 @@ public interface Visitor<S, T> {
 
     public T visitStmtDefinition(StmtDefinition sd, S arg) throws VisitException;
 
+    public T visitStmtAssignment(StmtAssignment sa, S arg) throws VisitException;
+
 
     public T visitStmtFunDefn(StmtFunDefn fd, S arg) throws VisitException;
 
@@ -33,6 +35,9 @@ public interface Visitor<S, T> {
     public T visitExpIf(ExpIf ifStmt, S arg) throws VisitException;
     public T visitExpCase(ExpCase c, S arg) throws VisitException;
     public T visitExpClause(ExpClause c, S arg) throws VisitException;
+
+    public T visitExpLet(ExpLet l, S arg) throws VisitException;
+    public T visitExpBind(ExpBind b, S arg) throws VisitException;
 
     public T visitExpAdd(ExpAdd exp, S arg) throws VisitException;
     public T visitExpSub(ExpSub exp, S arg) throws VisitException;
@@ -62,6 +67,15 @@ public interface Visitor<S, T> {
 
     public T visitExpRead(ExpRead r, S arg) throws VisitException;
     public T visitExpReadInt(ExpReadInt r, S arg) throws VisitException;
+
+
+    public T visitExpVector(ExpVector exp, S arg) throws VisitException;
+    public T visitSize(Size exp, S arg) throws VisitException;
+    public T visitExpGetVectEl(ExpGetVectEl exp, S arg) throws VisitException;
+    public T visitExpPopVectEl(ExpPopVectEl exp, S arg) throws VisitException;
+    public T visitExpSetVectEl(ExpSetVectEl exp, S arg) throws VisitException;
+
+
 
 
     // bitwise expressions

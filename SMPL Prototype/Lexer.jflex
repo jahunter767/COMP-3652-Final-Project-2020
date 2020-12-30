@@ -95,7 +95,7 @@ CommentContent       = ( [^*] | \*+ [^/*] )*
 
 <YYINITIAL>	" < "	{return new Symbol(sym.LESS);}
 <YYINITIAL>	" <= "	{return new Symbol(sym.LESSEQ);}
-<YYINITIAL>	" == "	{return new Symbol(sym.EQUAL);}
+<YYINITIAL>	" = "	{return new Symbol(sym.EQUAL);}
 <YYINITIAL>	" >= "	{return new Symbol(sym.GREATEREQ);}
 <YYINITIAL>	" > "	{return new Symbol(sym.GREATER);}
 <YYINITIAL>	" != "	{return new Symbol(sym.NEQUAL);}
@@ -130,7 +130,6 @@ CommentContent       = ( [^*] | \*+ [^/*] )*
 <YYINITIAL>	"call"	{return new Symbol(sym.CALL);}
 
 <YYINITIAL>	"let"	{return new Symbol(sym.LET);}
-<YYINITIAL>	" = "	{return new Symbol(sym.BIND);}
 
 <YYINITIAL> "if" {return new Symbol(sym.IF);}
 <YYINITIAL> "then" {return new Symbol(sym.THEN);}
@@ -196,6 +195,8 @@ CommentContent       = ( [^*] | \*+ [^/*] )*
 <YYINITIAL>	"#u"{hex}{4}	{int code = Integer.parseInt(yytext().substring(2), 16);
 							char[] c = Character.toChars(code);
 							return new Symbol(sym.CHAR, new Character(c[0]));}
+
+<YYINITIAL>	"#e"	{return new Symbol(sym.NIL);}
 
 <YYINITIAL>  {Comment}      { /* ignore */ }
 

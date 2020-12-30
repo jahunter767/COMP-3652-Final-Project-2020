@@ -91,7 +91,7 @@ public abstract class SMPLObject<T> {
     }
 
     public SMPLObject equalTo(SMPLObject object) throws TypeException {
-	throw new TypeException();
+	return Equal(object);
     }
 
     public SMPLObject greaterThanEq(SMPLObject object) throws TypeException {
@@ -138,6 +138,22 @@ public abstract class SMPLObject<T> {
     }
 
 
+
+    public SMPLObject set(SMPLObject index, SMPLObject val) throws TypeException, VectorException  {
+	throw new TypeException();
+    }
+
+    public SMPLObject get(SMPLObject index) throws TypeException, VectorException {
+	throw new TypeException();
+    }
+
+    public SMPLObject pop(SMPLObject index) throws TypeException, VectorException  {
+	throw new TypeException();
+    }
+
+    public SMPLObject size() throws TypeException {
+	throw new TypeException();
+    }
 
 
 

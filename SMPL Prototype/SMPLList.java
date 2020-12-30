@@ -14,9 +14,19 @@ public class SMPLList extends SMPLObject<List> {
 
     public SMPLObject cdr() throws TypeException {
 	if (isType("Nil", getVal().getSecondEl().getType())) return getVal().getSecondEl();// [1,nill] returns a nill object
-	return getRestofLst().car();//((SMPLPair)getVal().getSecondEl()).car();// [1,[2,nill]]
+	return makeLst();	//((SMPLPair)getVal().getSecondEl()).car();// [1,[2,nill]]
     }
 
+
+    private SMPLObject makeLst(){
+	if (isType("Nil", getVal().getSecondEl().getType())) return getVal().getSecondEl();// [1,nill] returns a nill object
+	return SMPL.makeInstance(new List(((SMPLPair)getVal().getSecondEl()).getVal(),length()));// return a pair [1,[2,nill]] -> [2,nill]
+    }
+
+
+
+
+// This method should be adjusted to check return list and not pairs
     private SMPLObject getRestofLst() throws TypeException {//
 	if (isType("Nil", getVal().getSecondEl().getType())) return getVal().getSecondEl();// [1,nill] 
 	return (SMPLPair) getVal().getSecondEl();// [1,[2,[3,[4,nil]]]] => [2,[3,[4,nill]]]

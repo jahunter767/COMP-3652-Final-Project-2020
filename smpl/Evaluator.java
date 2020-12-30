@@ -89,6 +89,14 @@ public class Evaluator implements Visitor<Environment<SMPLObject>, SMPLObject> {
     }
 
 
+	public SMPLObject visitStmtAssignment(StmtAssignment sa, Environment<SMPLObject> env)
+	throws VisitException {
+	SMPLObject result;
+	result = sa.getExp().visit(this, env);
+	env.update(sa.getVar(), result);
+	return SMPL.makeInstance();
+    }
+
 
     public SMPLObject visitStmtFunDefn(StmtFunDefn fd, Environment<SMPLObject> env)
 	throws VisitException {
@@ -139,13 +147,26 @@ public class Evaluator implements Visitor<Environment<SMPLObject>, SMPLObject> {
 
 
 // ------ FROM JASON'S CODE ------
-/*
+
+	public SMPLObject visitExpLet(ExpLet l, Environment<SMPLObject> env)
+	throws VisitException{
+	ArrayList<ExpBind> bindLst = l.getBindings();
+	ArrayList<String> ids = new ArrayList<String>();
+	ArrayList<SMPLObject> values = new ArrayList<SMPLObject>();
+	for (ExpBind b: bindLst){
+		ids.add(b.getName());
+		values.add(b.visit(this, env));
+	}
+	Environment<SMPLObject> newEnv = new Environment<SMPLObject>(env, ids, values);
+	return l.getBody().visit(this, newEnv);
+	}
+
+
 	public SMPLObject visitExpBind(ExpBind b, Environment<SMPLObject> env)
 	throws VisitException{
 	return b.getExpr().visit(this, env);
 	}
 
-*/
 
 	public SMPLObject visitExpIf(ExpIf ifStmt, Environment<SMPLObject> env)
 	throws VisitException {
@@ -331,6 +352,50 @@ public class Evaluator implements Visitor<Environment<SMPLObject>, SMPLObject> {
 	return val1.pow(val2);
     }
 
+
+    public SMPLObject visitExpVector(ExpVector vect, Environment<SMPLObject> env)
+	throws VisitException{
+	ArrayList<SMPLObject> args = new ArrayList<>();
+	ArrayList<Exp> exp = vect.getVal();	
+	for(int i = 0; i < exp.size(); i++){
+		args.add(exp.get(i).visit(this, env));
+	}
+	return SMPL.makeInstance(new Vector(args));
+    }
+
+	public SMPLObject visitSize(Size exp, Environment<SMPLObject> env)
+	throws VisitException{
+	SMPLObject arg = exp.getArg1().visit(this,env);
+	return arg.size();
+    }
+
+	public SMPLObject visitExpGetVectEl(ExpGetVectEl exp, Environment<SMPLObject> env)
+	throws VisitException{
+	SMPLObject vect;
+	SMPLObject index;
+	vect = env.get(exp.getId());
+	index = exp.getIndex().visit(this, env);
+	return vect.get(index);
+    }
+
+	public SMPLObject visitExpPopVectEl(ExpPopVectEl exp, Environment<SMPLObject> env)
+	throws VisitException{
+	SMPLObject vect;
+	SMPLObject index;
+	vect = env.get(exp.getId());
+	index = exp.getIndex().visit(this, env);
+	return vect.pop(index);
+    }
+
+	public SMPLObject visitExpSetVectEl(ExpSetVectEl exp, Environment<SMPLObject> env)
+	throws VisitException{
+	SMPLVector vect;
+	SMPLObject index, val;
+	vect = (SMPLVector) env.get(exp.getId());
+	index = exp.getIndex().visit(this, env);
+	val = exp.getValue().visit(this, env);
+	return vect.set(index, val);
+    }
 
 
 

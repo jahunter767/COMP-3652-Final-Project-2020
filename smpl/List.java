@@ -14,6 +14,13 @@ public class List{
 
     }
 
+    public List(Pair pair, int length) { // this constructor is when creating a new list from an existing list
+	this.el = SMPL.makeInstance();
+	this.pair = pair;
+	this.len = length - 1;
+
+    }
+
 
     public List(ArrayList<SMPLObject> Args) {
 	this.len = Args.size();
@@ -39,7 +46,7 @@ public class List{
 			element = next;
 		}
 		
-		this.pair = element; // a sequence of pairs
+		this.pair = element; // a sequence of pairs 
 	
 	}
 
@@ -47,11 +54,11 @@ public class List{
 
 
     public SMPLObject getFirstEl(){
-	return this.pair.getFirstEl();
+	return this.pair.getFirstEl(); // [Val,another pair in the form of a SMPLPair] -> return val
     }
 
     public SMPLObject getSecondEl(){
-	return this.pair.getSecondEl();
+	return this.pair.getSecondEl(); // [Val,another pair] -> return another pair or nill SMPL instance if empty
     }
 
     public int length(){

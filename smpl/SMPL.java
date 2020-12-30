@@ -25,6 +25,7 @@ public class SMPL {
 		if(Class.forName("Nil").isInstance(obj)) return new SMPLNil("Nil",(Nil)obj );
 		if(Class.forName("Pair").isInstance(obj)) return new SMPLPair("Pair",(Pair)obj );
 		if(Class.forName("List").isInstance(obj)) return new SMPLList("List",(List)obj );
+		if(Class.forName("Vector").isInstance(obj)) return new SMPLVector("Vector",(Vector)obj );
 
 
 	}catch(ClassNotFoundException ex) { 

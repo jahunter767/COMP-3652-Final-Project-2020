@@ -16,6 +16,6 @@ public class ExpVector extends Exp {
     }
 
     public String toString() {
-	return getName() + "(" + getExpL().toString() + ","  + getExpR().toString() +  ")";
+	return getName() + "[]";
     }
 }

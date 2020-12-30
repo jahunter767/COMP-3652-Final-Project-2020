@@ -51,6 +51,9 @@ public interface Visitor<S, T> {
     public T visitExpGetVectEl(ExpGetVectEl exp, S arg) throws VisitException;
     public T visitExpSetVectEl(ExpSetVectEl exp, S arg) throws VisitException;
 
+    public T visitEqual(Equal exp, S arg) throws VisitException;
+    public T visitEqv(Eqv exp, S arg) throws VisitException;
+
     // bitwise expressions
     public T visitExpBitwiseNot(ExpBitwiseNot exp, S arg) throws VisitException;
     public T visitExpBitwiseAnd(ExpBitwiseAnd exp, S arg) throws VisitException;

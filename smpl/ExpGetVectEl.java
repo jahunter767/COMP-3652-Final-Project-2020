@@ -1,14 +1,14 @@
 public class ExpGetVectEl extends Exp {
 
-    String id;
+    Exp vect;
 
-    public ExpGetVectEl(String id, Exp index) {
+    public ExpGetVectEl(Exp v, Exp index) {
     super("vectorAccess", index);
-    this.id = id;
+    this.vect = v;
     }
 
-    public String getId(){
-    return id;
+    public Exp getVect(){
+    return this.vect;
     }
 
     public Exp getIndex(){
@@ -19,5 +19,8 @@ public class ExpGetVectEl extends Exp {
 	return v.visitExpGetVectEl(this, arg);
     }
 
+    public String toString(){
+    return "VectorAccess :" + getVect().toString();
+    }
 }
 

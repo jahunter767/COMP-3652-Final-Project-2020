@@ -18,7 +18,7 @@ public class Vector{
     }
 
     public void set(int i, SMPLObject el){
-	return this.vect.set(i, el);
+	this.vect.set(i, el);
     }
 
     public int length(){

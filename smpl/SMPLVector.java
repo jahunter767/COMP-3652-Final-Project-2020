@@ -56,12 +56,14 @@ public class SMPLVector extends SMPLObject<Vector> {
     }
 
 
-    public void set(SMPLObject index, SMPLObject val) throws TypeException, IndexOutOfBoundsException {
-	getVal().set(index.getIntVal(), val);
+    public SMPLObject set(SMPLObject index, SMPLObject val) throws TypeException, IndexOutOfBoundsException {
+    SMPLNumbers i = (SMPLNumbers) index;
+    getVal().set(i.getIntVal(), val);
+    return SMPL.makeInstance(null);
     }
 
     public SMPLObject size() throws TypeException {
-	return SMPL.makeInstance(length);
+	return SMPL.makeInstance(length());
     }
 
 

@@ -12,7 +12,7 @@ public class Evaluator implements Visitor<Environment<SMPLObject>, SMPLObject> {
     private Class<SMPLObject> myClass;
 
     protected Evaluator(){
-	this(SMPL.makeInstance("none", null));
+	this(SMPL.makeInstance(null));
     }
 
     public Evaluator(SMPLObject defaultVal) {
@@ -69,7 +69,7 @@ public class Evaluator implements Visitor<Environment<SMPLObject>, SMPLObject> {
 	SMPLObject result;
 	result = sd.getExp().visit(this, env);
 	env.put(sd.getVar(), result);
-	return SMPL.makeInstance("none", null);
+	return SMPL.makeInstance(null);
     }
 
 	public SMPLObject visitStmtAssignment(StmtAssignment sa,
@@ -78,34 +78,34 @@ public class Evaluator implements Visitor<Environment<SMPLObject>, SMPLObject> {
 	SMPLObject result;
 	result = sa.getExp().visit(this, env);
 	env.update(sa.getVar(), result);
-	return SMPL.makeInstance("none", null);
+	return SMPL.makeInstance(null);
     }
 
 
 	public SMPLObject visitStmtPrint(StmtPrint p, Environment<SMPLObject> env)
 	throws VisitException{
 	System.out.print(p.getExp().visit(this, env));
-	return SMPL.makeInstance("none", null);
+	return SMPL.makeInstance(null);
 	}
 
 	public SMPLObject visitStmtPrintln(StmtPrintln p, Environment<SMPLObject> env)
 	throws VisitException{
 	System.out.println(p.getExp().visit(this, env));
-	return SMPL.makeInstance("none", null);
+	return SMPL.makeInstance(null);
 	}
 
 
     public SMPLObject visitStmtFunDefn(StmtFunDefn fd, Environment<SMPLObject> env)
 	throws VisitException {
 	Closure closure = new Closure(fd,env);// wrap function in a closure
-	SMPLObject f = SMPL.makeInstance("function", closure); //wrap that closure in SMPLFunc 
+	SMPLObject f = SMPL.makeInstance(closure); //wrap that closure in SMPLFunc 
 	// to be implemented
 	return f; // return that SMPLFunc
     }
 
     public SMPLObject visitExpFunCall(ExpFunCall fc, Environment<SMPLObject> env)
 	throws VisitException, MismatchedParamsException {
-	SMPLFunction Func = (SMPLFunction) env.get(fc.getName());
+	SMPLFunction Func = (SMPLFunction) fc.getFunction().visit(this, env);
 	Closure c = Func.getClosure();
 	StmtFunDefn myFunc = c.getFunction();
 	ArrayList<String> params = myFunc.getParams(); // getParam is within the function defintion
@@ -133,7 +133,7 @@ public class Evaluator implements Visitor<Environment<SMPLObject>, SMPLObject> {
 		for (i = paramCount; i < argCount; i++){
 			argOvf.add(arguements.get(i).visit(this, env));
 		}
-		newEnv.put(paramOvf, SMPL.makeInstance("list", argOvf));
+		newEnv.put(paramOvf, SMPL.makeInstance(new List(argOvf)));
 	}
 
 	return myFunc.getBody().visit(this, newEnv);
@@ -180,7 +180,7 @@ public class Evaluator implements Visitor<Environment<SMPLObject>, SMPLObject> {
 		for (i = paramCount; i < argCount; i++){
 			argOvf.add(arguements.get(i));
 		}
-		newEnv.put(paramOvf, SMPL.makeInstance("list", argOvf));
+		newEnv.put(paramOvf, SMPL.makeInstance(new List(argOvf)));
 	}
 
 	return myFunc.getBody().visit(this, newEnv);
@@ -212,7 +212,7 @@ public class Evaluator implements Visitor<Environment<SMPLObject>, SMPLObject> {
 			return cl.visit(this, env);
 		}
 	}
-	return SMPL.makeInstance("none", null);
+	return SMPL.makeInstance(null);
     }
 
 	public SMPLObject visitExpClause(ExpClause c, Environment<SMPLObject> env)
@@ -243,13 +243,13 @@ public class Evaluator implements Visitor<Environment<SMPLObject>, SMPLObject> {
 	public SMPLObject visitExpRead(ExpRead r, Environment<SMPLObject> env)
 	throws VisitException{
 	Scanner sc = new Scanner(System.in);
-	return SMPL.makeInstance("string", sc.next());
+	return SMPL.makeInstance(sc.next());
 	}
 
 	public SMPLObject visitExpReadInt(ExpReadInt r, Environment<SMPLObject> env)
 	throws VisitException{
 	Scanner sc = new Scanner(System.in);
-	return SMPL.makeInstance("number", new Double(sc.nextInt()));
+	return SMPL.makeInstance(new Double(sc.nextInt()));
 	}
 
 
@@ -307,7 +307,7 @@ public class Evaluator implements Visitor<Environment<SMPLObject>, SMPLObject> {
 
 	public SMPLObject visitSize(Size exp, Environment<SMPLObject> env)
 	throws VisitException{
-	SMPLVector arg = (SMPLVector) env.get(exp.getArg1());
+	SMPLVector arg = (SMPLVector) exp.getArg1().visit(this, env);
 	return arg.size();
     }
 
@@ -315,7 +315,7 @@ public class Evaluator implements Visitor<Environment<SMPLObject>, SMPLObject> {
 	throws VisitException{
 	SMPLVector vect;
 	SMPLObject index;
-	vect = (SMPLVector) env.get(exp.getId());
+	vect = (SMPLVector) exp.getVect().visit(this, env);
 	index = exp.getIndex().visit(this, env);
 	return vect.get(index);
     }
@@ -324,10 +324,27 @@ public class Evaluator implements Visitor<Environment<SMPLObject>, SMPLObject> {
 	throws VisitException{
 	SMPLVector vect;
 	SMPLObject index, val;
-	vect = (SMPLVector) env.get(exp.getId());
+	vect = (SMPLVector) exp.getVect().visit(this, env);
 	index = exp.getIndex().visit(this, env);
 	val = exp.getValue().visit(this, env);
 	return vect.set(index, val);
+    }
+
+
+	public SMPLObject visitEqual(Equal exp, Environment<SMPLObject> env)
+	throws VisitException{
+	SMPLObject val1, val2;
+	val1 = exp.getArg1().visit(this, env);
+	val2 = exp.getArg2().visit(this, env);
+	return val1.equalTo(val2);
+    }
+
+	public SMPLObject visitEqv(Eqv exp, Environment<SMPLObject> env)
+	throws VisitException{
+	SMPLObject val1, val2;
+	val1 = exp.getArg1().visit(this, env);
+	val2 = exp.getArg2().visit(this, env);
+	return val1.eqv(val2);
     }
 
 
@@ -479,7 +496,7 @@ public class Evaluator implements Visitor<Environment<SMPLObject>, SMPLObject> {
 
     public SMPLObject visitExpLit(ExpLit exp, Environment<SMPLObject> env)
 	throws VisitException {
-	return SMPL.makeInstance(exp); // returns the SMPL object
+	return SMPL.makeInstance(exp.getVal()); // returns the SMPL object
     }
 
     public SMPLObject visitExpVar(ExpVar exp, Environment<SMPLObject> env)

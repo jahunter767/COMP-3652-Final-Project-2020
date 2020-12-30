@@ -141,7 +141,7 @@ public class Environment<T> {
 
     // ----- BULTIN METHOD FOR SIZE -----
 	ArrayList<String> sizeParameters = new ArrayList<String>();
-	cdrParameters.add("sizeObj");
+	sizeParameters.add("sizeObj");
 	body = new StmtSequence(new Statement(new Size(new ExpVar("sizeObj"))));
 	fd = new StmtFunDefn(sizeParameters, body);
 	closure = new Closure(fd,result);

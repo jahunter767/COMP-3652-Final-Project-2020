@@ -1,13 +1,10 @@
 public class Size extends Exp {
 
-    String id;
-
-    public Size(String id) {
-    super("size");
-    this.id = id;
+    public Size(Exp e) {
+    super("size", e);
     }
 
-    public String getArg1() {
+    public Exp getArg1() {
 	return (Exp) getSubTree(0);
     }
 

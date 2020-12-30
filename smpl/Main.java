@@ -57,7 +57,7 @@ public class Main {
 	    PersistentWalker<?, ?> walker;	// to be set by switch statement
 	    if (walkerName.equals("")) {
 		walker = new PersistentWalker<Environment<SMPLObject>, SMPLObject>
-		    (new Evaluator(SMPL.makeInstance("none", null)));
+		    (new Evaluator(SMPL.makeInstance(null)));
 	    } else {
 		Class<? extends Visitor<S, T>> wclass =
 		    (Class<? extends Visitor<S, T>>) Class.forName(walkerName);

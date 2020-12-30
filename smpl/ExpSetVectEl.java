@@ -1,14 +1,14 @@
 public class ExpSetVectEl extends Exp {
 
-    String id;
+    Exp vect;
 
-    public ExpSetVectEl(String id, Exp index, Exp val) {
-    super("vectorAccess", index, val);
-    this.id = id;
+    public ExpSetVectEl(Exp v, Exp index, Exp val) {
+    super("vectorMutation", index, val);
+    this.vect = v;
     }
 
-    public String getId(){
-    return id;
+    public Exp getVect(){
+    return this.vect;
     }
 
     public Exp getIndex(){
@@ -21,6 +21,10 @@ public class ExpSetVectEl extends Exp {
 
     public <S, T> T visit(Visitor<S,T> v, S arg) throws VisitException {
 	return v.visitExpSetVectEl(this, arg);
+    }
+
+    public String toString(){
+    return "VectorMutation :" + getVect().toString();
     }
 
 }

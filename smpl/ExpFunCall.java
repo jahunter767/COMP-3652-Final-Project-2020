@@ -7,15 +7,15 @@ public class ExpFunCall extends Exp {
     
     // Implement this class
 
-    String name;
+    Exp func;
 
-    protected ExpFunCall(String funName, ArrayList<Exp> args) {	// placeholder; can be removed eventually
+    protected ExpFunCall(Exp func, ArrayList<Exp> args) {	// placeholder; can be removed eventually
     super("call", args);
-    this.name = funName;
+    this.func = func;
     }
 
-    public String getName(){
-    return this.name;
+    public Exp getFunction(){
+    return this.func;
     }
 
     public ArrayList<Exp> getArgs(){

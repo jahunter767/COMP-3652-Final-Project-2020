@@ -120,12 +120,11 @@ non terminal ArrayList<Exp> argListE;
 
 non terminal Exp read;
 
-non terminal ExpLit list;
+non terminal ExpList list;
 non terminal ArrayList<Exp> pairElementLst;
 
-non terminal ExpLit vector;
+non terminal ExpVector vector;
 non terminal ArrayList<Exp> vectorElementLst;
-non terminal Exp vectorOps;
 
 non terminal empty;
 
@@ -149,9 +148,13 @@ print ::= PRINT LPAREN expression:e RPAREN {: RESULT = new StmtPrint(e); :} |
 		PRINTLN LPAREN expression:e RPAREN {: RESULT = new StmtPrintln(e); :};
 
 
-definition ::= DEF VAR:v expression:e SEMI {: RESULT = new StmtDefinition(v, e); :};
+definition ::= DEF VAR:v expression:e SEMI {: 
+					RESULT = new StmtDefinition(v, e); :};
 
-assignment ::= VAR:v ASSIGN  expression:e SEMI {: RESULT = new StmtAssignment(v, e); :};
+assignment ::= VAR:v ASSIGN  expression:e SEMI {:
+					RESULT = new StmtAssignment(v, e); :} |
+				expression:v LSQPAREN expression:i RSQPAREN ASSIGN expression:e {:
+					RESULT = new ExpSetVectEl(v, i, e); :};
 
 
 body ::= compoundExpr:sList {: RESULT = sList; :} |
@@ -221,7 +224,8 @@ lit ::= let:l {: RESULT = l; :} |
 		LPAREN expression:e RPAREN {: RESULT = e; :} |
 		VAR:var {: RESULT = new ExpVar(var); :} |
 		vector:vect {: RESULT = vect; :} |
-		vectorOps:v {: RESULT = v; :} |
+		expression:v LSQPAREN expression:i RSQPAREN {:
+				RESULT = new ExpGetVectEl(v, i); :} |
 		list:lst {: RESULT = lst; :} |
 		NIL {: RESULT = new ExpLit("nil"); :} |
 		INT:ilit {: RESULT = new ExpLit("number", ilit); :} |
@@ -286,8 +290,8 @@ else  ::= ELSE compoundExpr:alt {: RESULT = alt; :} |
 
 funCall ::= CALL LPAREN expression:f COMMA expression:lst RPAREN {:
 				RESULT = new ExpCall(f, lst); :} |
-			VAR:v LPAREN argListE:aListE RPAREN {:
-				RESULT = new ExpFunCall(v, aListE); :};
+			expression:f LPAREN argListE:aListE RPAREN {:
+				RESULT = new ExpFunCall(f, aListE); :};
 
 argList ::= argList:aList COMMA expression:e {:
 				aList.add(e);
@@ -327,11 +331,6 @@ vectorElementLst ::= vectorElementLst:lst COMMA expression:e {:
 			ArrayList<Exp> lst = new ArrayList<Exp>();
 			lst.add(e);
 			RESULT = lst; :};
-
-vectorOp ::= VAR:v LSQPAREN expression:i RSQPAREN {:
-				RESULT = new ExpGetVectEl(v, i); :} |
-			VAR:v LSQPAREN expression:i RSQPAREN ASSIGN expression:e {:
-				RESULT = new ExpSetVectEl(v, i, e); :};
 
 
 empty ::= ;

@@ -123,11 +123,11 @@ public abstract class SMPLObject<T>{
 	throw new TypeException();
     }
 
-    public void set(SMPLObject index, SMPLObject val) throws TypeException, IndexOutOfBoundsException {
+    public SMPLObject set(SMPLObject index, SMPLObject val) throws TypeException, IndexOutOfBoundsException {
 	throw new TypeException();
     }
 
-    public void size() throws TypeException {
+    public SMPLObject size() throws TypeException {
 	throw new TypeException();
     }
 

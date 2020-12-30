@@ -103,7 +103,8 @@ public class ToScheme implements Visitor<Void, String> {
     public String visitExpFunCall(ExpFunCall fc, Void arg)
 	throws VisitException {
 	ArrayList<Exp> args = fc.getArgs();
-	String result = "(call " + fc.getName() + " (args " + args.remove(0).toString();
+	String result = "(call " + fc.getFunction().visit(this, arg) +
+			" (args " + args.remove(0).toString();
 	for (Exp a : args){
 		result = result + " " + a.toString();
 	}
@@ -115,7 +116,8 @@ public class ToScheme implements Visitor<Void, String> {
 	throws VisitException {
 	Exp args = fc.getArgs();
 	Exp body = fc.getFunction();
-	String result = "(call " + body.visit(this, arg) + "(args " + args.visit(this, arg) + ") )";
+	String result = "(call " + body.visit(this, arg) +
+			"(args " + args.visit(this, arg) + ") )";
 	return result;
 	}
 
@@ -175,6 +177,100 @@ public class ToScheme implements Visitor<Void, String> {
 	throws VisitException{
 	return "(readInt)";
 	}
+
+
+    public String visitExpPair(ExpPair exp, Void arg)
+	throws VisitException {
+	String obj1, obj2;
+	obj1 = exp.getExpL().visit(this, arg) + " ";
+	obj2 = exp.getExpR().visit(this, arg);
+	return "(pair " + obj1 + obj2 + ")";
+    }
+
+    public String visitCar(Car exp, Void arg)
+	throws VisitException {
+	String arg1;
+	arg1 = exp.getArg1().visit(this, arg);
+	return "(car " + arg1 + ")";
+    }
+
+    public String visitCdr(Cdr exp, Void arg)
+	throws VisitException {
+	String arg1;
+	arg1 = exp.getArg1().visit(this, arg);
+	return "(cdr " + arg1 + ")";
+    }
+
+    public String visitisPair(isPair exp, Void arg)
+	throws VisitException {
+	String arg1;
+	arg1 = exp.getArg1().visit(this, arg);
+	return "(pair? " + arg1 + ")";
+    }
+
+
+    public String visitExpList(ExpList lst, Void arg)
+	throws VisitException{
+	String result = "(list ";
+	ArrayList<Exp> exp = lst.getArgs(); // expressions that we got as arguments
+	result = result + exp.remove(0).visit(this, arg);
+	for(Exp e: exp){
+		result = result + " " + e.visit(this, arg);
+	}
+	result = result + ")";
+	return result;
+    }
+
+
+    public String visitExpVector(ExpVector vect, Void arg)
+	throws VisitException{
+	String args = "(vector ";
+	ArrayList<Exp> exp = vect.getVal();	
+	result = result + exp.remove(0).visit(this, arg);
+	for(Exp e: exp){
+		result = result + " " + e.visit(this, arg);
+	}
+	result = result + ")";
+	return result;
+    }
+
+	public String visitSize(Size exp, Void arg)
+	throws VisitException{
+	String arg1 = exp.getArg1().visit(this, arg);
+	return "(size " + arg1 + ")";
+    }
+
+	public String visitExpGetVectEl(ExpGetVectEl exp, Void arg)
+	throws VisitException{
+	String vect, index;
+	vect = exp.getVect().visit(this, arg) + " ";
+	index = exp.getIndex().visit(this, arg);
+	return "(vectAccess " + vect + index + ")";
+    }
+
+	public String visitExpSetVectEl(ExpSetVectEl exp, Void arg)
+	throws VisitException{
+	String vect, index, val;
+	vect = exp.getVect().visit(this, arg) + " ";
+	index = exp.getIndex().visit(this, arg) + " ";
+	val = exp.getValue().visit(this, arg);
+	return "(vectMutation " + vect + index + val + ")";
+    }
+
+
+	public String visitEqual(Equal exp, Void arg)
+	throws VisitException{
+	String a1 = exp.getArg1().visit(this, arg) + " ";
+	String a2 = exp.getArg2().visit(this, arg);
+	return "(eqeal?" + a1 + a2 + ")";
+    }
+
+	public String visitEqv(Eqv exp, Void arg)
+	throws VisitException{
+	String a1 = exp.getArg1().visit(this, arg) + " ";
+	String a2 = exp.getArg2().visit(this, arg);
+	return "(eqeal?" + a1 + a2 + ")";
+    }
 
 
 	public String visitExpBitwiseAnd(ExpBitwiseAnd exp, Void arg)

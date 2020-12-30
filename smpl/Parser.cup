@@ -140,14 +140,14 @@ non terminal ExpIf ifStmt;
 non terminal Exp else;
 
 non terminal Exp Not;
+non terminal Exp And;
 non terminal Exp expression;
-non terminal Exp Or;
 
 
 
 non terminal Exp arithExp;
 non terminal Exp bitwiseBinOp;
-
+non terminal Exp bitwiseNot;
 
 non terminal Exp comparisonExpression;
 
@@ -170,6 +170,7 @@ non terminal Equal Equal; // for equals
 
 non terminal Exp Pair;// for pairs
 non terminal Exp List;// for list
+non terminal Exp Listconcat;// for list concat
 
 non terminal Car Car; // for car
 non terminal Cdr Cdr; // for cdr
@@ -196,7 +197,7 @@ stmtList ::= stmtList:lst stmt:s {:
 		RESULT = new StmtSequence(s);
 		:};
 
-stmt ::= List:lst {:RESULT = new Statement(lst); :} | vectorOps:v {: RESULT = new Statement(v); :} | vector:v {: RESULT = new Statement(v); :}  | assignment:a {:RESULT = a; :}|let:l {: RESULT = new Statement(l); :} | case:c {: RESULT = new Statement(c); :} |ifStmt:i {: RESULT = new Statement(i); :}| read:r SEMI {: RESULT = new Statement(r); :} | print:p SEMI {: RESULT = p; :} | funDefn:func {: RESULT = func; :} | definition:d {: RESULT = d; :} | expression:a {: RESULT = new Statement(a); :} SEMI; // |conditionalExpression:conditional {: RESULT = new Statement(conditional); :}; // 
+stmt ::= Listconcat:lst {:RESULT = new Statement(lst); :}  | assignment:a {:RESULT = a; :}|let:l {: RESULT = new Statement(l); :} | case:c {: RESULT = new Statement(c); :} |ifStmt:i {: RESULT = new Statement(i); :}| read:r SEMI {: RESULT = new Statement(r); :} | print:p SEMI {: RESULT = p; :} | funDefn:func {: RESULT = func; :} | definition:d {: RESULT = d; :} | expression:a {: RESULT = new Statement(a); :} SEMI; // |conditionalExpression:conditional {: RESULT = new Statement(conditional); :}; // 
 
 
 
@@ -233,6 +234,9 @@ compoundExpr ::= LBRACE stmtList:sList RBRACE {: RESULT = sList; :} | expression
 //Pair::= PAIR LPAREN expr:obj1 COMMA expr:obj2 RPAREN {: RESULT = new ExpPair(obj1,obj2);:};
 
 List::= LIST LPAREN argsE:arguments RPAREN {:RESULT = new ExpList(arguments); :} | LSQPAREN argsE:arguments RSQPAREN {:RESULT = new ExpList(arguments); :};
+
+Listconcat::= expression: exp1 LSTCONCAT expression: exp2 SEMI{: RESULT = new ExpListConcat(exp1, exp2); :};
+
 
 
 vector ::= VECT_OPEN vectorElementLst:lst VECT_CLOSE {:
@@ -282,11 +286,11 @@ definition ::= DEF VAR:v Defnexpr:exp {: RESULT = new StmtDefinition(v,exp); :};
 assignment ::= VAR:v ASSIGN expression:e SEMI {: RESULT = new StmtAssignment(v, e); :};
 
 
-Defnexpr ::= List:lst {:RESULT = new Statement(lst); :} | vectorOps:v {: RESULT = new Statement(v); :} | vector:v {: RESULT = new Statement(v); :} | case:c {: RESULT = new Statement(c); :} |ifStmt:i {: RESULT = new Statement(i); :} | expression:a SEMI {: RESULT = new Statement(a); :} | funDefn:func {: RESULT = func; :};
+Defnexpr ::= Listconcat:lst {:RESULT = new Statement(lst); :}| case:c {: RESULT = new Statement(c); :} |ifStmt:i {: RESULT = new Statement(i); :} | expression:a SEMI {: RESULT = new Statement(a); :} | funDefn:func {: RESULT = func; :};
 
 //Car:car {:RESULT = new Statement(car); :} | Cdr:cdr {:RESULT = new Statement(cdr); :} | Pair:pair {:RESULT = new Statement(pair);:} | List:lst {:RESULT = new Statement(lst); :} | str:s {: RESULT = new Statement(s); :} | Substr:str {: RESULT = new Statement(str); :} |
 
-expr ::= List:lst {:RESULT = new Statement(lst); :} | vectorOps:v {: RESULT = new Statement(v); :} | vector:v {: RESULT = new Statement(v); :} | case:c {: RESULT = new Statement(c); :} |ifStmt:i {: RESULT = new Statement(i); :} | expression:a {: RESULT = new Statement(a); :} | funDefn:func {: RESULT = func; :};
+expr ::=  Listconcat:lst {:RESULT = new Statement(lst); :} | case:c {: RESULT = new Statement(c); :} |ifStmt:i {: RESULT = new Statement(i); :} | expression:a {: RESULT = new Statement(a); :} | funDefn:func {: RESULT = func; :};
 
 //arithExp:a {: RESULT = new Statement(a); :} | Car:car {:RESULT = new Statement(car); :} | Cdr:cdr {:RESULT = new Statement(cdr); :} | Pair:pair {:RESULT = new Statement(pair);:} | List:lst {:RESULT = new Statement(lst); :} | str:s {: RESULT = new Statement(s); :} | Substr:str {: RESULT = new Statement(str); :} | funDefn:func {: RESULT = func; :};
 
@@ -372,15 +376,43 @@ bindList ::= bindList:bindLst COMMA binding:b {:
 binding ::= VAR:v EQUAL expression:e {: RESULT = new ExpBind(v, e); :};
 
 
+
+
 Not ::= NOT Not:n {: RESULT = new ExpNot(n); :}	| comparisonExpression:c {: RESULT = c;:};	 //| Or:r{: RESULT = r; :} | empty; //logical expressions
 
-expression ::= expression:a AND Or:r{:  RESULT = new ExpAnd(a,r); :} | Or:r{: RESULT = r; :};// | empty;				//comparisonExpression:c {: RESULT = new Expexpression(a,e); :} | comparisonExpression:c {: RESULT = e;:};
+And ::= And:a AND Not:n{:  RESULT = new ExpAnd(a,n); :} | Not:n{: RESULT = n; :};// | empty;				//comparisonExpression:c {: RESULT = new Expexpression(a,e); :} | comparisonExpression:c {: RESULT = e;:};
 
-Or ::= Or:r OR Not:n {: RESULT = new ExpOr(r,n);:} | Not:n{: RESULT = n; :}; 		//expression:a {: RESULT = new ExpOr(r,a);:} | expression:a {: RESULT = a;:};
+expression ::= expression:r OR And:a {: RESULT = new ExpOr(r,a);:} | And:a{: RESULT = a; :}; 		//expression:a {: RESULT = new ExpOr(r,a);:} | expression:a {: RESULT = a;:};
 
 
 
-	
+/* -------- OMITTED -------------	
+comparisonExpression ::= comparisonExpression:c LESS arithExp:b {: // x < y < y comparison expressions
+			RESULT = new ExpLess(c, b); :} |
+		comparisonExpression:c LESSEQ arithExp:b {: 
+			RESULT = new ExpLessEq(c, b); :} |
+		comparisonExpression:c GREATER arithExp:b {: 
+			RESULT = new ExpGreater(c, b); :} |
+		comparisonExpression:c GREATEREQ arithExp:b {: 
+			RESULT = new ExpGreaterEq(c, b); :} |
+		comparisonExpression:c EQUAL arithExp:b {: 
+			RESULT = new ExpEqual(c,b); :} |
+		comparisonExpression:c NEQUAL arithExp:b {: 
+			RESULT = new ExpNotEqual(c,b); :} |
+		arithExp:a {: RESULT = a; :};			// |comparatorList:clist {: RESULT = new ExpComparator(clist); :}; //
+
+
+bitwiseBinOp ::= bitwiseBinOp:b BIT_AND comparisonExpression:a {:
+					RESULT = new ExpBitwiseAnd(b, a); :} |
+				bitwiseBinOp:b BIT_OR comparisonExpression:a {:
+					RESULT = new ExpBitwiseOr(b, a); :} |
+				comparisonExpression:c {: RESULT = c;:};
+
+*/
+
+
+
+
 comparisonExpression ::= comparisonExpression:c LESS bitwiseBinOp:b {: // x < y < y comparison expressions
 			RESULT = new ExpLess(c, b); :} |
 		comparisonExpression:c LESSEQ bitwiseBinOp:b {: 
@@ -401,6 +433,7 @@ bitwiseBinOp ::= bitwiseBinOp:b BIT_AND arithExp:a {:
 				bitwiseBinOp:b BIT_OR arithExp:a {:
 					RESULT = new ExpBitwiseOr(b, a); :} |
 				arithExp:a {: RESULT = a; :};
+
 
 
 /*
@@ -425,10 +458,12 @@ term ::= term:t MUL factor:f {: // x := f(2+1) + 1 * y
 		RESULT = new ExpMod(t, f); :} |
 	 factor:f {: RESULT = f; :};
 
-factor ::= atom:a EXP factor:f {:RESULT = new ExpPow(a,f); :} | atom:a {: RESULT = a; :};
+factor ::= bitwiseNot:n EXP factor:f {:RESULT = new ExpPow(n,f); :} | bitwiseNot:n {: RESULT = n; :};
+
+bitwiseNot ::= BIT_NOT bitwiseNot:n {: RESULT = new ExpBitwiseNot(n); :} |  atom:a {: RESULT = a; :};
 
 atom ::= INT:ilit {: RESULT = new ExpLit<Integer>(ilit); :}| DOUBLE:dlit {: RESULT = new ExpLit<Double>(dlit); :} | BOOL:blit {: RESULT = new ExpLit<Boolean>(blit); :}|STRING: slit {: RESULT = new ExpLit<String>(slit); :}|CHAR:clit {: RESULT = new ExpLit<Character>(clit); :}|
-	   NIL {: RESULT = new ExpList(); :}| LPAREN expression:a RPAREN {: RESULT = a; :} | funcall:fcall {:RESULT = fcall;:} | VAR:var {:RESULT = new ExpVar(var);:}; //
+	  List:lst {:RESULT = new Statement(lst); :} | vector:v {: RESULT = new Statement(v); :}  |vectorOps:v {: RESULT = new Statement(v); :} | NIL {: RESULT = new ExpList(); :}| LPAREN expression:a RPAREN {: RESULT = a; :} | funcall:fcall {:RESULT = fcall;:} | VAR:var {:RESULT = new ExpVar(var);:}; //
 	   
 
 emptyA ::= {: ArrayList<Exp> result = new ArrayList<>(); RESULT = result; :} ;

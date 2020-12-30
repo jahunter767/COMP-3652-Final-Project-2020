@@ -92,6 +92,23 @@ public class SMPLNumbers extends SMPLObject<Double> {
 
 //---------- FROM JASON'S CODE --------------
 
+    public SMPLObject bitwiseAnd(SMPLObject object) throws TypeException {
+	if(object instanceof SMPLNumbers){
+		SMPLNumbers obj = (SMPLNumbers) object;
+
+		if(isInt() && obj.isInt()){
+			Integer val2 = obj.getVal().intValue();
+			Integer result = getVal().intValue() & val2;
+			return SMPL.makeInstance(result);
+		}else {
+			throw new TypeException();
+		}
+    }else {
+		throw new TypeException();
+	}
+    }
+
+
     public SMPLObject bitwiseOr(SMPLObject object) throws TypeException {
 	if(object instanceof SMPLNumbers){
 		SMPLNumbers obj = (SMPLNumbers) object;

@@ -43,6 +43,34 @@ public class SMPLBoolean extends SMPLObject<Boolean> {
 
 //------- FROM JASON's CODE--------
 
+
+    public SMPLObject bitwiseAnd(SMPLObject object) throws TypeException {
+	if(object instanceof SMPLBoolean){
+		SMPLBoolean obj = (SMPLBoolean) object;
+		Boolean val2 = obj.getVal();
+		Boolean result = getVal().booleanValue() & val2;
+		return SMPL.makeInstance(result);
+    }else {
+		throw new TypeException();
+	}
+    }
+
+
+    public SMPLObject bitwiseOr(SMPLObject object) throws TypeException {
+	if(object instanceof SMPLBoolean){
+		SMPLBoolean obj = (SMPLBoolean) object;
+		Boolean val2 = obj.getVal();
+		Boolean result = getVal().booleanValue() | val2;
+		return SMPL.makeInstance(result);
+    }else {
+		throw new TypeException();
+	}
+
+    }
+
+ 
+
+
     public SMPLObject and(SMPLObject object) throws TypeException {
 	if(object instanceof SMPLBoolean){
 		SMPLBoolean obj = (SMPLBoolean) object;

@@ -3,6 +3,7 @@ public class List{
 
     private Pair pair;
     private SMPLObject el;
+    private ArrayList<SMPLObject> elements;
     private int len;
 
     //private SMPLObject nil = SMPL.makeInstance(new Nil());
@@ -11,18 +12,21 @@ public class List{
 	this.el = SMPL.makeInstance();
 	this.pair = new Pair(el,el);
 	this.len = 0;
+	this.elements = new ArrayList<SMPLObject>();
 
     }
 
-    public List(Pair pair, int length) { // this constructor is when creating a new list from an existing list
+    public List(Pair pair, int length, ArrayList<SMPLObject> els) { // this constructor is when creating a sub list from an existing list
 	this.el = SMPL.makeInstance();
 	this.pair = pair;
 	this.len = length - 1;
-
+	this.elements = (ArrayList)els.clone();
+	this.elements.remove(0);
     }
 
 
     public List(ArrayList<SMPLObject> Args) {
+	this.elements = (ArrayList)Args.clone();
 	this.len = Args.size();
 	SMPLObject nil = SMPL.makeInstance(new Nil()); // creates new SMPLNil
 
@@ -59,6 +63,11 @@ public class List{
 
     public SMPLObject getSecondEl(){
 	return this.pair.getSecondEl(); // [Val,another pair] -> return another pair or nill SMPL instance if empty
+    }
+
+
+    public ArrayList<SMPLObject> getElements(){
+	return this.elements; // returns the elements of the list
     }
 
     public int length(){

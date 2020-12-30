@@ -140,7 +140,14 @@ non terminal SMPLExp vectOps;
 non terminal SMPLExp substring;
 /* Grammar rules */
 
-precedence left COLON,RSQPAREN;
+precedence left COLON,RSQPAREN, LPAREN, LSQPAREN, ELSE;
+precedence left OR;
+precedence left AND;
+precedence left NEQUAL, LESS, LESSEQ, EQUAL, NEQUAL, GREATER, GREATEREQ;
+precedence left PLUS, MINUS;
+precedence left MOD;
+precedence left MUL, DIV;
+
 
 program ::= stmtList:s {: RESULT = new ArithProgram(s); :};
 
@@ -152,13 +159,12 @@ stmtList ::= stmtList:lst stmt:s {:
 		RESULT = new StmtSequence(s);
 		:};
 
-stmt ::= definition:d {: RESULT = d; :} | assignment:a {:RESULT = a;:} |
-		expression4:e {: RESULT = new Statement(e); :} SEMI |
-		ifStmt:i {:RESULT=i;:} | caseStmt:cs {:RESULT=cs;:} | 
+stmt ::= expression4:e {: RESULT = new Statement(e); :} SEMI | caseStmt:cs {:RESULT=cs;:} | 
 		procName:pn {:RESULT = pn;:} | procDefn:p {:RESULT = p;:} | subvector:sv {:RESULT=sv;:} |
-		letExp:le {:RESULT=le;:};
+		letExp:le {:RESULT=le;:} ;
 
-ifStmt::= IF expression4:pred THEN stmtList:cons ELSE stmt:alt {: RESULT = new StmtIfDefn(pred,cons, alt);:};
+ifStmt::= IF expression4:pred THEN body:cons {: RESULT = new StmtIfDefn(pred,cons);:} |
+		   IF expression4:pred THEN body:cons ELSE body:alt {: RESULT = new StmtIfDefn(pred,cons, alt);:} ;
 pair::= PAIR LPAREN expression4:p1 COMMA expression4:p2 RPAREN {: RESULT = new SMPLPair(p1,p2);:};
 list::= LIST tuple:t {:RESULT=t;:};
 subvector::= expression4:num COLON stmt:proc {:RESULT = new SubVector(num,proc);:} ;
@@ -172,7 +178,7 @@ procDefn ::= PROC LPAREN paramListE:pe RPAREN body:b {: RESULT = new StmtProc(pe
 LamdbaProcDefn::= LPAREN procDefn:pd RPAREN LPAREN paramListE:e RPAREN {: RESULT = new StmtProc(pd.getExps(),pd.getStmt(),e);:} ;
 procName::=  DEF VAR:v procDefn:p {:RESULT = new StmtProcDefn(v,p.getExps(),p.getStmt(),new ArrayList<SMPLExp>());:} |
 			 VAR:v ASSIGN procDefn:p {:RESULT = new StmtProcDefn(v,p.getExps(),p.getStmt(),new ArrayList<SMPLExp>());:};
-body ::= LBRACE stmtList:sl RBRACE {: RESULT = sl;:} | expression4:e SEMI{: RESULT = new StmtSequence (new Statement(e));:} ;
+body ::= LBRACE stmtList:sl RBRACE {: RESULT = sl;:} | expression4:e {: RESULT = new StmtSequence (new Statement(e));:} ;
 paramList ::= expression4:e COMMA paramList:p {: p.add(e); RESULT = p;:}| expression4:e {:ArrayList<SMPLExp> result = new ArrayList<>();result.add(e);RESULT = result;:} ; /* complete this */
 paramListE ::= paramList:p {:RESULT = p;:} | empty ;
 clauseList::= expression4:e1 COLON expression4:e2 COMMA clauseList:cl {:Pair p = new Pair(e1,e2); cl.add(p); RESULT = cl;:} |  
@@ -204,12 +210,11 @@ call::= CALL LPAREN expression4:p COMMA expression4:l RPAREN {:RESULT = new ExpC
 equals::= EQUAL_PRED LPAREN expression4:e1 COMMA expression4:e2 RPAREN {:RESULT = e1.equal(e2,"equal?");:} ;
 equiv::= EQUIV_PRED LPAREN expression4:e1 COMMA expression4:e2 RPAREN {:RESULT = e1.equal(e2,"eqv?");:} ;
 substring::= SUBSTR LPAREN expression4:e1 COMMA expression4:e2 COMMA expression4:e3 RPAREN {:RESULT = new SliceOperations(e1,e2,e3);:} ;
-assignment ::= VAR:v ASSIGN expression4:e SEMI {:RESULT = new StmtDefinition(v, e);:} | 
-			   VAR:v ASSIGN ifStmt:i {: RESULT = new StmtDefinition(v, i);:} |
+assignment ::= VAR:v ASSIGN expression4:e {:RESULT = new StmtDefinition(v, e);:} | 
 			   VAR:v ASSIGN subvector:i {: RESULT = new StmtDefinition(v, i);:} |
 			   VAR:v ASSIGN letExp:i {: RESULT = new StmtDefinition(v, i);:}
 			   ;
-definition::= DEF VAR:v expression4:e SEMI {:
+definition::= DEF VAR:v expression4:e {:
 		   RESULT = new StmtDefinition(v, e);:}  |
 		   DEF VAR:v subvector:e {:
 		   RESULT = new StmtDefinition(v, e);:} 
@@ -255,7 +260,8 @@ factor ::= INT:ilit {: RESULT = new SMPLInteger(ilit); :} |
 	   call:c {:RESULT=c;:} | LamdbaProcDefn:lpd {:RESULT = lpd;:} | vector:v {:RESULT =v;:} |
 	   vectOps:ops {:RESULT=ops;:} | readint:ri {:RESULT = ri;:} | read:r {:RESULT=r;:} |
 		print:p {:RESULT = p;:}   | println:pl {:RESULT = pl;:} | equals:s {:RESULT = s;:} |
-		equiv:e {:RESULT = e;:}  | substring:str {:RESULT = str;:} ; 
+		equiv:e {:RESULT = e;:}  | substring:str {:RESULT = str;:} |    ifStmt:i {:RESULT=i;:} |
+		definition:d {: RESULT = d; :} | assignment:a {:RESULT = a;:} ; 
 procCall ::= VAR:v LPAREN paramListE:pe RPAREN {:RESULT = new ExpProcCall(v,pe);:};
 
 empty ::= ;

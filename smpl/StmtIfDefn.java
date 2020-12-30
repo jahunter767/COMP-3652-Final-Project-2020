@@ -16,6 +16,12 @@ public class StmtIfDefn extends Statement {
 	alternative = a;
     }
 	
+	public StmtIfDefn(SMPLExp p,StmtSequence c) {	// placeholder; can be removed eventually
+	super("IfStmt");
+	predicate = p;
+	consequent = c;
+    }
+	
 	public SMPLExp getPredicate(){
 	return predicate;
 	}

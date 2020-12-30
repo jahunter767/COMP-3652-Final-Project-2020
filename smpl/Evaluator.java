@@ -449,16 +449,26 @@ public class Evaluator implements Visitor<Environment<Object>, Object> {
 	throws VisitException {
 	SMPLExp p = exp.getPredicate();
 	StmtSequence c = exp.getConsequent();
-	Statement a = exp.getAlternative();
-	Boolean flag = (Boolean) p.visit(this, env);
-	if (flag == true){
-		result = (Double) c.visit(this,env);
-	}else{
-		result = (Double) a.visit(this,env);
+	try{
+		Statement a = exp.getAlternative();
+		Boolean flag = (Boolean) p.visit(this, env);
+		if (flag == true){
+			result = c.visit(this,env);
+		}else{
+			result = a.visit(this,env);
+		}
+		}catch(NullPointerException e){
+			
+			Boolean flag = (Boolean) p.visit(this, env);
+			if (flag == true){
+				result = c.visit(this,env);
+			}
+			
+		}
+		return result;
 	}
 	
-	return result;
-	}
+	
 	
 	public Object visitStmtCaseDefn(StmtCaseDefn exp, Environment<Object> env) 
 	throws VisitException {

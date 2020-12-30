@@ -1,0 +1,32 @@
+def parent proc(i){
+    (i - 1 ) / 2;
+}
+
+def left_child proc(i){
+    2 * i + 1;
+}
+
+def right_child proc(i){
+    2 * i + 1;
+}
+
+def swap proc(x, y){
+    def temp x;
+    x := y;
+    y :=  temp;
+}
+
+def swap_and_insert proc(){
+
+}
+
+def insert proc(heap, value, size){
+    if size < 10 then {
+        def heap[size] value;
+        def n size+1;
+
+        def i n -1;
+
+
+    }
+}

@@ -1,8 +1,8 @@
-public class ExpSetVectEl extends Exp {
+public class StmtSetVectEl extends Statement {
 
     Exp vect;
 
-    public ExpSetVectEl(Exp v, Exp index, Exp val) {
+    public StmtSetVectEl(Exp v, Exp index, Exp val) {
     super("vectorMutation", index, val);
     this.vect = v;
     }
@@ -20,7 +20,7 @@ public class ExpSetVectEl extends Exp {
     }
 
     public <S, T> T visit(Visitor<S,T> v, S arg) throws VisitException {
-	return v.visitExpSetVectEl(this, arg);
+	return v.visitStmtSetVectEl(this, arg);
     }
 
     public String toString(){

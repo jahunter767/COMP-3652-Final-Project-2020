@@ -1,48 +1,29 @@
 import java.util.*;
+
 public class List{
 
     private Pair pair;
-    private SMPLObject el;
     private int len;
 
     //private SMPLObject nil = SMPL.makeInstance(new Nil());
 
     public List() { // this constructor is used by nill 
-	this.el = SMPL.makeInstance();
-	this.pair = new Pair(el,el);
+	this.pair = new Pair(SMPL.makeInstance(),
+			SMPL.makeInstance(new Nil()));
 	this.len = 0;
-
     }
 
 
     public List(ArrayList<SMPLObject> Args) {
-	this.len = Args.size();
 	SMPLObject nil = SMPL.makeInstance(new Nil()); // creates new SMPLNil
+	this.len = Args.size();
 
-	if(Args.size() == 1){ // create pair with nill
-		this.el = Args.get(0);
-		this.pair = new Pair(el, nil);
-
-	} else {
-		// Building the sequence of pairs in reverse
-		
-		Collections.reverse(Args); // reverse the order of the list
-		this.el = Args.get(0); // get the last element
-		Args.remove(0);// remove the last element
-		
-		Pair element = new Pair(el,nil); // create the last pair in the list
-		Pair next = null;
-		
-		for (SMPLObject obj : Args){
-			
-			next = new Pair(obj,SMPL.makeInstance(element));
-			element = next;
-		}
-		
-		this.pair = element; // a sequence of pairs
-	
+	Collections.reverse(Args); // reverse the order of the list
+	SMPLObject rest = Args.remove(0);
+	this.pair = new Pair(rest,nil); // create the last pair in the list
+	for (SMPLObject obj : Args){	
+		this.pair = new Pair(obj, SMPL.makeInstance(this.pair));
 	}
-
     }
 
 
@@ -58,4 +39,24 @@ public class List{
 	return this.len;
     }
 
+	public String toString(){
+	SMPLObject curr = this.pair.getFirstEl();
+	if (curr instanceof SMPLNone){
+		return "[]";
+	}
+
+	SMPLPair next = (SMPLPair) this.pair.getSecondEl();
+	String result = "[";
+	while (next instanceof SMPLPair){
+		result = result + curr.toString() + ", ";
+		try{
+			curr = next.car();
+			next = (SMPLPair) next.cdr();
+		}catch (TypeException t){
+			break;
+		}
+    }
+	result = result + curr.toString() + "]";
+    return result;
+    }
 }

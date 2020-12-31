@@ -198,7 +198,7 @@ public class SMPLNumbers extends SMPLObject<Double> {
 
 
     public String toString(){
-	return "Type: SMPLNumbers\nValue: " + String.valueOf(getVal());
+	return String.valueOf(getVal());
     }
 
 }

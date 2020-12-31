@@ -68,7 +68,7 @@ public class SMPLVector extends SMPLObject<Vector> {
 
 
 	public String toString(){
-	return "Type: SMPLVector\nValue: " + getVal();
+	return getVal().toString();
     }
 
 }

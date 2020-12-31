@@ -47,7 +47,7 @@ public class SMPLString extends SMPLObject<String> {
 
 
 	public String toString(){
-	return "Type: SMPLString\nValue: " + getVal();
+	return getVal();
     }
 
 }

@@ -78,7 +78,9 @@ def Q case{
     You probably need to fix something in your code."
 };
 
-def S Q("Here are the results of the tests: ");
+def S proc(){[:1, 2, 3:];}()[0];
+
+def T Q("Here are the results of the tests: ");
 println("Base 10 Numbers tests: ");
 print("\tx = "); println(x);
 print("\ty = "); println(y);
@@ -150,5 +152,6 @@ print("\tP = "); println(P);
 println("Case tests: ");
 print("\tQ = "); println(Q);
 
-println("Last proc test: ");
+println("Last proc tests: ");
 print("\tS = "); println(S);
+print("\tT = "); println(T);

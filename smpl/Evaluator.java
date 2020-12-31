@@ -288,8 +288,8 @@ public class Evaluator implements Visitor<Environment<SMPLObject>, SMPLObject> {
 	ArrayList<SMPLObject> args = new ArrayList<>();
 	ArrayList<Exp> exp = lst.getArgs(); // expressions that we got as arguments
 	if(exp.size() <= 0) return SMPL.makeInstance(new Nil());	
-	for(int i = 0; i < exp.size(); i++){
-		args.add(exp.get(i).visit(this, env));
+	for(Exp e: exp){
+		args.add(e.visit(this, env));
 	}
 	return SMPL.makeInstance(new List(args));
     }
@@ -298,9 +298,9 @@ public class Evaluator implements Visitor<Environment<SMPLObject>, SMPLObject> {
     public SMPLObject visitExpVector(ExpVector vect, Environment<SMPLObject> env)
 	throws VisitException{
 	ArrayList<SMPLObject> args = new ArrayList<>();
-	ArrayList<Exp> exp = vect.getVal();	
-	for(int i = 0; i < exp.size(); i++){
-		args.add(exp.get(i).visit(this, env));
+	ArrayList<Exp> exp = vect.getVal();
+	for(Exp e: exp){
+		args.add(e.visit(this, env));
 	}
 	return SMPL.makeInstance(new Vector(args));
     }
@@ -320,7 +320,7 @@ public class Evaluator implements Visitor<Environment<SMPLObject>, SMPLObject> {
 	return vect.get(index);
     }
 
-	public SMPLObject visitExpSetVectEl(ExpSetVectEl exp, Environment<SMPLObject> env)
+	public SMPLObject visitStmtSetVectEl(StmtSetVectEl exp, Environment<SMPLObject> env)
 	throws VisitException{
 	SMPLVector vect;
 	SMPLObject index, val;

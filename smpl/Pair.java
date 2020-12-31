@@ -18,4 +18,8 @@ public class Pair{ // you could eventually declare pair with a type variable <T>
 	return this.obj2;
     }
 
+    public String toString(){
+    return "(" + getFirstEl().toString() +
+        ", " + getSecondEl().toString() + ")";
+    }
 }

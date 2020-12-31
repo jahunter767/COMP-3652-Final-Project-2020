@@ -20,7 +20,7 @@ public class SMPLCharacter extends SMPLObject<Character> {
 
 
     public String toString(){
-	return "Type: SMPLCharacter\nValue: " + String.valueOf(getVal());
+	return String.valueOf(getVal());
     }
 
 }

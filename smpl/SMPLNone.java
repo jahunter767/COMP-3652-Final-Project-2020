@@ -15,7 +15,7 @@ public class SMPLNone extends SMPLObject<String> {
 
 
 	public String toString(){
-	return "Type: SMPLNone\nValue: " + getVal();
+	return "none";
     }
 
 }

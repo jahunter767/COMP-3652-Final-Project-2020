@@ -9,7 +9,7 @@ public class Vector{
 
 
     public Vector(ArrayList<SMPLObject> Args) {
-    this.vect = new ArrayList<SMPLObject>();
+    this.vect = Args;
 	}
 
 
@@ -25,4 +25,12 @@ public class Vector{
 	return this.vect.size();
     }
 
+    public String toString(){
+    String result = "[:";
+    for (SMPLObject el: this.vect){
+        result = result + el.toString();
+    }
+    result = result + ":]";
+    return result;
+    }
 }

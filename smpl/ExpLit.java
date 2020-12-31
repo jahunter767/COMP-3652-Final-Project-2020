@@ -28,7 +28,7 @@ public class ExpLit extends Exp {
     }
 
     public String toString() {
-	return type;
+	return "Type: " + type + "Val: " + val.toString();
     }
 }
 

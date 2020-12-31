@@ -15,7 +15,7 @@ public class SMPLNil extends SMPLObject<String> {
 
 
 	public String toString(){
-	return "Type: SMPLNil\nValue: " + getVal();
+	return getVal().toString();
     }
 
 }

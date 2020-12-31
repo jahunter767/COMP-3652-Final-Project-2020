@@ -30,7 +30,7 @@ public class SMPLPair extends SMPLObject<Pair> {
 
 
 	public String toString(){
-	return "Type: SMPLPair\nValue: " + getVal();
+	return getVal().toString();
     }
 
 }

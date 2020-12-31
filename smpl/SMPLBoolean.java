@@ -47,7 +47,7 @@ public class SMPLBoolean extends SMPLObject<Boolean> {
 
 
     public String toString(){
-	return "Type: SMPLBoolean\nValue: " + String.valueOf(getVal());
+	return String.valueOf(getVal());
     }
 
 }

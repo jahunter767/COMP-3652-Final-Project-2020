@@ -27,9 +27,9 @@ public class ToScheme implements Visitor<Void, String> {
     public String visitSubstr(Substr exp, Void arg)
 	throws VisitException {
 	String arg1, arg2, arg3;
-	arg1 = exp.getArg1().toString() + " ";
-	arg2 = exp.getArg2().toString() + " ";
-	arg3 = exp.getArg3().toString();
+	arg1 = exp.getArg1().visit(this, arg) + " ";
+	arg2 = exp.getArg2().visit(this, arg) + " ";
+	arg3 = exp.getArg3().visit(this, arg);
 	return "(substr" + arg1 + arg2 + arg3 + ")";
     }
 
@@ -96,7 +96,7 @@ public class ToScheme implements Visitor<Void, String> {
 	if (ovf != null){
 		result = result + " (rest " + ovf + ")";
 	}
-	result = result + ") (body " + fd.getBody().toString() + ")";
+	result = result + ") (body " + fd.getBody().visit(this, arg) + ")";
 	return result;
     }
 
@@ -104,9 +104,9 @@ public class ToScheme implements Visitor<Void, String> {
 	throws VisitException {
 	ArrayList<Exp> args = fc.getArgs();
 	String result = "(call " + fc.getFunction().visit(this, arg) +
-			" (args " + args.remove(0).toString();
+			" (args " + args.remove(0).visit(this, arg);
 	for (Exp a : args){
-		result = result + " " + a.toString();
+		result = result + " " + a.visit(this, arg);
 	}
 	result = result + ") )";
 	return result;
@@ -248,7 +248,7 @@ public class ToScheme implements Visitor<Void, String> {
 	return "(vectAccess " + vect + index + ")";
     }
 
-	public String visitExpSetVectEl(ExpSetVectEl exp, Void arg)
+	public String visitStmtSetVectEl(StmtSetVectEl exp, Void arg)
 	throws VisitException{
 	String vect, index, val;
 	vect = exp.getVect().visit(this, arg) + " ";

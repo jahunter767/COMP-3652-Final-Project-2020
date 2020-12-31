@@ -49,7 +49,7 @@ public interface Visitor<S, T> {
     public T visitExpVector(ExpVector exp, S arg) throws VisitException;
     public T visitSize(Size exp, S arg) throws VisitException;
     public T visitExpGetVectEl(ExpGetVectEl exp, S arg) throws VisitException;
-    public T visitExpSetVectEl(ExpSetVectEl exp, S arg) throws VisitException;
+    public T visitStmtSetVectEl(StmtSetVectEl exp, S arg) throws VisitException;
 
     public T visitEqual(Equal exp, S arg) throws VisitException;
     public T visitEqv(Eqv exp, S arg) throws VisitException;

@@ -11,7 +11,7 @@ public class SMPLFunction extends SMPLObject<Closure> {
     }
 
     public String toString(){
-	return "Type: SMPLFunction\nValue: " + getVal().toString();
+	return getVal().toString();
     }
 
 }

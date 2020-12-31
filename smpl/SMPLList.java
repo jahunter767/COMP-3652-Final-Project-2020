@@ -33,6 +33,6 @@ public class SMPLList extends SMPLObject<List> {
 
 
     public String toString(){
-	return "Type: SMPLList\nValue: " + getVal();
+	return getVal().toString();
     }
 }

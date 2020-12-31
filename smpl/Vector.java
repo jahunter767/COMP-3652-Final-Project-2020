@@ -27,10 +27,14 @@ public class Vector{
 
     public String toString(){
     String result = "[:";
-    for (SMPLObject el: this.vect){
-        result = result + el.toString();
+    SMPLObject el;
+    int i;
+    for (i = 0; i < this.vect.size()-1; i ++){
+        el = this.vect.get(i);
+        result = result + el.toString() + ", ";
     }
-    result = result + ":]";
+    el = this.vect.get(i);
+    result = result + el.toString() + ":]";
     return result;
     }
 }

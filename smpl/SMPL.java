@@ -13,9 +13,9 @@ public class SMPL {
     public static SMPLObject makeInstance(Object obj){
 	if(obj instanceof Closure) return new SMPLFunction((Closure) obj);
 	if(obj instanceof Vector) return new SMPLVector((Vector) obj);
-	if(obj instanceof List) return new SMPLList((List) obj);
-	if(obj instanceof Pair) return new SMPLPair((Pair) obj);
 	if(obj instanceof Nil) return new SMPLNil();
+	if(obj instanceof Pair) return new SMPLPair((Pair) obj);
+	if(obj instanceof List) return new SMPLList((List) obj);
 	if(obj instanceof Integer) return new SMPLNumbers((Integer) obj);
 	if(obj instanceof Double) return new SMPLNumbers((Double) obj);
 	if(obj instanceof Boolean)return new SMPLBoolean((Boolean) obj);

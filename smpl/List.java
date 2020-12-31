@@ -9,7 +9,7 @@ public class List{
 
     public List() { // this constructor is used by nill 
 	this.pair = new Pair(SMPL.makeInstance(),
-			SMPL.makeInstance(new Nil()));
+				SMPL.makeInstance());
 	this.len = 0;
     }
 
@@ -45,18 +45,21 @@ public class List{
 		return "[]";
 	}
 
-	SMPLPair next = (SMPLPair) this.pair.getSecondEl();
 	String result = "[";
-	while (next instanceof SMPLPair){
-		result = result + curr.toString() + ", ";
-		try{
-			curr = next.car();
-			next = (SMPLPair) next.cdr();
-		}catch (TypeException t){
-			break;
+	try{
+		SMPLPair next = (SMPLPair) this.pair.getSecondEl();
+		while (next instanceof SMPLPair){
+			result = result + curr.toString() + ", ";
+			try{
+				curr = next.car();
+				next = (SMPLPair) next.cdr();
+			}catch (TypeException t){
+				break;
+			}
 		}
-    }
-	result = result + curr.toString() + "]";
-    return result;
+	}catch (ClassCastException c){
+		result = result + curr.toString() + "]";
+	}
+	return result;
     }
 }

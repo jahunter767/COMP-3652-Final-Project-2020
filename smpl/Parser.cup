@@ -201,8 +201,8 @@ stmt ::= Listconcat:lst {:RESULT = new Statement(lst); :} |vectorOps:v {: RESULT
 
 
 
-print ::= PRINT LPAREN expression:e RPAREN {: RESULT = new StmtPrint(e); :} |
-		PRINTLN LPAREN expression:e RPAREN {: RESULT = new StmtPrintln(e); :};
+print ::= PRINT LPAREN expr:e RPAREN {: RESULT = new StmtPrint(e); :} |
+		PRINTLN LPAREN expr:e RPAREN {: RESULT = new StmtPrintln(e); :};
 
 read ::= READ LPAREN RPAREN {: RESULT = new ExpRead(); :} |
 		READINT LPAREN RPAREN {: RESULT = new ExpReadInt(); :};
@@ -242,19 +242,19 @@ Listconcat::= expression: exp1 LSTCONCAT expression: exp2 SEMI{: RESULT = new Ex
 vector ::= VECT_OPEN vectorElementLst:lst VECT_CLOSE {:
 			RESULT = new ExpVector(lst); :};
 
-vectorElementLst ::= vectorElementLst:lst COMMA expression:e {:
+vectorElementLst ::= vectorElementLst:lst COMMA expr:e {:
 			lst.add(e);
 			RESULT = lst; :} |
-		expression:e {:
+		expr:e {:
 			ArrayList<Exp> lst = new ArrayList<Exp>();
 			lst.add(e);
 			RESULT = lst; :};
 
-vectorOps ::= VAR:v LSQPAREN expression:i RSQPAREN SEMI {:
+vectorOps ::= VAR:v LSQPAREN expr:i RSQPAREN SEMI {:
 				RESULT = new ExpGetVectEl(v, i); :} |
-			VAR:v LSQPAREN expression:i RSQPAREN ASSIGN expression:e SEMI {:
+			VAR:v LSQPAREN expr:i RSQPAREN ASSIGN expr:e SEMI {:
 				RESULT = new ExpSetVectEl(v, i, e); :} |
-			VAR:v DOT POP LPAREN expression:i RPAREN{:
+			VAR:v DOT POP LPAREN expr:i RPAREN SEMI{:
 				RESULT = new ExpPopVectEl(v, i); :};
 
 

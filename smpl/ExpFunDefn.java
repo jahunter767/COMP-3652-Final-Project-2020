@@ -3,25 +3,25 @@ import java.util.ArrayList;
 /**
  * IR Class to represent a function definition
  */
-public class StmtFunDefn extends Statement {
+public class ExpFunDefn extends Exp {
     // Implement this class
 
     ArrayList<String> params;
     String paramOvf;
 
-    protected StmtFunDefn(String param, Exp body) {
+    protected ExpFunDefn(String param, Exp body) {
     super("funDef", body);
     this.params = new ArrayList<String>();
     this.paramOvf = param;
     }
 
-    protected StmtFunDefn(ArrayList<String> parameters, Exp body) {
+    protected ExpFunDefn(ArrayList<String> parameters, Exp body) {
     super("funDef", body);
     this.params = parameters;
     this.paramOvf = null;
     }
 
-    protected StmtFunDefn(ArrayList<String> parameters, String paramOvf, Exp body) {
+    protected ExpFunDefn(ArrayList<String> parameters, String paramOvf, Exp body) {
     super("proc", body);
     this.params = parameters;
     this.paramOvf = paramOvf;
@@ -41,7 +41,7 @@ public class StmtFunDefn extends Statement {
     }
 
     public <S, T> T visit(Visitor<S,T> v, S arg) throws VisitException {
-    return v.visitStmtFunDefn(this, arg);
+    return v.visitExpFunDefn(this, arg);
     }
     
     public String toString(){

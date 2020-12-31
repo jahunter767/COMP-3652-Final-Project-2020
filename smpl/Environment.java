@@ -25,6 +25,14 @@ public class Environment<T> {
     }
 
     /**
+     * Creates a new <code>Environment</code> instance.
+     */
+    public Environment(Environment<T> parent) {
+	this.parent = parent;
+	dictionary = new HashMap<>();
+    }
+
+	/**
      * Creates a new <code>Environment</code> instance that is
      * initialised with the given collection of bindings
      * (presented as separate arrays of names and values).
@@ -77,7 +85,7 @@ public class Environment<T> {
 	ArrayList<String> parameters = new ArrayList<String>();
 	parameters.add("string");parameters.add("start");parameters.add("end");
 	StmtSequence body = new StmtSequence(new Statement(new Substr(new ExpVar("string"),new ExpVar("start"),new ExpVar("end"))));
-	StmtFunDefn fd = new StmtFunDefn(parameters, body);
+	ExpFunDefn fd = new ExpFunDefn(parameters, body);
 	Closure closure = new Closure(fd,result);
 	SMPLObject substr = SMPL.makeInstance(closure);
 	result.put("substr",(b) substr);
@@ -86,7 +94,7 @@ public class Environment<T> {
 	ArrayList<String> Eqvparameters = new ArrayList<String>();
 	Eqvparameters.add("eqvobj1");Eqvparameters.add("eqvobj2");
 	body = new StmtSequence(new Statement(new Eqv(new ExpVar("eqvobj1"),new ExpVar("eqvobj2"))));
-	fd = new StmtFunDefn(Eqvparameters, body);
+	fd = new ExpFunDefn(Eqvparameters, body);
 	closure = new Closure(fd,result);
 	SMPLObject eqv = SMPL.makeInstance(closure);
 	result.put("eqv?", (b) eqv);
@@ -95,7 +103,7 @@ public class Environment<T> {
 	ArrayList<String> equalParameters = new ArrayList<String>();
 	equalParameters.add("equalobj1");equalParameters.add("equalobj2");
 	body = new StmtSequence(new Statement(new Equal(new ExpVar("equalobj1"),new ExpVar("equalobj2"))));
-	fd = new StmtFunDefn(equalParameters, body);
+	fd = new ExpFunDefn(equalParameters, body);
 	closure = new Closure(fd,result);
 	SMPLObject equal = SMPL.makeInstance(closure);
 	result.put("equal?", (b) equal);
@@ -105,7 +113,7 @@ public class Environment<T> {
 	ArrayList<String> pairParameters = new ArrayList<String>();
 	pairParameters.add("pairObj1");pairParameters.add("pairObj2");
 	body = new StmtSequence(new Statement(new ExpPair(new ExpVar("pairObj1"),new ExpVar("pairObj2"))));
-	fd = new StmtFunDefn(pairParameters, body);
+	fd = new ExpFunDefn(pairParameters, body);
 	closure = new Closure(fd,result);
 	SMPLObject pair = SMPL.makeInstance(closure);
 	result.put("pair", (b) pair);
@@ -115,7 +123,7 @@ public class Environment<T> {
 	ArrayList<String> ispairParameters = new ArrayList<String>();
 	ispairParameters.add("ispairObj");
 	body = new StmtSequence(new Statement(new isPair(new ExpVar("ispairObj"))));
-	fd = new StmtFunDefn(ispairParameters, body);
+	fd = new ExpFunDefn(ispairParameters, body);
 	closure = new Closure(fd,result);
 	SMPLObject ispair = SMPL.makeInstance(closure);
 	result.put("pair?", (b) ispair);
@@ -124,7 +132,7 @@ public class Environment<T> {
 	ArrayList<String> carParameters = new ArrayList<String>();
 	carParameters.add("carObj");
 	body = new StmtSequence(new Statement(new Car(new ExpVar("carObj"))));
-	fd = new StmtFunDefn(carParameters, body);
+	fd = new ExpFunDefn(carParameters, body);
 	closure = new Closure(fd,result);
 	SMPLObject car = SMPL.makeInstance(closure);
 	result.put("car", (b) car);
@@ -134,7 +142,7 @@ public class Environment<T> {
 	ArrayList<String> cdrParameters = new ArrayList<String>();
 	cdrParameters.add("cdrObj");
 	body = new StmtSequence(new Statement(new Cdr(new ExpVar("cdrObj"))));
-	fd = new StmtFunDefn(cdrParameters, body);
+	fd = new ExpFunDefn(cdrParameters, body);
 	closure = new Closure(fd,result);
 	SMPLObject cdr = SMPL.makeInstance(closure);
 	result.put("cdr", (b) cdr);
@@ -143,7 +151,7 @@ public class Environment<T> {
 	ArrayList<String> sizeParameters = new ArrayList<String>();
 	sizeParameters.add("sizeObj");
 	body = new StmtSequence(new Statement(new Size(new ExpVar("sizeObj"))));
-	fd = new StmtFunDefn(sizeParameters, body);
+	fd = new ExpFunDefn(sizeParameters, body);
 	closure = new Closure(fd,result);
 	SMPLObject size = SMPL.makeInstance(closure);
 	result.put("size", (b) size);

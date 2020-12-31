@@ -95,7 +95,7 @@ public class Evaluator implements Visitor<Environment<SMPLObject>, SMPLObject> {
 	}
 
 
-    public SMPLObject visitStmtFunDefn(StmtFunDefn fd, Environment<SMPLObject> env)
+    public SMPLObject visitExpFunDefn(ExpFunDefn fd, Environment<SMPLObject> env)
 	throws VisitException {
 	Closure closure = new Closure(fd,env);// wrap function in a closure
 	SMPLObject f = SMPL.makeInstance(closure); //wrap that closure in SMPLFunc 
@@ -107,7 +107,7 @@ public class Evaluator implements Visitor<Environment<SMPLObject>, SMPLObject> {
 	throws VisitException, MismatchedParamsException {
 	SMPLFunction Func = (SMPLFunction) fc.getFunction().visit(this, env);
 	Closure c = Func.getClosure();
-	StmtFunDefn myFunc = c.getFunction();
+	ExpFunDefn myFunc = c.getFunction();
 	ArrayList<String> params = myFunc.getParams(); // getParam is within the function defintion
 	String paramOvf = myFunc.getParamOvf();
 	int paramCount = params.size();
@@ -143,13 +143,13 @@ public class Evaluator implements Visitor<Environment<SMPLObject>, SMPLObject> {
 	throws VisitException, MismatchedParamsException {
 	SMPLFunction Func = (SMPLFunction) fc.getFunction().visit(this, env);
 	Closure c = Func.getClosure();
-	StmtFunDefn myFunc = c.getFunction();
+	ExpFunDefn myFunc = c.getFunction();
 	ArrayList<String> params = myFunc.getParams(); // getParam is within the function defintion
 	String paramOvf = myFunc.getParamOvf();
 	int paramCount = params.size();
 
 	ArrayList<SMPLObject> arguements = new ArrayList<SMPLObject>();
-	SMPLPair lst = (SMPLPair) fc.getArgs().visit(this, env); // expressions that we got as arguments
+	SMPLList lst = (SMPLList) fc.getArgs().visit(this, env); // expressions that we got as arguments
 	SMPLObject left = lst.car();
 	SMPLObject next = lst.cdr();
 	SMPLBoolean p = (SMPLBoolean) next.equalTo(new SMPLNil());
@@ -167,14 +167,12 @@ public class Evaluator implements Visitor<Environment<SMPLObject>, SMPLObject> {
 		throw new MismatchedParamsException(params.size(),arguements.size());
 	}
 
-	ArrayList<SMPLObject> args = new ArrayList<SMPLObject>();
-	Environment newEnv;
+	Environment newEnv = new Environment(env);
 	int i;
-	for(i = 0; i < paramCount; i++){
-		args.add(arguements.get(i));
+	for(i = 0; i < paramCount; i ++){
+		newEnv.put(params.get(i), arguements.get(i));
 	}
 
-	newEnv = new Environment(c.getClosingEnv(), params, args);
 	if (paramOvf != null){
 		ArrayList<SMPLObject> argOvf = new ArrayList<SMPLObject>();
 		for (i = paramCount; i < argCount; i++){
@@ -294,15 +292,67 @@ public class Evaluator implements Visitor<Environment<SMPLObject>, SMPLObject> {
 	return SMPL.makeInstance(new List(args));
     }
 
+    public SMPLObject visitExpListConcat(ExpListConcat exp, Environment<SMPLObject> env)
+	throws VisitException {
+	SMPLObject obj1, obj2;
+	obj1 = exp.getExpL().visit(this, env);
+	obj2 = exp.getExpR().visit(this, env);
+	return obj1.concat(obj2);
+    }
+
 
     public SMPLObject visitExpVector(ExpVector vect, Environment<SMPLObject> env)
 	throws VisitException{
 	ArrayList<SMPLObject> args = new ArrayList<>();
 	ArrayList<Exp> exp = vect.getVal();
 	for(Exp e: exp){
-		args.add(e.visit(this, env));
+		if (e instanceof ExpSubVector){
+			SMPLVector sub = (SMPLVector) e.visit(this, env);
+			int len = ((SMPLNumbers) sub.size()).getIntVal();
+			for (int i = 0; i < len; i++){
+				args.add(sub.get(i));
+			}
+		}else{
+			args.add(e.visit(this, env));
+		}
 	}
 	return SMPL.makeInstance(new Vector(args));
+    }
+
+	public SMPLObject visitExpSubVector(ExpSubVector vect, Environment<SMPLObject> env)
+	throws VisitException{
+	SMPLFunction func = (SMPLFunction) vect.getFunction().visit(this, env);
+	Closure c = func.getClosure();
+	ExpFunDefn myFunc = c.getFunction();
+	ArrayList<String> params = myFunc.getParams(); // getParam is within the function defintion
+	String paramOvf = myFunc.getParamOvf();
+	int paramCount = params.size();
+
+	if (((paramCount == 0) && (paramOvf == null)) ||
+	(paramCount != 1)){
+		throw new MismatchedParamsException(params.size(),1);
+	}
+
+	String p;
+	if (paramCount == 0){
+		p = paramOvf;
+	}else{
+		p = params.get(0);
+	}
+
+	ArrayList<SMPLObject> v = new ArrayList<SMPLObject>();
+	Environment newEnv = new Environment(env);
+	SMPLNumbers count = (SMPLNumbers) vect.getCount().visit(this, env);
+	Integer end = count.getIntVal();
+	for (int i = 0; i < end; i ++){
+		try{
+			newEnv.update(p, SMPL.makeInstance(new Integer(i)));
+		}catch(UnboundVarException u){
+			newEnv.put(p, SMPL.makeInstance(new Integer(i)));
+		}
+		v.add(myFunc.getBody().visit(this, newEnv));
+	}
+	return SMPL.makeInstance(new Vector(v));
     }
 
 	public SMPLObject visitSize(Size exp, Environment<SMPLObject> env)

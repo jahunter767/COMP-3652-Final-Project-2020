@@ -85,7 +85,7 @@ public class ToScheme implements Visitor<Void, String> {
 
 
     // expressions
-	public String visitStmtFunDefn(StmtFunDefn fd, Void arg)
+	public String visitExpFunDefn(ExpFunDefn fd, Void arg)
 	throws VisitException {
 	ArrayList<String> params = fd.getParams();
 	String result = "(proc (params " + params.remove(0);
@@ -219,6 +219,14 @@ public class ToScheme implements Visitor<Void, String> {
 	}
 	result = result + ")";
 	return result;
+	}
+
+	public String visitExpListConcat(ExpListConcat exp, Void arg)
+	throws VisitException {
+	String obj1, obj2;
+	obj1 = exp.getExpL().visit(this, arg) + " ";
+	obj2 = exp.getExpR().visit(this, arg);
+	return "(@ " + obj1 + obj2 + ")";
     }
 
 
@@ -233,6 +241,13 @@ public class ToScheme implements Visitor<Void, String> {
 	result = result + ")";
 	return result;
     }
+
+	public String visitExpSubVector(ExpSubVector vect, Void arg)
+	throws VisitException{
+	String count = vect.getCount().visit(this, arg) + " ";
+	String func = vect.getFunction().visit(this, arg);
+	return "(: " + count + func + ")";
+	}
 
 	public String visitSize(Size exp, Void arg)
 	throws VisitException{

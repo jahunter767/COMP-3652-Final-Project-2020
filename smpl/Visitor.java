@@ -25,7 +25,7 @@ public interface Visitor<S, T> {
     public T visitStmtPrintln(StmtPrintln p, S arg) throws VisitException;
     
     // expressions
-    public T visitStmtFunDefn(StmtFunDefn fd, S arg) throws VisitException;
+    public T visitExpFunDefn(ExpFunDefn fd, S arg) throws VisitException;
     public T visitExpFunCall(ExpFunCall fc, S arg) throws VisitException;
     public T visitExpCall(ExpCall fc, S arg) throws VisitException;
 
@@ -45,8 +45,10 @@ public interface Visitor<S, T> {
     public T visitisPair(isPair exp, S arg) throws VisitException;
 
     public T visitExpList(ExpList exp, S arg) throws VisitException;
+    public T visitExpListConcat(ExpListConcat exp, S arg) throws VisitException;
 
     public T visitExpVector(ExpVector exp, S arg) throws VisitException;
+    public T visitExpSubVector(ExpSubVector exp, S arg) throws VisitException;
     public T visitSize(Size exp, S arg) throws VisitException;
     public T visitExpGetVectEl(ExpGetVectEl exp, S arg) throws VisitException;
     public T visitStmtSetVectEl(StmtSetVectEl exp, S arg) throws VisitException;

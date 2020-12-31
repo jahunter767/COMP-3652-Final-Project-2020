@@ -48,6 +48,8 @@ import java_cup.runtime.*;
     }
 %}
 
+%debug
+
 %xstates SMPL_STRING, CHAR_ESCAPE
 %xstates BLK_COMMENT
 

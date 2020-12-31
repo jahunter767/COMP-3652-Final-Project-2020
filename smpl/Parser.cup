@@ -96,13 +96,12 @@ non terminal Exp term;
 non terminal Exp power;
 non terminal Exp bitwiseNot;
 non terminal Exp lit;
-non terminal Exp complexLit;
 
 non terminal ExpLet let;
 non terminal ArrayList<ExpBind> bindList;
 non terminal ExpBind binding;
 
-non terminal StmtFunDefn funDefn;
+non terminal ExpFunDefn funDefn;
 non terminal ArrayList<String> paramList;
 non terminal ArrayList<String> paramListE;
 
@@ -152,9 +151,9 @@ print ::= PRINT LPAREN expression:e RPAREN SEMI {: RESULT = new StmtPrint(e); :}
 definition ::= DEF VAR:v expression:e SEMI {: 
 					RESULT = new StmtDefinition(v, e); :};
 
-assignment ::= VAR:v ASSIGN  expression:e SEMI {:
+assignment ::= VAR:v ASSIGN expression:e SEMI {:
 					RESULT = new StmtAssignment(v, e); :} |
-				complexLit:l LSQPAREN expression:i RSQPAREN ASSIGN expression:e SEMI {:
+				lit:l LSQPAREN expression:i RSQPAREN ASSIGN expression:e SEMI {:
 					RESULT = new StmtSetVectEl(l, i, e); :};
 
 
@@ -162,8 +161,8 @@ compoundExpr ::= LBRACE stmtList:sList RBRACE {: RESULT = sList; :};/* |
 				expression:e RBRACE {: RESULT = e; :}; */
 
 
-//expression ::= expression:e LSTCONCAT and:a {: RESULT = new ExpLstConcat(e, a); :} |
-expression ::= expression:e OR and:a {: RESULT = new ExpOr(e, a); :} |
+expression ::= expression:e LSTCONCAT and:a {: RESULT = new ExpListConcat(e, a); :} |
+				expression:e OR and:a {: RESULT = new ExpOr(e, a); :} |
 				and:a {: RESULT = a; :};
 
 and ::= and:a AND not:n {: RESULT = new ExpAnd(a, n); :} |
@@ -214,7 +213,16 @@ power ::= bitwiseNot:b EXP power:p {: RESULT = new ExpPow(b, p); :} |
 bitwiseNot ::= BIT_NOT lit:l {: RESULT = new ExpBitwiseNot(l); :} |
 				lit:l {: RESULT = l; :};
 
-lit ::= complexLit:l {: RESULT = l; :} |
+lit ::= let:l {: RESULT = l; :} |
+		funDefn:f {: RESULT = f; :} |
+		case:c {: RESULT = c; :} |
+		ifStmt:i {: RESULT = i; :} |
+		funCall:fCall {: RESULT = fCall; :} |
+		LPAREN expression:e RPAREN {: RESULT = e; :} |
+		vectorAccess:vectGet {: RESULT = vectGet; :} |
+		VAR:var {: RESULT = new ExpVar(var); :} |
+		vector:vect {: RESULT = vect; :} |
+		list:lst {: RESULT = lst; :} |
 		read:r {: RESULT = r; :} |
 		NIL {: RESULT = new ExpLit("nil"); :} |
 		INT:ilit {: RESULT = new ExpLit("number", ilit); :} |
@@ -222,17 +230,6 @@ lit ::= complexLit:l {: RESULT = l; :} |
 		BOOL:blit {: RESULT = new ExpLit("boolean", blit); :} |
 		CHAR:charLit {: RESULT = new ExpLit("character", charLit); :} |
 		STRING:strLit {: RESULT = new ExpLit("string", strLit); :};
-
-complexLit ::= let:l {: RESULT = l; :} |
-		funDefn:f {: RESULT = f; :} |
-		case:c {: RESULT = c; :} |
-		ifStmt:i {: RESULT = i; :} |
-		funCall:fCall {: RESULT = fCall; :} |
-		LPAREN compoundExpr:e RPAREN {: RESULT = e; :} |
-		vectorAccess:vectGet {: RESULT = vectGet; :} |
-		VAR:var {: RESULT = new ExpVar(var); :} |
-		vector:vect {: RESULT = vect; :} |
-		list:lst {: RESULT = lst; :};
 
 
 let ::= LET LPAREN bindList:bindLst RPAREN compoundExpr:b {:
@@ -250,11 +247,11 @@ binding ::= VAR:v EQUAL expression:e {: RESULT = new ExpBind(v, e); :};
 
 
 funDefn ::= PROC LPAREN paramListE:pListE RPAREN compoundExpr:b {:
-				RESULT = new StmtFunDefn(pListE, b); :} |
+				RESULT = new ExpFunDefn(pListE, b); :} |
 			PROC LPAREN paramList:pList DOT VAR:paramOvf RPAREN compoundExpr:b {:
-				RESULT = new StmtFunDefn(pList, paramOvf, b); :} |
+				RESULT = new ExpFunDefn(pList, paramOvf, b); :} |
 			PROC VAR:v compoundExpr:b {:
-				RESULT = new StmtFunDefn(v, b); :};
+				RESULT = new ExpFunDefn(v, b); :};
 
 paramList ::=  paramList:pList COMMA VAR:v {:
 					pList.add(v);
@@ -290,7 +287,7 @@ else  ::= ELSE compoundExpr:alt {: RESULT = alt; :} |
 
 funCall ::= CALL LPAREN expression:f COMMA expression:lst RPAREN {:
 				RESULT = new ExpCall(f, lst); :} |
-			complexLit:l LPAREN argListE:aListE RPAREN {:
+			lit:l LPAREN argListE:aListE RPAREN {:
 				RESULT = new ExpFunCall(l, aListE); :};
 
 argList ::= argList:aList COMMA expression:e {:
@@ -332,10 +329,10 @@ vectorElementLst ::= vectorElementLst:lst COMMA vectEl:e {:
 			lst.add(e);
 			RESULT = lst; :};
 
-vectEl ::= expression:e {: RESULT = e; :};/* |
-			expression:e COLON funDefn:f {: RESULT = new ExpSubVect(e, f) :};
-*/
-vectorAccess ::= complexLit:l LSQPAREN expression:i RSQPAREN {:
+vectEl ::= expression:e {: RESULT = e; :} |
+			expression:e COLON funDefn:f {: RESULT = new ExpSubVector(e, f); :};
+
+vectorAccess ::= lit:l LSQPAREN expression:i RSQPAREN {:
 				RESULT = new ExpGetVectEl(l, i); :};
 
 

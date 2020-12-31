@@ -197,7 +197,7 @@ stmtList ::= stmtList:lst stmt:s {:
 		RESULT = new StmtSequence(s);
 		:};
 
-stmt ::= Listconcat:lst {:RESULT = new Statement(lst); :}  | assignment:a {:RESULT = a; :}|let:l {: RESULT = new Statement(l); :} | case:c {: RESULT = new Statement(c); :} |ifStmt:i {: RESULT = new Statement(i); :}| read:r SEMI {: RESULT = new Statement(r); :} | print:p SEMI {: RESULT = p; :} | funDefn:func {: RESULT = func; :} | definition:d {: RESULT = d; :} | expression:a {: RESULT = new Statement(a); :} SEMI; // |conditionalExpression:conditional {: RESULT = new Statement(conditional); :}; // 
+stmt ::= Listconcat:lst {:RESULT = new Statement(lst); :} |vectorOps:v {: RESULT = new Statement(v); :}   | assignment:a {:RESULT = a; :}|let:l {: RESULT = new Statement(l); :} | case:c {: RESULT = new Statement(c); :} |ifStmt:i {: RESULT = new Statement(i); :}| read:r SEMI {: RESULT = new Statement(r); :} | print:p SEMI {: RESULT = p; :} | funDefn:func {: RESULT = func; :} | definition:d {: RESULT = d; :} | expression:a {: RESULT = new Statement(a); :} SEMI; // |conditionalExpression:conditional {: RESULT = new Statement(conditional); :}; // 
 
 
 
@@ -250,7 +250,7 @@ vectorElementLst ::= vectorElementLst:lst COMMA expression:e {:
 			lst.add(e);
 			RESULT = lst; :};
 
-vectorOps ::= VAR:v LSQPAREN expression:i RSQPAREN {:
+vectorOps ::= VAR:v LSQPAREN expression:i RSQPAREN SEMI {:
 				RESULT = new ExpGetVectEl(v, i); :} |
 			VAR:v LSQPAREN expression:i RSQPAREN ASSIGN expression:e SEMI {:
 				RESULT = new ExpSetVectEl(v, i, e); :} |
@@ -286,11 +286,11 @@ definition ::= DEF VAR:v Defnexpr:exp {: RESULT = new StmtDefinition(v,exp); :};
 assignment ::= VAR:v ASSIGN expression:e SEMI {: RESULT = new StmtAssignment(v, e); :};
 
 
-Defnexpr ::= Listconcat:lst {:RESULT = new Statement(lst); :}| case:c {: RESULT = new Statement(c); :} |ifStmt:i {: RESULT = new Statement(i); :} | expression:a SEMI {: RESULT = new Statement(a); :} | funDefn:func {: RESULT = func; :};
+Defnexpr ::= Listconcat:lst {:RESULT = new Statement(lst); :}  |vectorOps:v {: RESULT = new Statement(v); :} | case:c {: RESULT = new Statement(c); :} |ifStmt:i {: RESULT = new Statement(i); :} | expression:a SEMI {: RESULT = new Statement(a); :} | funDefn:func {: RESULT = func; :};
 
 //Car:car {:RESULT = new Statement(car); :} | Cdr:cdr {:RESULT = new Statement(cdr); :} | Pair:pair {:RESULT = new Statement(pair);:} | List:lst {:RESULT = new Statement(lst); :} | str:s {: RESULT = new Statement(s); :} | Substr:str {: RESULT = new Statement(str); :} |
 
-expr ::=  Listconcat:lst {:RESULT = new Statement(lst); :} | case:c {: RESULT = new Statement(c); :} |ifStmt:i {: RESULT = new Statement(i); :} | expression:a {: RESULT = new Statement(a); :} | funDefn:func {: RESULT = func; :};
+expr ::=  Listconcat:lst {:RESULT = new Statement(lst); :} | vectorOps:v {: RESULT = new Statement(v); :}  | case:c {: RESULT = new Statement(c); :} |ifStmt:i {: RESULT = new Statement(i); :} | expression:a {: RESULT = new Statement(a); :} | funDefn:func {: RESULT = func; :};
 
 //arithExp:a {: RESULT = new Statement(a); :} | Car:car {:RESULT = new Statement(car); :} | Cdr:cdr {:RESULT = new Statement(cdr); :} | Pair:pair {:RESULT = new Statement(pair);:} | List:lst {:RESULT = new Statement(lst); :} | str:s {: RESULT = new Statement(s); :} | Substr:str {: RESULT = new Statement(str); :} | funDefn:func {: RESULT = func; :};
 
@@ -465,7 +465,7 @@ factor ::= bitwiseNot:n EXP factor:f {:RESULT = new ExpPow(n,f); :} | bitwiseNot
 bitwiseNot ::= BIT_NOT bitwiseNot:n {: RESULT = new ExpBitwiseNot(n); :} |  atom:a {: RESULT = a; :};
 
 atom ::= INT:ilit {: RESULT = new ExpLit<Integer>(ilit); :}| DOUBLE:dlit {: RESULT = new ExpLit<Double>(dlit); :} | BOOL:blit {: RESULT = new ExpLit<Boolean>(blit); :}|STRING: slit {: RESULT = new ExpLit<String>(slit); :}|CHAR:clit {: RESULT = new ExpLit<Character>(clit); :}|
-	  List:lst {:RESULT = new Statement(lst); :} | vector:v {: RESULT = new Statement(v); :}  |vectorOps:v {: RESULT = new Statement(v); :} | NIL {: RESULT = new ExpList(); :}| LPAREN expression:a RPAREN {: RESULT = a; :} | funcall:fcall {:RESULT = fcall;:} | VAR:var {:RESULT = new ExpVar(var);:}; //
+	  List:lst {:RESULT = new Statement(lst); :} | vector:v {: RESULT = new Statement(v); :} | NIL {: RESULT = new ExpList(); :}| LPAREN expression:a RPAREN {: RESULT = a; :} | funcall:fcall {:RESULT = fcall;:} | VAR:var {:RESULT = new ExpVar(var);:}; //
 	   
 
 emptyA ::= {: ArrayList<Exp> result = new ArrayList<>(); RESULT = result; :} ;

@@ -56,7 +56,7 @@ terminal ASSIGN, BIND, COMMA, DOT, COLON, SEMI,POP;
 terminal LSTCONCAT;
 
 // arithmetic operators
-terminal PLUS, MINUS, MUL, DIV, MOD, EXP;
+terminal PLUS, MINUS, MUL, DIV, MOD, EXP, INTDIV;
 
 // bit-wise operators
 terminal BIT_AND, BIT_OR, BIT_NOT;
@@ -456,6 +456,8 @@ term ::= term:t MUL factor:f {: // x := f(2+1) + 1 * y
 		RESULT = new ExpDiv(t, f); :} |
 	 term:t MOD factor:f {:
 		RESULT = new ExpMod(t, f); :} |
+	 term:t INTDIV factor:f {:
+		RESULT = new ExpIntDiv(t, f); :} |
 	 factor:f {: RESULT = f; :};
 
 factor ::= bitwiseNot:n EXP factor:f {:RESULT = new ExpPow(n,f); :} | bitwiseNot:n {: RESULT = n; :};

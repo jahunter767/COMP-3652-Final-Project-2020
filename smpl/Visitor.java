@@ -43,6 +43,7 @@ public interface Visitor<S, T> {
     public T visitExpSub(ExpSub exp, S arg) throws VisitException;
     public T visitExpMul(ExpMul exp, S arg) throws VisitException;
     public T visitExpDiv(ExpDiv exp, S arg) throws VisitException;
+	public T visitExpIntDiv(ExpIntDiv exp, S arg) throws VisitException;
     public T visitExpMod(ExpMod exp, S arg) throws VisitException;
 
     public T visitExpLit(ExpLit exp, S arg) throws VisitException;
@@ -98,5 +99,4 @@ public interface Visitor<S, T> {
     public T visitExpNot(ExpNot exp, S arg) throws VisitException;
     public T visitExpAnd(ExpAnd exp, S arg) throws VisitException;
     public T visitExpOr(ExpOr exp, S arg) throws VisitException;
-
 }

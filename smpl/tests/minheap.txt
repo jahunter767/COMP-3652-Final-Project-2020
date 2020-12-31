@@ -1,5 +1,9 @@
+def heap [:100000,100000,100000,100000,100000,100000,100000,100000,100000,100000,100000,100000:];
+def count 10;
+def size 0;
+
 def parent proc(i){
-    (i - 1 ) / 2;
+    (i - 1 ) // 2;
 }
 
 def left_child proc(i){
@@ -10,23 +14,46 @@ def right_child proc(i){
     2 * i + 1;
 }
 
-def swap proc(x, y){
-    def temp x;
-    x := y;
-    y :=  temp;
+def getMin proc(heap){
+    heap[0];
 }
 
-def swap_and_insert proc(){
+def swap_and_insert proc(i, value){
+    if heap[i] < heap[parent(i)] and i != 0 then {
+        def temp heap[i];
+        heap[i] := heap[parent(i)];;
+        heap[parent(i)] := temp;;
 
-}
-
-def insert proc(heap, value, size){
-    if size < 10 then {
-        def heap[size] value;
-        def n size+1;
-
-        def i n -1;
-
-
+        swap_and_insert( parent(i) , value);
     }
+    else{
+        heap[0];
+    };
 }
+
+def insert proc(data){
+    if size < 10  then{
+        heap[10] := data;;
+        swap_and_insert(10, data);
+        size := size + 1;
+    };
+}
+
+def print_heap proc(heap, count){
+    if count < 1 then {
+        println(heap[0]);
+    }
+    else{
+        println(heap[count]);
+        print_heap(heap, count - 1);
+    };
+}
+
+insert(-5);
+insert(1);
+insert(-4);
+insert(2);
+
+print_heap(heap, 10);
+
+getMin(heap);

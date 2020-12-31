@@ -105,6 +105,7 @@ CommentContent       = ( [^*] | \*+ [^/*] )*
 <YYINITIAL>	" * "	{return new Symbol(sym.MUL);}
 <YYINITIAL>	" / "	{return new Symbol(sym.DIV);}
 <YYINITIAL>	" % "	{return new Symbol(sym.MOD);}
+<YYINITIAL>	" // "	{return new Symbol(sym.INTDIV);}
 <YYINITIAL>	" ^ "	{return new Symbol(sym.EXP);}
 
 <YYINITIAL>	" & "	{return new Symbol(sym.BIT_AND);}

@@ -123,6 +123,10 @@ public abstract class SMPLObject<T> {
 	throw new TypeException();
     }
 
+    public SMPLObject intDivide(SMPLObject object) throws TypeException {
+    throw new TypeException();
+    }
+
     public SMPLObject mod(SMPLObject object) throws TypeException {
 	throw new TypeException();
     }

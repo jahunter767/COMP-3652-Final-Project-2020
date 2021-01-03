@@ -19,11 +19,12 @@ def getMin proc(heap){
 }
 
 def swap_and_insert proc(heap, i, value){
-    if heap[i] < heap[parent(i)] and i != 0 then {
-
+    def child heap[i];
+    def root heap[parent(i)];
+    if child < root and i != 0 then {
         def temp heap[i];
-        heap[i] := heap[parent(i)];;
-        heap[parent(i)] := temp;;
+        heap[i] := root;
+        heap[parent(i)] := temp;
 
         swap_and_insert(heap, parent(i) , value);
     }
@@ -34,7 +35,7 @@ def swap_and_insert proc(heap, i, value){
 
 def insert proc(heap, data){
     if heap_size < 10  then{
-        heap[9] := data;;
+        heap[9] := data;
         swap_and_insert(heap, 9, data);
         heap_size := heap_size + 1;
     };
@@ -45,21 +46,26 @@ def heapify proc(heap, index, size){
     def right right_child(index);
     def smallest index;
     if left <= size then {
-        if heap[left] < heap[smallest] then{
+        def left_value heap[left];
+        def smallest_value heap[smallest];
+        if left_value < smallest_value then{
             smallest := left;
         };
     };
 
     if right <= size then {
-        if heap[right] < heap[smallest] then{
+        def right_value heap[right];
+        def smallest_value heap[smallest];
+        if right_value < smallest_value then{
             smallest := right;
         };
     };
 
     if smallest != index then {
         def temp heap[index];
-        heap[index] := heap[smallest];;
-        heap[smallest] := temp;;
+        def smallest_value heap[smallest];
+        heap[index] := smallest_value;
+        heap[smallest] := temp;
         heapify(heap, smallest, size);
     };
 }
@@ -73,8 +79,8 @@ def build_heap proc(heap, size, counter){
 
 def deleteMin proc(heap, count){
     def min getMin(heap);
-
-    heap[0] := heap[count - 1];;
+    def last heap[count - 1];
+    heap[0] := last;
     count := count - 1;
 
     heapify(heap, 0, count);
@@ -83,24 +89,20 @@ def deleteMin proc(heap, count){
 
 def print_heap proc(heap, count){
     if count < 1 then {
-        println(heap[0]);
+        def root heap[0];
+        println(root);
     }
     else{
-        println(heap[count]);
+        def element heap[count];
+        println(element);
         print_heap(heap, count - 1);
     };
 }
 
 build_heap(heap, 10, 5);
 
-deleteMin(heap, count);
-
-getMin(heap);
+print_heap(heap, count);
 
 deleteMin(heap, count);
 
-getMin(heap);
-
-deleteMin(heap, count);
-
-getMin(heap);
+print_heap(heap, count);

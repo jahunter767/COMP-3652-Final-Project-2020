@@ -162,6 +162,8 @@ non terminal Exp atom;
 non terminal Exp expr; // for all expressions
 non terminal Exp Defnexpr; // for all definition expressions 
 non terminal Exp ifexpr;
+non terminal Exp printexpr;
+
 non terminal Exp str; // for strings
 non terminal Exp concat; // for strings concat
 non terminal Substr Substr; // for substrings
@@ -208,11 +210,12 @@ Defnexpr ::= Listconcat:lst {:RESULT = new Statement(lst); :}  |vectorOpAssign:v
 
 expr ::=  Listconcat:lst {:RESULT = new Statement(lst); :} | vectorOpAssign:v {: RESULT = new Statement(v); :}  | case:c {: RESULT = new Statement(c); :} |ifStmt:i {: RESULT = new Statement(i); :} | expression:a {: RESULT = new Statement(a); :} | funDefn:func {: RESULT = func; :};
 
-ifexpr ::= ifStmt:i {: RESULT = new Statement(i); :} | expression:a {: RESULT = new Statement(a); :};
 
 
-print ::= PRINT LPAREN stmt:e RPAREN {: RESULT = new StmtPrint(e); :} |
-		PRINTLN LPAREN stmt:e RPAREN {: RESULT = new StmtPrintln(e); :};
+printexpr ::= Listconcat:lst {:RESULT = new Statement(lst); :} | call:c {: RESULT = new Statement(c); :} |vectorOpAssign:v {: RESULT = new Statement(v); :}   | assignment:a {:RESULT = a; :}|let:l {: RESULT = new Statement(l); :} | case:c {: RESULT = new Statement(c); :} |ifStmt:i {: RESULT = new Statement(i); :}| funDefn:func {: RESULT = func; :} | definition:d {: RESULT = d; :} | expression:a {: RESULT = new Statement(a); :};
+
+print ::= PRINT LPAREN printexpr:e RPAREN {: RESULT = new StmtPrint(e); :} |
+		PRINTLN LPAREN printexpr:e RPAREN {: RESULT = new StmtPrintln(e); :};
 
 read ::= READ LPAREN RPAREN {: RESULT = new ExpRead(); :} |
 		READINT LPAREN RPAREN {: RESULT = new ExpReadInt(); :};

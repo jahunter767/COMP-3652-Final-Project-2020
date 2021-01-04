@@ -68,11 +68,9 @@ public class SMPLString extends SMPLObject<String> {
 
 
 
-
     public String toString(){
-	return "Type: " + getType() + "\nValue: " + getVal();
+	return String.valueOf(getVal());
     }
-
 
     public String printVal(){
 	return String.valueOf(getVal());

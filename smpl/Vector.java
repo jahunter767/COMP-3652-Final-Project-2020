@@ -31,4 +31,17 @@ public class Vector{
 	return this.vect.size();
     }
 
+    public String toString(){
+    String result = "[:";
+    SMPLObject el;
+    int i;
+    for (i = 0; i < this.vect.size()-1; i ++){
+        el = this.vect.get(i);
+        result = result + el.toString() + ", ";
+    }
+    el = this.vect.get(i);
+    result = result + el.toString() + ":]";
+    return result;
+    }
+
 }

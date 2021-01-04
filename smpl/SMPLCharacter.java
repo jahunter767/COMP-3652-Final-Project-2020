@@ -37,9 +37,8 @@ public class SMPLCharacter extends SMPLObject<Character> {
 
 
     public String toString(){
-	return "Type: " + getType() + "\nValue: " + getVal();
+	return String.valueOf(getVal());
     }
-
 
     public String printVal(){
 	return String.valueOf(getVal());

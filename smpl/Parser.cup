@@ -204,7 +204,25 @@ stmtList ::= stmtList:lst stmt:s {:
 		RESULT = new StmtSequence(s);
 		:}; // | expression:e {:RESULT = new StmtSequence(new Statement(e)); :};
 
-stmt ::= Listconcat:lst {:RESULT = new Statement(lst); :} | call:c {: RESULT = new Statement(c); :} |vectorOpAssign:v {: RESULT = new Statement(v); :}   | assignment:a {:RESULT = a; :}|let:l {: RESULT = new Statement(l); :} | case:c {: RESULT = new Statement(c); :} |ifStmt:i {: RESULT = new Statement(i); :}| read:r SEMI {: RESULT = new Statement(r); :} | print:p SEMI {: RESULT = p; :} | funDefn:func {: RESULT = func; :} | definition:d {: RESULT = d; :} | expression:a {: RESULT = new Statement(a); :} SEMI; // |conditionalExpression:conditional {: RESULT = new Statement(conditional); :}; // 
+
+
+
+stmt ::= Listconcat:lst {:RESULT = new Statement(lst); :} |
+ 	 call:c {: RESULT = new Statement(c); :} |
+	 vectorOpAssign:v {: RESULT = new Statement(v); :}   |
+	 assignment:a {:RESULT = a; :}|
+	 let:l {: RESULT = new Statement(l); :} |
+	 case:c {: RESULT = new Statement(c); :} |
+	 ifStmt:i {: RESULT = new Statement(i); :}|
+	 read:r SEMI {: RESULT = new Statement(r); :} |
+	 print:p SEMI {: RESULT = p; :} |
+	 funDefn:func {: RESULT = func; :} |
+	 definition:d {: RESULT = d; :} |
+	 expression:a {: RESULT = new Statement(a); :} SEMI;
+
+
+
+ 
 
 Defnexpr ::= Listconcat:lst {:RESULT = new Statement(lst); :}  |vectorOpAssign:v {: RESULT = new Statement(v); :} | case:c {: RESULT = new Statement(c); :} |ifStmt:i {: RESULT = new Statement(i); :} | expression:a SEMI {: RESULT = new Statement(a); :} | funDefn:func {: RESULT = func; :};
 

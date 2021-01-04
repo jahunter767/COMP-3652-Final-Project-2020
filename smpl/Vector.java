@@ -31,4 +31,15 @@ public class Vector{
 	return this.vect.size();
     }
 
+    public String toString(){
+        String string = "[:";
+        string += vect.get(0).getVal();
+        for (int i=1; i< vect.size(); i++){
+            string+=",";
+            string += vect.get(i).getVal();
+        }
+        string+= ":]";
+        return string;
+    }
+
 }

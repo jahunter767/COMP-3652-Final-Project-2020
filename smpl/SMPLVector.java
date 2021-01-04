@@ -93,10 +93,11 @@ public class SMPLVector extends SMPLObject<Vector> {
     public SMPLObject size() throws TypeException {
 	return SMPL.makeInstance(length());
     }
-
+    
+    
 
 	public String toString(){
-	return "Type: SMPLVector\nValue: " + getVal();
+        return getVal().toString();
     }
 
 }

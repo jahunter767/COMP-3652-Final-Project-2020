@@ -1,0 +1,5 @@
+def f proc(lst){
+    println(lst);
+};
+
+call(f, [1,#e]);

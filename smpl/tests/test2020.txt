@@ -1,0 +1,78 @@
+// test a line comment
+println("*** Line comments ***");
+1 + // 2
+3 ;
+
+1 + /* 2 */ 2 ;
+println("*** End of line comments ***");
+
+// integers
+print("*** Integers Tests ***\n");
+print("10: "); println(10);
+print("#b101"); println(#b101);
+print("#x10ff"); println(#x10ff);
+print("*** End of Integers ***\n");
+
+// identifiers
+print("*** Identifiers Tests ***\n");
+def x 1;
+def x1 1 ;
+def x1y 1;
+def 1xy 1;
+def 11xy 1;
+print("*** End of Identifiers tests ***\n");
+
+// strings
+println("*** Strings test ***");
+print(substr("foo", 1, 3)); println(" Should be oo");
+"def";  // should not give error
+"hello world" ;  // ensures that spaces are allowed
+print("*** End of string tests ***\n");
+
+// arithExps
+print ("1 + 2 * 3 ="); println(1 + 2 * 3) ;
+print("1 + 2 + 3 ="); println(1 + 2 + 3);
+print("1 + 2 > 2 + 3 ="); println(1 + 2 > 2 + 3);
+
+// def tests
+println("*** def tests ***");
+println("def x 1 ...");
+def x 1 ;
+print("x = "); print(x) ; print("\n");
+
+println("def x 1 + 2 * 3 ...") ;
+def x 1 + 2 * 3 ;
+print("x = "); print(x); println(" Should be 7");
+
+println("def s <quote foo>") ;
+def s "foo" ;
+print("s = "); print(s); print("\n");
+println("*** End of def tests ***");
+
+// proc tests
+print("*** proc tests ***\n");
+proc(x) x + 1 ;
+proc(x) proc(n) x + n ;
+print("\n");
+print("*** End of proc tests ***\n");
+
+// def within proc
+println("*** Def within proc tests ***");
+def a 5;
+def f proc(n) {
+    def a 3;
+    def g proc(x) {
+	println("<now in g>:");
+	print("x = "); println(x);
+	print("n = "); println(n);
+	print("x + a * n = ");
+	print(x + a * n); print("\t");
+	print("Should be 3n + x"); print("\n");
+	println("<leaving g>...");
+	x + a * n;
+	}
+    g(1);
+}
+print("f(2) = "); print(f(2)); print("Should be 7"); print("\n");
+print("a = "); print(a); print("Should be 5"); print("\n");
+println("*** End of Internal Def Test ***");

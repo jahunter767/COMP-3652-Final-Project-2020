@@ -1,6 +1,6 @@
 def heap [:10, 9,  8, 7, 6, 5, 4, 3, 2, 1, 10000, 10000,  10000, 10000:];
 def count 10;
-def heap_size 0;
+def heap_size count;
 
 def parent proc(i){
     (i - 1 ) // 2;
@@ -77,9 +77,10 @@ def build_heap proc(heap, size, counter){
     };
 }
 
-def deleteMin proc(heap, count){
+def deleteMin proc(heap){
     def min getMin(heap);
     def last heap[count - 1];
+    heap[count - 1] := 10000;
     heap[0] := last;
     count := count - 1;
 
@@ -101,8 +102,10 @@ def print_heap proc(heap, count){
 
 build_heap(heap, 10, 5);
 
-print_heap(heap, count);
+print_heap(heap, count - 1);
+deleteMin(heap);
+deleteMin(heap);
+deleteMin(heap);
+deleteMin(heap);
 
-deleteMin(heap, count);
-
-print_heap(heap, count);
+print_heap(heap, count - 1);

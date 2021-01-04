@@ -260,7 +260,7 @@ public class Evaluator implements Visitor<Environment<SMPLObject>, SMPLObject> {
 	SMPLObject val1, val2;
 	val1 = exp.getExpL().visit(this, env);
 	val2 = exp.getExpR().visit(this, env);
-	return val1.equalTo(val2);
+	return val1.Equal(val2);
     }
 
     public SMPLObject visitExpGreaterEq(ExpGreaterEq exp, Environment<SMPLObject> env)

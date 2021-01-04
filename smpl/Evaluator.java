@@ -148,37 +148,51 @@ public class Evaluator implements Visitor<Environment<SMPLObject>, SMPLObject> {
 	String paramOvf = myFunc.getParamOvf();
 	int paramCount = params.size();
 
+	Environment newEnv;
 	ArrayList<SMPLObject> arguements = new ArrayList<SMPLObject>();
-	SMPLList lst = (SMPLList) fc.getArgs().visit(this, env); // expressions that we got as arguments
-	SMPLObject left = lst.car();
-	SMPLObject next = lst.cdr();
-	SMPLBoolean p = (SMPLBoolean) next.equalTo(new SMPLNil());
-	while (!p.getVal()){
-		arguements.add(left);
-		left = next.car();
-		next = next.cdr();
-		p = (SMPLBoolean) next.equalTo(new SMPLNil());
-	}
-	arguements.add(left);
-	int argCount = arguements.size();
-
-	if (((paramCount < argCount) && (paramOvf == null)) ||
-	(paramCount > argCount)){
-		throw new MismatchedParamsException(params.size(),arguements.size());
-	}
-
-	Environment newEnv = new Environment(env);
-	int i;
-	for(i = 0; i < paramCount; i ++){
-		newEnv.put(params.get(i), arguements.get(i));
-	}
-
-	if (paramOvf != null){
-		ArrayList<SMPLObject> argOvf = new ArrayList<SMPLObject>();
-		for (i = paramCount; i < argCount; i++){
-			argOvf.add(arguements.get(i));
+	SMPLObject a = fc.getArgs().visit(this, env); // expressions that we got as arguments
+	try{
+		SMPLList lst = (SMPLList) a;
+		SMPLObject left = lst.car();
+		SMPLObject next = lst.cdr();
+		SMPLBoolean p = (SMPLBoolean) next.equalTo(new SMPLNil());
+		while (!p.getVal()){
+			arguements.add(left);
+			left = next.car();
+			next = next.cdr();
+			p = (SMPLBoolean) next.equalTo(new SMPLNil());
 		}
-		newEnv.put(paramOvf, SMPL.makeInstance(new List(argOvf)));
+		arguements.add(left);
+		int argCount = arguements.size();
+	
+		if (((paramCount < argCount) && (paramOvf == null)) ||
+		(paramCount > argCount)){
+			throw new MismatchedParamsException(params.size(),arguements.size());
+		}
+	
+		newEnv = new Environment(env);
+		int i;
+		for(i = 0; i < paramCount; i ++){
+			newEnv.put(params.get(i), arguements.get(i));
+		}
+	
+		if (paramOvf != null){
+			ArrayList<SMPLObject> argOvf = new ArrayList<SMPLObject>();
+			for (i = paramCount; i < argCount; i++){
+				argOvf.add(arguements.get(i));
+			}
+			newEnv.put(paramOvf, SMPL.makeInstance(new List(argOvf)));
+		}
+	}catch (ClassCastException cce){
+		newEnv = new Environment(env);
+
+		if (paramCount > 0){
+			throw new MismatchedParamsException(params.size(),arguements.size());
+		}
+
+		if (paramOvf != null){
+			newEnv.put(paramOvf, a);
+		}
 	}
 
 	return myFunc.getBody().visit(this, newEnv);

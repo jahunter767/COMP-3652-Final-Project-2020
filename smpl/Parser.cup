@@ -224,7 +224,7 @@ lit ::= let:l {: RESULT = l; :} |
 		vector:vect {: RESULT = vect; :} |
 		list:lst {: RESULT = lst; :} |
 		read:r {: RESULT = r; :} |
-		NIL {: RESULT = new ExpLit("nil"); :} |
+		NIL {: RESULT = new ExpList(new ArrayList<Exp>()); :} |
 		INT:ilit {: RESULT = new ExpLit("number", ilit); :} |
 		DOUBLE:dlit {: RESULT = new ExpLit("number", dlit); :} |
 		BOOL:blit {: RESULT = new ExpLit("boolean", blit); :} |

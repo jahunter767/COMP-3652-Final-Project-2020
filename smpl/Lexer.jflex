@@ -48,7 +48,7 @@ import java_cup.runtime.*;
     }
 %}
 
-%debug
+//%debug
 
 %xstates SMPL_STRING, CHAR_ESCAPE
 %xstates BLK_COMMENT
@@ -180,7 +180,7 @@ hex = [0-9A-Fa-f]
 		}
 <YYINITIAL>    "- "{0,1}"#b"[01]+ {
 			String num = yytext().replaceFirst("#b", "");
-			num = yytext().replaceAll(" ", "");
+			num = num.replaceAll(" ", "");
 			int i = Integer.parseInt(num, 2);
 			return new Symbol(sym.INT, new Double(i));
 		}

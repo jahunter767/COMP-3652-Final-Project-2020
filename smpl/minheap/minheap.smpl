@@ -1,4 +1,5 @@
-def MAX_SIZE 10;
+def MAX_SIZE 15;
+def INFINITY 100000;
 
 def mkHeap proc(vector, size){
     heapify(vector, size);
@@ -21,11 +22,9 @@ def getMin proc(heap){
 }
 
 def swap_and_insert proc(heap, i, value){
-    def child heap[i];
-    def root heap[parent(i)];
-    if child < root and i != 0 then {
+    if heap[i] < heap[parent(i)] and i != 0 then {
         def temp heap[i];
-        heap[i] := root;
+        heap[i] := heap[parent(i)];
         heap[parent(i)] := temp;
 
         swap_and_insert(heap, parent(i) , value);
@@ -40,6 +39,9 @@ def insert proc(heap, data){
         heap[count] := data;
         swap_and_insert(heap, count, data);
         count := count + 1;
+    }
+    else{
+        println("Heap is full");
     };
 }
 
@@ -48,25 +50,20 @@ def min_heapify proc(heap, index, size){
     def right right_child(index);
     def smallest index;
     if left <= size then {
-        def left_value heap[left];
-        def smallest_value heap[smallest];
-        if left_value < smallest_value then{
+        if heap[left] < heap[smallest] then{
             smallest := left;
         };
     };
 
     if right <= size then {
-        def right_value heap[right];
-        def smallest_value heap[smallest];
-        if right_value < smallest_value then{
+        if heap[right] < heap[smallest] then{
             smallest := right;
         };
     };
 
     if smallest != index then {
         def temp heap[index];
-        def smallest_value heap[smallest];
-        heap[index] := smallest_value;
+        heap[index] := heap[smallest];
         heap[smallest] := temp;
         min_heapify(heap, smallest, size);
     };
@@ -80,24 +77,32 @@ def heapify proc(heap, index, size){
 }
 
 def deleteMin proc(heap){
-    def min getMin(heap);
-    def last heap[count - 1];
-    heap[count - 1] := 10000;
-    heap[0] := last;
-    count := count - 1;
+    if count > 0 then {
+        def min getMin(heap);
+        heap[0] := heap[count - 1];
+        heap[count - 1] := 10000;
+        count := count - 1;
 
-    min_heapify(heap, 0, count);
-    min;
+        min_heapify(heap, 0, count);
+        min;
+    }
+    else{
+        println("Heap is empty");
+    };
+    
 }
 
 def print_heap proc(heap, count){
-    if count < 1 then {
-        def root heap[0];
-        println(root);
+    if count < 0 then {
+        println("Heap is empty");
     }
     else{
-        def element heap[count];
-        println(element);
-        print_heap(heap, count - 1);
+        if count < 1 then {
+            println(heap[0]);
+        }
+        else{
+            println(heap[count]);
+            print_heap(heap, count - 1);
+        };
     };
 }

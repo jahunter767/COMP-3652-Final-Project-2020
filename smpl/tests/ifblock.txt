@@ -1,9 +1,13 @@
 def v 1;
 def v1 0;
 
-if v - 1 = v1 then {
+def vector [:1,2,3:];
+
+if vector[1] - 1 = vector[0] then {
     println(v - 1);
     println(v1); // this is a comment
+    vector[2] := 6.09;
+    println(vector[2]);
 }
 else{
     println(v - 1);

@@ -29,7 +29,7 @@ public interface Visitor<S, T> {
     public T visitStmtFunDefn(StmtFunDefn fd, S arg) throws VisitException;
 
     public T visitExpFunCall(ExpFunCall fc, S arg) throws VisitException;
-
+    public T visitExpCall(ExpCall fc, S arg) throws VisitException;
 
     // expressions
     public T visitExpIf(ExpIf ifStmt, S arg) throws VisitException;

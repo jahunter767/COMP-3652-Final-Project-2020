@@ -4,8 +4,8 @@ public class SMPLPair extends SMPLObject<Pair> {
 	super(type,val);
     }
 
-    public String toString(){
-	return "Type: " + getType() + "\nValue: " + getVal();
+	public String toString(){
+	return getVal().toString();
     }
 
 

@@ -32,14 +32,16 @@ public class Vector{
     }
 
     public String toString(){
-        String string = "[:";
-        string += vect.get(0).getVal();
-        for (int i=1; i< vect.size(); i++){
-            string+=",";
-            string += vect.get(i).getVal();
-        }
-        string+= ":]";
-        return string;
+    String result = "[:";
+    SMPLObject el;
+    int i;
+    for (i = 0; i < this.vect.size()-1; i ++){
+        el = this.vect.get(i);
+        result = result + el.toString() + ", ";
+    }
+    el = this.vect.get(i);
+    result = result + el.toString() + ":]";
+    return result;
     }
 
 }

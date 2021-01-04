@@ -7,7 +7,7 @@ public class SMPLList extends SMPLObject<List> {
     }
 
     public String toString(){
-	return "Type: " + getType() + "\nValue: " + getVal();
+	return getVal().toString();
     }
 
     public SMPLObject car() throws TypeException {
@@ -61,8 +61,8 @@ public class SMPLList extends SMPLObject<List> {
 		
 		return SMPL.makeInstance(new List(mergedEl));
 	} else {
-		
-		throw new TypeException();
+					// [11] and [21,15,4,5,3,2,1,0]
+		throw new TypeException();// [11,1,2,3,4,15,21]
 	}
 
     }

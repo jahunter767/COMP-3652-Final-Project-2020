@@ -74,4 +74,31 @@ public class List{
 	return this.len;
     }
 
+public String toString(){
+	SMPLObject curr = this.pair.getFirstEl();
+	if (curr instanceof SMPLNone){
+		return "[]";
+	}
+
+	String result = "[";
+	try{
+		SMPLPair next = (SMPLPair) this.pair.getSecondEl();
+		while (next instanceof SMPLPair){
+			result = result + curr.toString() + ", ";
+			try{
+				curr = next.car();
+				next = (SMPLPair) next.cdr();
+			}catch (TypeException t){
+				break;
+			}
+		}
+	}catch (ClassCastException c){
+		result = result + curr.toString() + "]";
+	}
+	return result;
+    }
+
+
+
+
 }

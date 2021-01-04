@@ -18,5 +18,5 @@ deleteMin(heap);
 insert(heap, 2);
 insert(heap, -12);
 insert(heap, 11);
-print_heap(heap, count - 1);
+print_heap(heap);
 getMin(heap);

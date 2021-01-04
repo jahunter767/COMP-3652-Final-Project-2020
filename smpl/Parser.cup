@@ -162,6 +162,8 @@ non terminal Exp atom;
 non terminal Exp expr; // for all expressions
 non terminal Exp Defnexpr; // for all definition expressions 
 non terminal Exp ifexpr;
+non terminal Exp printexpr;
+
 non terminal Exp str; // for strings
 non terminal Exp concat; // for strings concat
 non terminal Substr Substr; // for substrings
@@ -172,6 +174,9 @@ non terminal Equal Equal; // for equals
 non terminal Exp Pair;// for pairs
 non terminal Exp List;// for list
 non terminal Exp Listconcat;// for list concat
+
+non terminal Exp call;
+non terminal Exp callArgs;
 
 non terminal Car Car; // for car
 non terminal Cdr Cdr; // for cdr
@@ -199,17 +204,36 @@ stmtList ::= stmtList:lst stmt:s {:
 		RESULT = new StmtSequence(s);
 		:}; // | expression:e {:RESULT = new StmtSequence(new Statement(e)); :};
 
-stmt ::= Listconcat:lst {:RESULT = new Statement(lst); :} |vectorOpAssign:v {: RESULT = new Statement(v); :}   | assignment:a {:RESULT = a; :}|let:l {: RESULT = new Statement(l); :} | case:c {: RESULT = new Statement(c); :} |ifStmt:i {: RESULT = new Statement(i); :}| read:r SEMI {: RESULT = new Statement(r); :} | print:p SEMI {: RESULT = p; :} | funDefn:func {: RESULT = func; :} | definition:d {: RESULT = d; :} | expression:a {: RESULT = new Statement(a); :} SEMI; // |conditionalExpression:conditional {: RESULT = new Statement(conditional); :}; // 
+
+
+
+stmt ::= Listconcat:lst {:RESULT = new Statement(lst); :} |
+ 	 call:c {: RESULT = new Statement(c); :} |
+	 vectorOpAssign:v {: RESULT = new Statement(v); :}   |
+	 assignment:a {:RESULT = a; :}|
+	 let:l {: RESULT = new Statement(l); :} |
+	 case:c {: RESULT = new Statement(c); :} |
+	 ifStmt:i {: RESULT = new Statement(i); :}|
+	 read:r SEMI {: RESULT = new Statement(r); :} |
+	 print:p SEMI {: RESULT = p; :} |
+	 funDefn:func {: RESULT = func; :} |
+	 definition:d {: RESULT = d; :} |
+	 expression:a {: RESULT = new Statement(a); :} SEMI;
+
+
+
+ 
 
 Defnexpr ::= Listconcat:lst {:RESULT = new Statement(lst); :}  |vectorOpAssign:v {: RESULT = new Statement(v); :} | case:c {: RESULT = new Statement(c); :} |ifStmt:i {: RESULT = new Statement(i); :} | expression:a SEMI {: RESULT = new Statement(a); :} | funDefn:func {: RESULT = func; :};
 
 expr ::=  Listconcat:lst {:RESULT = new Statement(lst); :} | vectorOpAssign:v {: RESULT = new Statement(v); :}  | case:c {: RESULT = new Statement(c); :} |ifStmt:i {: RESULT = new Statement(i); :} | expression:a {: RESULT = new Statement(a); :} | funDefn:func {: RESULT = func; :};
 
-ifexpr ::= ifStmt:i {: RESULT = new Statement(i); :} | expression:a {: RESULT = new Statement(a); :};
 
 
-print ::= PRINT LPAREN expr:e RPAREN {: RESULT = new StmtPrint(e); :} |
-		PRINTLN LPAREN expr:e RPAREN {: RESULT = new StmtPrintln(e); :};
+printexpr ::= Listconcat:lst {:RESULT = new Statement(lst); :} | call:c {: RESULT = new Statement(c); :} |vectorOpAssign:v {: RESULT = new Statement(v); :}   | assignment:a {:RESULT = a; :}|let:l {: RESULT = new Statement(l); :} | case:c {: RESULT = new Statement(c); :} |ifStmt:i {: RESULT = new Statement(i); :}| funDefn:func {: RESULT = func; :} | definition:d {: RESULT = d; :} | expression:a {: RESULT = new Statement(a); :};
+
+print ::= PRINT LPAREN printexpr:e RPAREN {: RESULT = new StmtPrint(e); :} |
+		PRINTLN LPAREN printexpr:e RPAREN {: RESULT = new StmtPrintln(e); :};
 
 read ::= READ LPAREN RPAREN {: RESULT = new ExpRead(); :} |
 		READINT LPAREN RPAREN {: RESULT = new ExpReadInt(); :};
@@ -293,7 +317,13 @@ argsE ::= args:aList {: RESULT = aList; :} | emptyA:e {: RESULT = e; :};
 
 
 funcall::= LPAREN funDefn:procedure RPAREN LPAREN argsE:arguments RPAREN{: RESULT = new ExpFunCall(procedure, arguments); :} |
-	 VAR:procedure LPAREN argsE:arguments RPAREN {: RESULT = new ExpFunCall(procedure, arguments); :}; //
+	 VAR:var LPAREN argsE:arguments RPAREN {: RESULT = new ExpFunCall(var, arguments); :}; //
+
+call ::= CALL LPAREN funcall:fcall COMMA callArgs:lst RPAREN {: RESULT = new ExpCall(fcall,lst); :}|
+	CALL LPAREN VAR:var COMMA callArgs:lst RPAREN {: RESULT = new ExpCall(var,lst); :};
+
+callArgs ::= List:lst {: RESULT = lst; :};// | VAR:v {:RESULT = v; :};
+
 
 //funcall ::= VAR:name LPAREN argsE:arguments RPAREN {: RESULT = new ExpFunCall(name, arguments); :};
 

@@ -87,22 +87,11 @@ def deleteMin proc(heap){
         min;
     }
     else{
-        println("Heap is empty");
+        println("You are trying to delete from an empty heap");
     };
     
 }
 
-def print_heap proc(heap, count){
-    if count < 0 then {
-        println("Heap is empty");
-    }
-    else{
-        if count < 1 then {
-            println(heap[0]);
-        }
-        else{
-            println(heap[count]);
-            print_heap(heap, count - 1);
-        };
-    };
+def print_heap proc(heap){
+    println(heap);
 }

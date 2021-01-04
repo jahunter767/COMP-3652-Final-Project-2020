@@ -180,6 +180,7 @@ non terminal Cdr Cdr; // for cdr
 non terminal Exp vector;// for vector
 non terminal ArrayList<Exp> vectorElementLst;
 non terminal Exp vectorOps;
+non terminal Exp vectorOpAssign;
 
 
 non terminal Exp empty;
@@ -198,11 +199,11 @@ stmtList ::= stmtList:lst stmt:s {:
 		RESULT = new StmtSequence(s);
 		:}; // | expression:e {:RESULT = new StmtSequence(new Statement(e)); :};
 
-stmt ::= Listconcat:lst {:RESULT = new Statement(lst); :} |vectorOps:v {: RESULT = new Statement(v); :}   | assignment:a {:RESULT = a; :}|let:l {: RESULT = new Statement(l); :} | case:c {: RESULT = new Statement(c); :} |ifStmt:i {: RESULT = new Statement(i); :}| read:r SEMI {: RESULT = new Statement(r); :} | print:p SEMI {: RESULT = p; :} | funDefn:func {: RESULT = func; :} | definition:d {: RESULT = d; :} | expression:a {: RESULT = new Statement(a); :} SEMI; // |conditionalExpression:conditional {: RESULT = new Statement(conditional); :}; // 
+stmt ::= Listconcat:lst {:RESULT = new Statement(lst); :} |vectorOpAssign:v {: RESULT = new Statement(v); :}   | assignment:a {:RESULT = a; :}|let:l {: RESULT = new Statement(l); :} | case:c {: RESULT = new Statement(c); :} |ifStmt:i {: RESULT = new Statement(i); :}| read:r SEMI {: RESULT = new Statement(r); :} | print:p SEMI {: RESULT = p; :} | funDefn:func {: RESULT = func; :} | definition:d {: RESULT = d; :} | expression:a {: RESULT = new Statement(a); :} SEMI; // |conditionalExpression:conditional {: RESULT = new Statement(conditional); :}; // 
 
-Defnexpr ::= Listconcat:lst {:RESULT = new Statement(lst); :}  |vectorOps:v {: RESULT = new Statement(v); :} | case:c {: RESULT = new Statement(c); :} |ifStmt:i {: RESULT = new Statement(i); :} | expression:a SEMI {: RESULT = new Statement(a); :} | funDefn:func {: RESULT = func; :};
+Defnexpr ::= Listconcat:lst {:RESULT = new Statement(lst); :}  |vectorOpAssign:v {: RESULT = new Statement(v); :} | case:c {: RESULT = new Statement(c); :} |ifStmt:i {: RESULT = new Statement(i); :} | expression:a SEMI {: RESULT = new Statement(a); :} | funDefn:func {: RESULT = func; :};
 
-expr ::=  Listconcat:lst {:RESULT = new Statement(lst); :} | vectorOps:v {: RESULT = new Statement(v); :}  | case:c {: RESULT = new Statement(c); :} |ifStmt:i {: RESULT = new Statement(i); :} | expression:a {: RESULT = new Statement(a); :} | funDefn:func {: RESULT = func; :};
+expr ::=  Listconcat:lst {:RESULT = new Statement(lst); :} | vectorOpAssign:v {: RESULT = new Statement(v); :}  | case:c {: RESULT = new Statement(c); :} |ifStmt:i {: RESULT = new Statement(i); :} | expression:a {: RESULT = new Statement(a); :} | funDefn:func {: RESULT = func; :};
 
 ifexpr ::= ifStmt:i {: RESULT = new Statement(i); :} | expression:a {: RESULT = new Statement(a); :};
 
@@ -238,12 +239,15 @@ vectorElementLst ::= vectorElementLst:lst COMMA expr:e {:
 			lst.add(e);
 			RESULT = lst; :};
 
-vectorOps ::= VAR:v LSQPAREN expr:i RSQPAREN SEMI {:
-				RESULT = new ExpGetVectEl(v, i); :} |
-			VAR:v LSQPAREN expr:i RSQPAREN ASSIGN expr:e SEMI {:
-				RESULT = new ExpSetVectEl(v, i, e); :} |
-			VAR:v DOT POP LPAREN expr:i RPAREN SEMI{:
+vectorOps ::= VAR:v LSQPAREN expr:i RSQPAREN {:
+				RESULT = new ExpGetVectEl(v, i); :}|
+			VAR:v DOT POP LPAREN expr:i RPAREN{:
 				RESULT = new ExpPopVectEl(v, i); :};
+
+
+
+vectorOpAssign ::= VAR:v LSQPAREN expr:i RSQPAREN ASSIGN expr:e SEMI{:RESULT = new ExpSetVectEl(v, i, e); :};
+
 
 
 
@@ -320,26 +324,28 @@ ifStmt ::= IF expression:e THEN compoundExpr:conseq else:alt SEMI {:
 else  ::= ELSE compoundExpr:alt {: RESULT = alt; :} |
 			empty {: RESULT = new ExpLit(); :};
 
+// testing
+ifStmt ::= IF expr:e THEN expr:e2 ELSE expr: e3 SEMI {: RESULT = new ExpIf(e, e2, e3); :} |
+		IF expr:e THEN expr:e2 SEMI {: RESULT = new ExpIf(e, e2, null); :};
+
+
 */
+
+
+
 //modified code
 
-ifStmt ::= IF expr:e THEN expr:conseq else:alt SEMI{:
+ifStmt ::= IF expression:e THEN expr:conseq else:alt SEMI{:
 				RESULT = new ExpIf(e, conseq, alt); :}|
-		IF expr:e THEN LBRACE stmtList:conseq RBRACE else:alt SEMI {:
+		IF expression:e THEN LBRACE stmtList:conseq RBRACE else:alt SEMI{:
 				RESULT = new ExpIf(e, conseq, alt); :};
 
 else  ::= ELSE expr:alt{: RESULT = alt; :}|
 		ELSE LBRACE stmtList:alt RBRACE{: RESULT = alt; :} |
 			empty {: RESULT = new ExpLit(); :};
 
-/*
 
 
-
-
-ifStmt ::= IF expr:e THEN expr:e2 ELSE expr: e3 SEMI {: RESULT = new ExpIf(e, e2, e3); :} |
-		IF expr:e THEN expr:e2 SEMI {: RESULT = new ExpIf(e, e2, null); :};
-*/
 let ::= LET LPAREN bindList:bindLst RPAREN LBRACE stmtList:b RBRACE  {:
 	 		RESULT = new ExpLet(bindLst, b); :};
 
@@ -415,6 +421,7 @@ atom ::= INT:ilit {: RESULT = new ExpLit<Integer>(ilit); :}|
 			CHAR:clit {: RESULT = new ExpLit<Character>(clit); :}|
 	  		List:lst {:RESULT = new Statement(lst); :} |
 			 vector:v {: RESULT = new Statement(v); :} |
+			vectorOps:vops {:RESULT = new Statement(vops);:}|
 			 NIL {: RESULT = new ExpList(); :}|
 			 LPAREN expression:a RPAREN {: RESULT = a; :} |
 			 funcall:fcall {:RESULT = fcall;:} |

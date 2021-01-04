@@ -315,6 +315,9 @@ pairElementLst ::= pairElementLst:lst COMMA expression:e {:
 		expression:e {:
 			ArrayList<Exp> lst = new ArrayList<Exp>();
 			lst.add(e);
+			RESULT = lst; :} |
+		empty {:
+			ArrayList<Exp> lst = new ArrayList<Exp>();
 			RESULT = lst; :};
 
 

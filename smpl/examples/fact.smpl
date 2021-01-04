@@ -3,4 +3,4 @@ def fact proc(n)
    then 1
    else n * fact(n - 1);
 
-fact(5)
+fact(5);

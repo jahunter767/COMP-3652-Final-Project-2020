@@ -91,7 +91,7 @@ non terminal Exp read;
 non terminal StmtDefinition definition;
 non terminal StmtAssignment assignment;
 
-non terminal Exp proc;
+non terminal StmtFunDefn proc;
 non terminal Exp body;
 non terminal StmtSequence compoundExpr;
 
@@ -261,10 +261,10 @@ vectorOps ::= VAR:v LSQPAREN expression:i RSQPAREN SEMI {:
 
 
 
-funDefn ::= /*proc:p  {: RESULT = p; :}; // | */ PROC LPAREN paramListE:parameters RPAREN LBRACE stmtList:statements RBRACE {: RESULT = new StmtFunDefn(parameters, statements); :} ; // PROC LPAREN paramListE:p RPAREN DEFINE expression:a SEMI {: RESULT = new StmtFunDefn(v,p,new StmtSequence(new Statement(a))); :} |  
+funDefn ::= proc:p  {: RESULT = p; :} | PROC LPAREN paramListE:parameters RPAREN LBRACE stmtList:statements RBRACE {: RESULT = new StmtFunDefn(parameters, statements); :} ; // PROC LPAREN paramListE:p RPAREN DEFINE expression:a SEMI {: RESULT = new StmtFunDefn(v,p,new StmtSequence(new Statement(a))); :} |  
 
 
-proc ::= PROC LPAREN paramListE:parameters RPAREN stmt:s {:RESULT = new StmtFunDefn(parameters,new StmtSequence(s)); :};
+proc ::= PROC LPAREN paramListE:parameters RPAREN stmt:s {:RESULT = new StmtFunDefn(parameters, new StmtSequence(s)); :};
 
 paramList ::= paramList:pList COMMA VAR:var {: 
 	pList.add(var);

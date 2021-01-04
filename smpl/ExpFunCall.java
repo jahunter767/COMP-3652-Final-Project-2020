@@ -7,19 +7,18 @@ public class ExpFunCall extends Exp {
     Exp procedure;
     String name;
     ArrayList<Exp> arguments;
-    // Implement this class
 
     protected ExpFunCall() {	// placeholder; can be removed eventually
 	super("Funcall");
     }
 
-    protected ExpFunCall(SMPLFunction proc, ArrayList<Exp> funcArgs) {	// placeholder; can be removed eventually
+    protected ExpFunCall(SMPLFunction proc, ArrayList<Exp> funcArgs) {	// placeholder; can be removed eventually 
 	super("Funcall",funcArgs);
 	this.procedure = null;
 	this.arguments = funcArgs;
     }
 
-    protected ExpFunCall(Exp proc, ArrayList<Exp> funcArgs) {	// placeholder; can be removed eventually
+    protected ExpFunCall(Exp proc, ArrayList<Exp> funcArgs) { // when there's a raw proc nd arguments
 	super("Funcall",funcArgs);
 	this.procedure = proc;
 	this.name = null;
@@ -27,7 +26,7 @@ public class ExpFunCall extends Exp {
     }
 
 
-    protected ExpFunCall(String proc, ArrayList<Exp> funcArgs) {	// placeholder; can be removed eventually
+    protected ExpFunCall(String proc, ArrayList<Exp> funcArgs) { // when there's a var nd arguments
 	super("Funcall",funcArgs);
 	this.procedure = null;
 	this.name = proc ;

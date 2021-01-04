@@ -1,10 +1,10 @@
-def heap [:0,0,1,0,0,0:];
+def v 1;
+def v1 0;
 
-def v 0;
-
-def hey proc(i){
-    heap[2] := 6;;
-    heap[ i + v ];
+if v - 1 = v1 then {
+    println(v - 1);
+    println(v1); // this is a comment
 }
-
-hey(2);
+else{
+    println(v - 1);
+};

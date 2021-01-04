@@ -91,7 +91,7 @@ non terminal Exp read;
 non terminal StmtDefinition definition;
 non terminal StmtAssignment assignment;
 
-non terminal Exp proc;
+non terminal StmtFunDefn proc;
 non terminal Exp body;
 non terminal StmtSequence compoundExpr;
 
@@ -257,7 +257,7 @@ funDefn ::= PROC LPAREN paramListE:parameters RPAREN LBRACE stmtList:statements 
 		PROC LPAREN paramListE:parameters RPAREN stmt:s {: RESULT = new StmtFunDefn(parameters, new StmtSequence(s)); :} ;
 
 
-proc ::= PROC LPAREN paramListE:parameters RPAREN stmt:s {:RESULT = new StmtFunDefn(parameters,new StmtSequence(s)); :};
+proc ::= PROC LPAREN paramListE:parameters RPAREN stmt:s {:RESULT = new StmtFunDefn(parameters, new StmtSequence(s)); :};
 
 paramList ::= paramList:pList COMMA VAR:var {: 
 	pList.add(var);

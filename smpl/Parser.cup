@@ -211,8 +211,8 @@ expr ::=  Listconcat:lst {:RESULT = new Statement(lst); :} | vectorOpAssign:v {:
 ifexpr ::= ifStmt:i {: RESULT = new Statement(i); :} | expression:a {: RESULT = new Statement(a); :};
 
 
-print ::= PRINT LPAREN expr:e RPAREN {: RESULT = new StmtPrint(e); :} |
-		PRINTLN LPAREN expr:e RPAREN {: RESULT = new StmtPrintln(e); :};
+print ::= PRINT LPAREN stmt:e RPAREN {: RESULT = new StmtPrint(e); :} |
+		PRINTLN LPAREN stmt:e RPAREN {: RESULT = new StmtPrintln(e); :};
 
 read ::= READ LPAREN RPAREN {: RESULT = new ExpRead(); :} |
 		READINT LPAREN RPAREN {: RESULT = new ExpReadInt(); :};

@@ -1,0 +1,17 @@
+def heap [:10, 9,  8, 7, 6, 5, 4, 3, 2, 1, 10000, 10000,  10000, 10000:];
+def count 10;
+
+heapify(heap, count / 2, count);
+deleteMin(heap);
+deleteMin(heap);
+deleteMin(heap);
+deleteMin(heap);
+insert(heap, 12);
+insert(heap, -2);
+insert(heap, 4);
+deleteMin(heap);
+deleteMin(heap);
+insert(heap, -6);
+insert(heap, 100);
+print_heap(heap, count - 1);
+getMin(heap);

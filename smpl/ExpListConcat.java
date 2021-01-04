@@ -2,7 +2,7 @@ public class ExpListConcat extends ExpBinOp {
 
 
     public ExpListConcat(Exp Obj1, Exp Obj2) {
-	super("ListConcat",Obj1, Obj2);
+	super("@",Obj1, Obj2);
     }
 
 

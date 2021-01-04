@@ -158,7 +158,7 @@ assignment ::= VAR:v ASSIGN expression:e SEMI {:
 
 
 compoundExpr ::= LBRACE stmtList:sList RBRACE {: RESULT = sList; :};/* |
-				expression:e RBRACE {: RESULT = e; :}; */
+				expression:e {: RESULT = e; :}; */
 
 
 expression ::= expression:e LSTCONCAT and:a {: RESULT = new ExpListConcat(e, a); :} |

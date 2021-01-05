@@ -103,6 +103,7 @@ hex = [0-9A-Fa-f]
 <YYINITIAL>	{space}"-"{space}	{return new Symbol(sym.MINUS);}
 <YYINITIAL>	{space}"*"{space}	{return new Symbol(sym.MUL);}
 <YYINITIAL>	{space}"/"{space}	{return new Symbol(sym.DIV);}
+<YYINITIAL>	{space}"/#"{space}	{return new Symbol(sym.INTDIV);}
 <YYINITIAL>	{space}"%"{space}	{return new Symbol(sym.MOD);}
 <YYINITIAL>	{space}"^"{space}	{return new Symbol(sym.EXP);}
 

@@ -56,7 +56,7 @@ terminal ASSIGN, EQUAL, COMMA, DOT, COLON, SEMI;
 terminal LSTCONCAT;
 
 // arithmetic operators
-terminal PLUS, MINUS, MUL, DIV, MOD, EXP;
+terminal PLUS, MINUS, MUL, DIV, MOD, INTDIV, EXP;
 
 // bit-wise operators
 terminal BIT_AND, BIT_OR, BIT_NOT;
@@ -203,6 +203,8 @@ term ::= term:t MUL power:p {:
 		term:t DIV power:p {:
 			RESULT = new ExpDiv(t, p); :} |
 		term:t MOD power:p {:
+			RESULT = new ExpMod(t, p); :} |
+		term:t INTDIV power:p {:
 			RESULT = new ExpMod(t, p); :} |
 		power:p {:
 			RESULT = p; :};

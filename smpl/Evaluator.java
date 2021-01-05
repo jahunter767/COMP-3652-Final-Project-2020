@@ -547,7 +547,15 @@ public class Evaluator implements Visitor<Environment<SMPLObject>, SMPLObject> {
 	val1 = exp.getExpL().visit(this, env);
 	val2 = exp.getExpR().visit(this, env);
 	return val1.mod(val2);
-    }
+	}
+	
+	public SMPLObject visitExpIntDiv(ExpIntDiv exp, Environment<SMPLObject> env)
+	throws VisitException {
+	SMPLObject val1, val2;
+	val1 = exp.getExpL().visit(this, env);
+	val2 = exp.getExpR().visit(this, env);
+	return val1.intDivide(val2);
+	}
 
     public SMPLObject visitExpPow(ExpPow exp, Environment<SMPLObject> env)
 	throws VisitException {

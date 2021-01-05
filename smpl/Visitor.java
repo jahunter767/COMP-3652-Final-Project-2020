@@ -79,6 +79,7 @@ public interface Visitor<S, T> {
     public T visitExpMul(ExpMul exp, S arg) throws VisitException;
     public T visitExpDiv(ExpDiv exp, S arg) throws VisitException;
     public T visitExpMod(ExpMod exp, S arg) throws VisitException;
+    public T visitExpIntDiv(ExpIntDiv exp,S arg) throws VisitException;
     public T visitExpPow(ExpPow exp, S arg) throws VisitException;
 
     public T visitExpVar(ExpVar exp, S arg) throws VisitException;

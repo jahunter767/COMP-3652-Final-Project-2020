@@ -118,6 +118,17 @@ public class SMPLNumbers extends SMPLObject<Double> {
     }else {
 		throw new TypeException();
 	}
+	}
+
+	public SMPLObject intDivide(SMPLObject object) throws TypeException {
+	if(object instanceof SMPLNumbers){
+		SMPLNumbers obj = (SMPLNumbers) object;
+		Double val2 = obj.getVal();
+		Double result = getVal() / val2;
+		return new SMPLNumbers(result.intValue());
+    }else {
+		throw new TypeException();
+	}
     }
 
 	public SMPLObject pow(SMPLObject object) throws TypeException {

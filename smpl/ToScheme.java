@@ -405,7 +405,14 @@ public class ToScheme implements Visitor<Void, String> {
 	String left = exp.getExpL().visit(this, arg);
 	String right = exp.getExpR().visit(this, arg);
 	return "(% " + left + " " + right + ")";
-    }
+	}
+	
+	public String visitExpIntDiv(ExpIntDiv exp, Void arg)
+	throws VisitException {
+	String left = exp.getExpL().visit(this, arg);
+	String right = exp.getExpR().visit(this, arg);
+	return "(/#" + left + " " + right + ")";
+	}
 
 	public String visitExpPow(ExpPow exp, Void arg)
 	throws VisitException{
